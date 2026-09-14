@@ -3,7 +3,7 @@ import SwiftUI
 /// NeonPixel brand tokens applied to Pocket Chef. Values match the approved
 /// Phase 1.4 visual identity (locked brand pink/teal plus supporting ink/cream neutrals).
 enum PCColor {
-    static let pink = Color(red: 255 / 255, green: 61 / 255, blue: 148 / 255)
+    static let pink = Color(red: 1.0, green: 61 / 255, blue: 148 / 255)
     static let teal = Color(red: 46 / 255, green: 196 / 255, blue: 182 / 255)
     static let deepTeal = Color(red: 62 / 255, green: 122 / 255, blue: 109 / 255)
     static let ink = Color(red: 20 / 255, green: 20 / 255, blue: 31 / 255)
