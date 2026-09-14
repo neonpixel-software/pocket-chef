@@ -8,7 +8,18 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
-      - run: echo "placeholder check, real build/test steps land with phase 1 scaffolding"
+      - name: Install xcodegen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build & test macOS
+        run: |
+          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
+            -destination 'platform=macOS' clean test
+      - name: Build & test iOS
+        run: |
+          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
+            -destination 'platform=iOS Simulator,name=iPhone 17' clean test
