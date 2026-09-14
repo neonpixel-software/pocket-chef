@@ -1,0 +1,60 @@
+name: PocketChef
+options:
+  bundleIdPrefix: com.neonpixel.pocketchef
+  deploymentTarget:
+    iOS: "26.0"
+    macOS: "26.0"
+
+settings:
+  base:
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_CFBundleDisplayName: Pocket Chef
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  PocketChef-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - Sources/PocketChef
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
+      INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+      INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+      TARGETED_DEVICE_FAMILY: "1,2"
+    scheme:
+      testTargets:
+        - PocketChef-iOSTests
+      gatherCoverageData: true
+
+  PocketChef-iOSTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests/PocketChefTests
+    dependencies:
+      - target: PocketChef-iOS
+
+  PocketChef-macOS:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/PocketChef
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
+      COMBINE_HIDPI_IMAGES: YES
+      ENABLE_HARDENED_RUNTIME: YES
+    scheme:
+      testTargets:
+        - PocketChef-macOSTests
+      gatherCoverageData: true
+
+  PocketChef-macOSTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests/PocketChefTests
+    dependencies:
+      - target: PocketChef-macOS
