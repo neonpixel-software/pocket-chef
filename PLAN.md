@@ -79,8 +79,10 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
   Acceptance: models compile, a recipe with ingredients and tags can be created and fetched in a unit test or preview.
 - [x] **1.3 Recipe list + detail view (read-only)** — basic list of saved recipes, tapping one shows title/ingredients/steps.
   Acceptance: seeding a couple of sample recipes via SwiftData shows them correctly on all three platforms.
+- [ ] **1.4 Visual design pass** — define the app's visual identity (color palette, typography, iconography, spacing/layout conventions) and apply it to the recipe list/detail views built in 1.3, replacing default system styling.
+  Acceptance: recipe list and detail views reflect a deliberate, documented visual style that reads consistently across macOS, iPadOS, and iOS.
 
-**Checkpoint:** app runs on Mac, iPad, iPhone; sample recipes persist and display. Review before continuing.
+**Checkpoint:** app runs on Mac, iPad, iPhone with the app's visual design applied; sample recipes persist and display. Review before continuing.
 
 ### Phase 2: Manual entry & review screen
 - [ ] **2.1 Structured entry/edit form** — title, ingredient lines (amount, unit, name, raw text), steps. This is both the no-AI fallback and the review screen every capture path lands on later.
