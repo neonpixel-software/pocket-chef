@@ -22,21 +22,63 @@ struct RecipeListView: View {
                         systemImage: "fork.knife"
                     )
                 } else {
-                    List(viewModel.recipes) { recipe in
-                        NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
-                            Text(recipe.title)
+                    ScrollView {
+                        LazyVStack(spacing: 12) {
+                            ForEach(viewModel.recipes) { recipe in
+                                NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+                                    RecipeRow(recipe: recipe)
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
+                        .padding(16)
                     }
                 }
             }
-            .navigationTitle("Recipes")
+            .background(PCColor.background)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                PCHeader(title: "Recipes")
+            }
+            .navigationTitle("")
         }
+        .tint(PCColor.pink)
         .task { viewModel.load() }
     }
 }
 
+private struct RecipeRow: View {
+    let recipe: Recipe
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(recipe.title)
+                    .font(PCFont.body(17, weight: .semibold))
+                    .foregroundStyle(PCColor.textPrimary)
+
+                if let tag = recipe.tags.first {
+                    Text(tag.name)
+                        .font(PCFont.body(11, weight: .bold))
+                        .foregroundStyle(PCColor.ink)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 3)
+                        .background(PCColor.teal, in: Capsule())
+                }
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(PCColor.textPrimary.opacity(0.35))
+        }
+        .padding(16)
+        .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 14))
+        .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
+    }
+}
+
 #Preview {
-    RecipeListView(viewModel: RecipeListViewModel(
+    PCFontRegistrar.registerCustomFonts()
+    return RecipeListView(viewModel: RecipeListViewModel(
         fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: PreviewRecipeRepository())
     ))
 }
