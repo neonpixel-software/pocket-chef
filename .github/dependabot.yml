@@ -1,0 +1,10 @@
+version: 2
+updates:
+  # Only ecosystem currently in use — the app has no SPM dependencies yet.
+  # Add a "swift" entry here once Package.swift shows up.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "03:00"
+      timezone: "UTC"
