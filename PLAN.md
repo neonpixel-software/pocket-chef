@@ -123,6 +123,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 ### Phase 7: Density API (.NET)
 - [ ] **7.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams-per-cup), basic persistence (Postgres or SQLite, whichever Nick prefers on the VPS).
   Acceptance: API runs locally, entries can be created/read directly against the database.
+  Also add a `nuget` ecosystem entry to `.github/dependabot.yml` once this project exists — it currently only watches `github-actions`.
 - [ ] **7.2 Read endpoint + low-privilege key** — public-ish read endpoint gated by a read-only API key.
   Acceptance: requests with a valid read key succeed; requests without one, or with a write key used as read, still succeed only for reads — a request with no key fails.
 - [ ] **7.3 Write endpoints + high-privilege key** — add/edit density entries, gated by a separate write key.
@@ -167,3 +168,4 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 
 - Recipe search/browse UX (by tag, by ingredient) — not discussed yet, reasonable default (search + tag filter) assumed but not specced.
 - Admin tooling for the density API beyond a basic script.
+- If Swift Package Manager dependencies are ever added (a `Package.swift` shows up), add a `swift` ecosystem entry to `.github/dependabot.yml` — not there yet since there's nothing for it to check.
