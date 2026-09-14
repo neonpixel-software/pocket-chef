@@ -41,13 +41,17 @@ jobs:
         run: |
           curl -sSLo build-wrapper-macosx-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-macosx-x86.zip
           unzip -q build-wrapper-macosx-x86.zip
-      - name: Build for analysis
+      - name: Build for analysis (iOS + macOS — the shared codebase has #if os(...) branches, so both must be compiled for build-wrapper to see all of it)
         run: |
           ./build-wrapper-macosx-x86/build-wrapper-macosx-x86 --out-dir bw-output \
             xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
               -destination 'generic/platform=iOS Simulator' clean build
+          ./build-wrapper-macosx-x86/build-wrapper-macosx-x86 --out-dir bw-output \
+            xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
+              -destination 'platform=macOS' clean build
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5
+        timeout-minutes: 10
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: SonarCloud Quality Gate
