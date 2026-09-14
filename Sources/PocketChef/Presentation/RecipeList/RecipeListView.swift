@@ -40,9 +40,3 @@ struct RecipeListView: View {
         fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: PreviewRecipeRepository())
     ))
 }
-
-private struct PreviewRecipeRepository: RecipeRepository {
-    func fetchAll() throws -> [Recipe] {
-        SampleData.recipes
-    }
-}
