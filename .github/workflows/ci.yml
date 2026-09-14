@@ -23,3 +23,35 @@ jobs:
         run: |
           xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
             -destination 'platform=iOS Simulator,name=iPhone 17' clean test
+
+  sonarcloud:
+    runs-on: macos-26
+    needs: build
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Install xcodegen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Ensure Rosetta is available (build-wrapper is x86_64-only)
+        run: softwareupdate --install-rosetta --agree-to-license
+      - name: Download build-wrapper
+        run: |
+          curl -sSLo build-wrapper-macosx-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-macosx-x86.zip
+          unzip -q build-wrapper-macosx-x86.zip
+      - name: Build for analysis
+        run: |
+          ./build-wrapper-macosx-x86/build-wrapper-macosx-x86 --out-dir bw-output \
+            xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
+              -destination 'generic/platform=iOS Simulator' clean build
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
