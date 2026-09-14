@@ -20,6 +20,7 @@ targets:
     sources:
       - Sources/PocketChef
     settings:
+      PRODUCT_MODULE_NAME: PocketChef
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
       INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
       INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
@@ -43,6 +44,7 @@ targets:
     sources:
       - Sources/PocketChef
     settings:
+      PRODUCT_MODULE_NAME: PocketChef
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
       COMBINE_HIDPI_IMAGES: YES
       ENABLE_HARDENED_RUNTIME: YES
