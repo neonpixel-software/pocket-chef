@@ -77,7 +77,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
   Acceptance: app builds and runs on all three platform simulators/destinations with an empty root view.
 - [x] **1.2 SwiftData model layer** — `Recipe`, `IngredientLine`, `Tag`, `DensityEntry` models per the data model above, local-only (no CloudKit yet).
   Acceptance: models compile, a recipe with ingredients and tags can be created and fetched in a unit test or preview.
-- [ ] **1.3 Recipe list + detail view (read-only)** — basic list of saved recipes, tapping one shows title/ingredients/steps.
+- [x] **1.3 Recipe list + detail view (read-only)** — basic list of saved recipes, tapping one shows title/ingredients/steps.
   Acceptance: seeding a couple of sample recipes via SwiftData shows them correctly on all three platforms.
 
 **Checkpoint:** app runs on Mac, iPad, iPhone; sample recipes persist and display. Review before continuing.
