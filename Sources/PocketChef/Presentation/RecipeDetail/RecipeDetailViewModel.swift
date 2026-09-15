@@ -4,6 +4,8 @@ import Observation
 @Observable
 final class RecipeDetailViewModel {
     var recipe: Recipe
+    var isPresentingEdit = false
+    var isPresentingDeleteConfirmation = false
     private(set) var errorMessage: String?
     private(set) var isDeleted = false
 

@@ -1,9 +1,7 @@
 import SwiftUI
 
 struct RecipeDetailView: View {
-    @State private var viewModel: RecipeDetailViewModel
-    @State private var isPresentingEdit = false
-    @State private var isPresentingDeleteConfirmation = false
+    @Bindable private var viewModel: RecipeDetailViewModel
     @Environment(\.dismiss) private var dismiss
 
     /// Invoked whenever this recipe is edited or deleted, so the list that pushed this
@@ -11,14 +9,8 @@ struct RecipeDetailView: View {
     /// re-triggered on macOS, so the list can't rely on lifecycle events alone.
     private let onRecipeChanged: () -> Void
 
-    /// Test-only hook (ViewInspector's documented pattern for inspecting views with local
-    /// @State, e.g. isPresentingEdit/isPresentingDeleteConfirmation below, which unlike the
-    /// viewModel's own properties have no externally-held reference a test can read/mutate
-    /// directly). Never set outside of tests.
-    internal var didAppear: ((Self) -> Void)?
-
     init(viewModel: RecipeDetailViewModel, onRecipeChanged: @escaping () -> Void = {}) {
-        _viewModel = State(initialValue: viewModel)
+        _viewModel = Bindable(viewModel)
         self.onRecipeChanged = onRecipeChanged
     }
 
@@ -93,13 +85,13 @@ struct RecipeDetailView: View {
         .navigationTitle("")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Edit") { isPresentingEdit = true }
+                Button("Edit") { viewModel.isPresentingEdit = true }
             }
             ToolbarItem(placement: .destructiveAction) {
-                Button("Delete", role: .destructive) { isPresentingDeleteConfirmation = true }
+                Button("Delete", role: .destructive) { viewModel.isPresentingDeleteConfirmation = true }
             }
         }
-        .sheet(isPresented: $isPresentingEdit) {
+        .sheet(isPresented: $viewModel.isPresentingEdit) {
             RecipeFormView(viewModel: viewModel.makeEditFormViewModel()) { saved in
                 viewModel.recipe = saved
                 onRecipeChanged()
@@ -107,7 +99,7 @@ struct RecipeDetailView: View {
         }
         .confirmationDialog(
             "Delete this recipe?",
-            isPresented: $isPresentingDeleteConfirmation,
+            isPresented: $viewModel.isPresentingDeleteConfirmation,
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) { viewModel.delete() }
@@ -120,7 +112,6 @@ struct RecipeDetailView: View {
             }
         }
         .tint(PCColor.pink)
-        .onAppear { self.didAppear?(self) }
     }
 
     @ViewBuilder

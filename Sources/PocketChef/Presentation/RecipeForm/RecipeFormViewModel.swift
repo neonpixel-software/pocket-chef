@@ -41,13 +41,22 @@ struct IngredientLineDraft: Identifiable, Equatable {
     }
 }
 
+struct StepDraft: Identifiable, Equatable {
+    let id: UUID
+    var text: String
+
+    init(id: UUID = UUID(), text: String = "") {
+        self.id = id
+        self.text = text
+    }
+}
+
 @Observable
 final class RecipeFormViewModel {
     var title: String
     var ingredients: [IngredientLineDraft]
-    var steps: [String]
+    var steps: [StepDraft]
     private(set) var errorMessage: String?
-    private(set) var isSaving = false
 
     private let mode: RecipeFormMode
     private let createRecipeUseCase: CreateRecipeUseCase
@@ -70,7 +79,7 @@ final class RecipeFormViewModel {
         case .edit(let recipe):
             title = recipe.title
             ingredients = recipe.ingredients.map { IngredientLineDraft(ingredientLine: $0) }
-            steps = recipe.steps
+            steps = recipe.steps.map { StepDraft(text: $0) }
         }
     }
 
@@ -98,7 +107,7 @@ final class RecipeFormViewModel {
     }
 
     func addStep() {
-        steps.append("")
+        steps.append(StepDraft())
     }
 
     func removeStep(at index: Int) {
@@ -121,9 +130,6 @@ final class RecipeFormViewModel {
         guard canSave else { return nil }
 
         let recipe = buildRecipe()
-
-        isSaving = true
-        defer { isSaving = false }
 
         do {
             switch mode {
@@ -166,7 +172,7 @@ final class RecipeFormViewModel {
             )
         }
         let builtSteps = steps
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
 
         switch mode {

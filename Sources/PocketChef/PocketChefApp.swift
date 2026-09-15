@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct PocketChefApp: App {
     private let modelContainer: ModelContainer
+    private let recipeRepository: RecipeRepository
 
     init() {
         PCFontRegistrar.registerCustomFonts()
@@ -13,6 +14,7 @@ struct PocketChefApp: App {
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
+        recipeRepository = SwiftDataRecipeRepository(modelContext: modelContainer.mainContext)
 
         #if DEBUG
         modelContainer.mainContext.seedSampleDataIfNeeded()
@@ -21,12 +23,11 @@ struct PocketChefApp: App {
 
     var body: some Scene {
         WindowGroup {
-            let repository = SwiftDataRecipeRepository(modelContext: modelContainer.mainContext)
             RecipeListView(viewModel: RecipeListViewModel(
-                fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: repository),
-                createRecipeUseCase: DefaultCreateRecipeUseCase(repository: repository),
-                updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: repository),
-                deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: repository)
+                fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: recipeRepository),
+                createRecipeUseCase: DefaultCreateRecipeUseCase(repository: recipeRepository),
+                updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: recipeRepository),
+                deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: recipeRepository)
             ))
         }
         .modelContainer(modelContainer)

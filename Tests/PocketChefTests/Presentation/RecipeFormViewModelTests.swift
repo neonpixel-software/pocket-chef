@@ -59,7 +59,7 @@ final class RecipeFormViewModelTests: XCTestCase {
         let viewModel = makeViewModel(mode: .edit(original))
 
         XCTAssertEqual(viewModel.title, "Pancakes")
-        XCTAssertEqual(viewModel.steps, ["Mix", "Cook"])
+        XCTAssertEqual(viewModel.steps.map(\.text), ["Mix", "Cook"])
         XCTAssertEqual(viewModel.ingredients.first?.amount, "2")
         XCTAssertEqual(viewModel.ingredients.first?.unit, "cup")
         XCTAssertEqual(viewModel.ingredients.first?.ingredientName, "flour")
@@ -139,18 +139,31 @@ final class RecipeFormViewModelTests: XCTestCase {
         let viewModel = makeViewModel(mode: .create)
 
         viewModel.addStep()
-        viewModel.steps[0] = "Mix"
+        viewModel.steps[0].text = "Mix"
         viewModel.addStep()
-        viewModel.steps[1] = "Cook"
+        viewModel.steps[1].text = "Cook"
 
         viewModel.moveStepDown(at: 0)
-        XCTAssertEqual(viewModel.steps, ["Cook", "Mix"])
+        XCTAssertEqual(viewModel.steps.map(\.text), ["Cook", "Mix"])
 
         viewModel.moveStepUp(at: 1)
-        XCTAssertEqual(viewModel.steps, ["Mix", "Cook"])
+        XCTAssertEqual(viewModel.steps.map(\.text), ["Mix", "Cook"])
 
         viewModel.removeStep(at: 0)
-        XCTAssertEqual(viewModel.steps, ["Cook"])
+        XCTAssertEqual(viewModel.steps.map(\.text), ["Cook"])
+    }
+
+    func testStepIdentityStaysStableAcrossMoves() {
+        let viewModel = makeViewModel(mode: .create)
+
+        viewModel.addStep()
+        viewModel.addStep()
+        let firstID = viewModel.steps[0].id
+        let secondID = viewModel.steps[1].id
+
+        viewModel.moveStepDown(at: 0)
+
+        XCTAssertEqual(viewModel.steps.map(\.id), [secondID, firstID])
     }
 
     // MARK: save — create
@@ -164,7 +177,7 @@ final class RecipeFormViewModelTests: XCTestCase {
         viewModel.ingredients[0].unit = "cups"
         viewModel.ingredients[0].ingredientName = "flour"
         viewModel.addStep()
-        viewModel.steps[0] = "  Mix well  "
+        viewModel.steps[0].text = "  Mix well  "
 
         let saved = viewModel.save()
 
@@ -188,7 +201,7 @@ final class RecipeFormViewModelTests: XCTestCase {
         viewModel.ingredients[1].ingredientName = "salt" // only name filled
         viewModel.addStep() // blank, should be dropped
         viewModel.addStep()
-        viewModel.steps[1] = "Simmer"
+        viewModel.steps[1].text = "Simmer"
 
         let saved = viewModel.save()
 

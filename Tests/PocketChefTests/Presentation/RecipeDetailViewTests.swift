@@ -64,26 +64,19 @@ final class RecipeDetailViewTests: XCTestCase {
             updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
             deleteRecipeUseCase: deleteUseCase
         )
-        var sut = RecipeDetailView(viewModel: viewModel)
+        let sut = RecipeDetailView(viewModel: viewModel)
 
-        // Local @State (isPresentingDeleteConfirmation) only reflects a tap once the view is
-        // actually hosted and re-rendered, unlike the viewModel's own properties — hence the
-        // didAppear hook instead of a bare `.inspect()` call before/after tapping.
-        let exp = sut.on(\.didAppear) { view in
-            XCTAssertThrowsError(try view.find(ViewType.ConfirmationDialog.self))
+        XCTAssertThrowsError(try sut.inspect().find(ViewType.ConfirmationDialog.self))
 
-            try view.find(button: "Delete").tap()
+        try sut.inspect().find(button: "Delete").tap()
+        XCTAssertTrue(viewModel.isPresentingDeleteConfirmation)
 
-            let dialog = try view.find(ViewType.ConfirmationDialog.self)
-            XCTAssertEqual(try dialog.title().string(), "Delete this recipe?")
-            try dialog.actions().find(button: "Delete").tap()
+        let dialog = try sut.inspect().find(ViewType.ConfirmationDialog.self)
+        XCTAssertEqual(try dialog.title().string(), "Delete this recipe?")
+        try dialog.actions().find(button: "Delete").tap()
 
-            XCTAssertEqual(deleteUseCase.executedIDs, [recipe.id])
-            XCTAssertTrue(viewModel.isDeleted)
-        }
-        ViewHosting.host(view: sut)
-        defer { ViewHosting.expel() }
-        wait(for: [exp], timeout: 1)
+        XCTAssertEqual(deleteUseCase.executedIDs, [recipe.id])
+        XCTAssertTrue(viewModel.isDeleted)
     }
 
     func testCancellingConfirmationDialogDoesNotCallDelete() throws {
@@ -94,22 +87,17 @@ final class RecipeDetailViewTests: XCTestCase {
             updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
             deleteRecipeUseCase: deleteUseCase
         )
-        var sut = RecipeDetailView(viewModel: viewModel)
+        let sut = RecipeDetailView(viewModel: viewModel)
 
-        let exp = sut.on(\.didAppear) { view in
-            try view.find(button: "Delete").tap()
-            let dialog = try view.find(ViewType.ConfirmationDialog.self)
-            try dialog.actions().find(button: "Cancel").tap()
+        try sut.inspect().find(button: "Delete").tap()
+        let dialog = try sut.inspect().find(ViewType.ConfirmationDialog.self)
+        try dialog.actions().find(button: "Cancel").tap()
 
-            XCTAssertTrue(deleteUseCase.executedIDs.isEmpty)
-            XCTAssertFalse(viewModel.isDeleted)
-        }
-        ViewHosting.host(view: sut)
-        defer { ViewHosting.expel() }
-        wait(for: [exp], timeout: 1)
+        XCTAssertTrue(deleteUseCase.executedIDs.isEmpty)
+        XCTAssertFalse(viewModel.isDeleted)
     }
 
-    func testTappingEditTogglesEditSheetPresentedState() throws {
+    func testTappingEditSetsPresentingEditOnViewModel() throws {
         let viewModel = RecipeDetailViewModel(
             recipe: makeRecipe(),
             createRecipeUseCase: NoOpCreateRecipeUseCase(),
@@ -118,8 +106,8 @@ final class RecipeDetailViewTests: XCTestCase {
         )
         let sut = RecipeDetailView(viewModel: viewModel)
 
-        // Tapping Edit shouldn't throw, and the toolbar should still be intact afterward.
+        XCTAssertFalse(viewModel.isPresentingEdit)
         try sut.inspect().find(button: "Edit").tap()
-        XCTAssertNoThrow(try sut.inspect().find(button: "Edit"))
+        XCTAssertTrue(viewModel.isPresentingEdit)
     }
 }

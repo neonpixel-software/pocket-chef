@@ -34,10 +34,10 @@ struct RecipeFormView: View {
 
                     formSection(title: "Steps", accent: PCColor.pink) {
                         VStack(spacing: 12) {
-                            ForEach(Array(viewModel.steps.enumerated()), id: \.offset) { index, _ in
+                            ForEach(Array(viewModel.steps.enumerated()), id: \.element.id) { index, _ in
                                 StepRow(
                                     stepNumber: index + 1,
-                                    text: $viewModel.steps[index],
+                                    text: $viewModel.steps[index].text,
                                     canMoveUp: index > 0,
                                     canMoveDown: index < viewModel.steps.count - 1,
                                     onMoveUp: { viewModel.moveStepUp(at: index) },

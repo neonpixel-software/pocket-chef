@@ -60,7 +60,7 @@ struct RecipeListView: View {
             }
         }
         .tint(PCColor.pink)
-        .onAppear { viewModel.load() }
+        .task { viewModel.load() }
     }
 }
 

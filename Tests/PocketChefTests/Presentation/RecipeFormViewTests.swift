@@ -142,18 +142,18 @@ final class RecipeFormViewTests: XCTestCase {
         )
         viewModel.addStep()
         viewModel.addStep()
-        viewModel.steps[0] = "Mix"
-        viewModel.steps[1] = "Cook"
+        viewModel.steps[0].text = "Mix"
+        viewModel.steps[1].text = "Cook"
         let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
 
         let moveDownButtons = try sut.inspect().findAll(where: { try $0.accessibilityLabel().string() == "Move down" })
         XCTAssertEqual(moveDownButtons.count, 2)
         try moveDownButtons[0].button().tap()
-        XCTAssertEqual(viewModel.steps, ["Cook", "Mix"])
+        XCTAssertEqual(viewModel.steps.map(\.text), ["Cook", "Mix"])
 
         let deleteButtons = try sut.inspect().findAll(where: { try $0.accessibilityLabel().string() == "Delete" })
         try deleteButtons[1].button().tap()
-        XCTAssertEqual(viewModel.steps, ["Cook"])
+        XCTAssertEqual(viewModel.steps.map(\.text), ["Cook"])
     }
 
     func testEditModeRendersPrefilledTitleIngredientsAndSteps() throws {
