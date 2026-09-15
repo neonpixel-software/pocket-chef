@@ -5,6 +5,7 @@ import SwiftData
 struct PocketChefApp: App {
     private let modelContainer: ModelContainer
     private let recipeRepository: RecipeRepository
+    private let tagRepository: TagRepository
 
     init() {
         PCFontRegistrar.registerCustomFonts()
@@ -15,6 +16,9 @@ struct PocketChefApp: App {
             fatalError("Failed to create ModelContainer: \(error)")
         }
         recipeRepository = SwiftDataRecipeRepository(modelContext: modelContainer.mainContext)
+        tagRepository = SwiftDataTagRepository(modelContext: modelContainer.mainContext)
+
+        modelContainer.mainContext.seedPresetTagsIfNeeded()
 
         #if DEBUG
         modelContainer.mainContext.seedSampleDataIfNeeded()
@@ -27,7 +31,9 @@ struct PocketChefApp: App {
                 fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: recipeRepository),
                 createRecipeUseCase: DefaultCreateRecipeUseCase(repository: recipeRepository),
                 updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: recipeRepository),
-                deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: recipeRepository)
+                deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: recipeRepository),
+                fetchTagsUseCase: DefaultFetchTagsUseCase(repository: tagRepository),
+                findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository)
             ))
         }
         .modelContainer(modelContainer)

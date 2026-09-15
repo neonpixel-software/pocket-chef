@@ -136,3 +136,30 @@ existing `Recipe.tags` field, saved through the existing
 - **View tests** (ViewInspector, per the established pattern from Phase
   2.1 — see `reference-viewinspector` memory): tag chip rendering/toggling
   on both `RecipeFormView` and `RecipeListView`.
+
+## Addendum: found during implementation
+
+- **`RecipeDetailView` now displays assigned tags too** (a small chip row
+  above Ingredients), not called out in the original design — an obvious
+  gap once the form let you assign multiple tags and the list showed them
+  all: viewing a recipe's full detail without seeing its tags would be an
+  inconsistent experience.
+- **Real bug in `seedPresetTagsIfNeeded()`, found via manual testing**: the
+  first implementation bailed out entirely if *any* `isPreset == true` tag
+  already existed (`guard presetCount == 0`). On the dev store carried over
+  from Phase 2.1 manual testing, two ad-hoc "Breakfast"/"Dinner" tags from
+  `SampleData` already satisfied that guard, so Lunch/Dessert/Snack never
+  got seeded — confirmed live (filter row showed only 2 of 5 presets).
+  Fixed to check each preset name individually and insert only the missing
+  ones, matching "ensure presets exist" semantics rather than "seed once
+  ever."
+- **`buildRecipe()` hardened against a save-before-load race**: an existing
+  Phase 2.1 test (`testSaveInEditModePreservesOriginalIdentitySourceAndTagsAndCallsUpdateUseCase`)
+  failed once `tags: []`/`tags: original.tags` was replaced with the
+  selected-tags computation, because it never called `loadTags()` first, so
+  `allTags` was empty and `allTags.filter { selectedTagIDs.contains($0.id) }`
+  dropped the pre-selected original tags entirely. Rather than just fixing
+  the test, `buildRecipe()` now falls back to `initialTags` for any
+  selected id not (yet) found in `allTags`, so a save that somehow races
+  ahead of `loadTags()` still preserves the recipe's original tags instead
+  of silently dropping them.

@@ -24,20 +24,39 @@ private struct FakeDeleteRecipeUseCase: DeleteRecipeUseCase {
     }
 }
 
+private struct NoOpFetchTagsUseCase: FetchTagsUseCase {
+    func execute() throws -> [Tag] { [] }
+}
+
+private struct NoOpFindOrCreateTagUseCase: FindOrCreateTagUseCase {
+    func execute(name: String) throws -> Tag {
+        Tag(id: UUID(), name: name, isPreset: false)
+    }
+}
+
 private struct UseCaseFailure: LocalizedError {
     var errorDescription: String? { "Something went wrong" }
+}
+
+private func makeViewModel(
+    recipe: Recipe,
+    deleteRecipeUseCase: FakeDeleteRecipeUseCase = FakeDeleteRecipeUseCase()
+) -> RecipeDetailViewModel {
+    RecipeDetailViewModel(
+        recipe: recipe,
+        createRecipeUseCase: NoOpCreateRecipeUseCase(),
+        updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
+        deleteRecipeUseCase: deleteRecipeUseCase,
+        fetchTagsUseCase: NoOpFetchTagsUseCase(),
+        findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
+    )
 }
 
 final class RecipeDetailViewModelTests: XCTestCase {
     func testDeleteSetsIsDeletedOnSuccess() {
         let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
         var deletedID: UUID?
-        let viewModel = RecipeDetailViewModel(
-            recipe: recipe,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: FakeDeleteRecipeUseCase(onExecute: { deletedID = $0 })
-        )
+        let viewModel = makeViewModel(recipe: recipe, deleteRecipeUseCase: FakeDeleteRecipeUseCase(onExecute: { deletedID = $0 }))
 
         viewModel.delete()
 
@@ -48,12 +67,7 @@ final class RecipeDetailViewModelTests: XCTestCase {
 
     func testDeleteSetsErrorMessageAndLeavesIsDeletedFalseOnFailure() {
         let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
-        let viewModel = RecipeDetailViewModel(
-            recipe: recipe,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: FakeDeleteRecipeUseCase(result: .failure(UseCaseFailure()))
-        )
+        let viewModel = makeViewModel(recipe: recipe, deleteRecipeUseCase: FakeDeleteRecipeUseCase(result: .failure(UseCaseFailure())))
 
         viewModel.delete()
 
@@ -63,12 +77,7 @@ final class RecipeDetailViewModelTests: XCTestCase {
 
     func testMakeEditFormViewModelPrefillsFromCurrentRecipe() {
         let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
-        let viewModel = RecipeDetailViewModel(
-            recipe: recipe,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: FakeDeleteRecipeUseCase()
-        )
+        let viewModel = makeViewModel(recipe: recipe)
 
         let formViewModel = viewModel.makeEditFormViewModel()
 
