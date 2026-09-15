@@ -13,6 +13,11 @@ settings:
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
 
+packages:
+  ViewInspector:
+    url: https://github.com/nalexn/ViewInspector
+    exactVersion: 0.10.3
+
 targets:
   PocketChef-iOS:
     type: application
@@ -37,6 +42,7 @@ targets:
       - Tests/PocketChefTests
     dependencies:
       - target: PocketChef-iOS
+      - package: ViewInspector
 
   PocketChef-macOS:
     type: application
@@ -60,3 +66,4 @@ targets:
       - Tests/PocketChefTests
     dependencies:
       - target: PocketChef-macOS
+      - package: ViewInspector

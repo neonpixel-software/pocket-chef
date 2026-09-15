@@ -190,14 +190,17 @@ private struct RowControls: View {
                 Image(systemName: "chevron.up")
             }
             .disabled(!canMoveUp)
+            .accessibilityLabel("Move up")
             Button(action: onMoveDown) {
                 Image(systemName: "chevron.down")
             }
             .disabled(!canMoveDown)
+            .accessibilityLabel("Move down")
             Button(action: onDelete) {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundStyle(PCColor.pink)
             }
+            .accessibilityLabel("Delete")
         }
         .font(.system(size: 15, weight: .semibold))
         .foregroundStyle(PCColor.textPrimary.opacity(0.55))

@@ -11,6 +11,12 @@ struct RecipeDetailView: View {
     /// re-triggered on macOS, so the list can't rely on lifecycle events alone.
     private let onRecipeChanged: () -> Void
 
+    /// Test-only hook (ViewInspector's documented pattern for inspecting views with local
+    /// @State, e.g. isPresentingEdit/isPresentingDeleteConfirmation below, which unlike the
+    /// viewModel's own properties have no externally-held reference a test can read/mutate
+    /// directly). Never set outside of tests.
+    internal var didAppear: ((Self) -> Void)?
+
     init(viewModel: RecipeDetailViewModel, onRecipeChanged: @escaping () -> Void = {}) {
         _viewModel = State(initialValue: viewModel)
         self.onRecipeChanged = onRecipeChanged
@@ -114,6 +120,7 @@ struct RecipeDetailView: View {
             }
         }
         .tint(PCColor.pink)
+        .onAppear { self.didAppear?(self) }
     }
 
     @ViewBuilder

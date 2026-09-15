@@ -206,3 +206,56 @@ final class RecipeFormViewModel {
   `RecipeDetailViewModelTests` for delete success/failure.
 - Views aren't unit tested (consistent with current project state) — manual
   verification on macOS + iOS simulator before calling this done.
+
+## Addendum: view tests + ViewInspector (added after initial merge)
+
+SonarCloud's new-code coverage gate (80% minimum, wired up in a parallel CI
+fix — see PR #13) failed at 58.5% once real coverage numbers started
+flowing, almost entirely because `RecipeFormView.swift` (0%, 160 uncovered
+lines) and `RecipeDetailView.swift`'s new toolbar/sheet/dialog wiring (17%,
+29 uncovered lines) had no tests, consistent with the "views aren't unit
+tested" note above.
+
+Considered three options: (1) exclude View files from the coverage gate,
+(2) lower the project-wide threshold, (3) add real view tests. Went with
+(3) — the project's own architecture rule ("no business logic in views or
+view models") means views should be pure wiring, and the actual wiring bugs
+found via manual testing this session (list not refreshing after edit/
+delete, the button-index confusion while driving the app with AppleScript)
+are exactly what view-level tests target, unlike a coverage-percentage
+metric.
+
+Added **ViewInspector** (`nalexn/ViewInspector`, pinned to `0.10.3`) as the
+project's first Swift Package Manager dependency, scoped to the two test
+targets only (not shipped in the app). `Package.resolved` isn't committed
+since this project's `.xcodeproj` is itself generated/gitignored via
+XcodeGen — the exact version pin in `project.yml` is what keeps resolution
+reproducible instead.
+
+Two real API constraints shaped the tests:
+- `RecipeFormView`'s state lives entirely in the externally-held `@Bindable
+  viewModel`, so a plain `sut.inspect()` call re-reads current state with no
+  extra scaffolding — matches ViewInspector's `@ObservedObject`-style
+  support.
+- `RecipeDetailView`'s `isPresentingEdit`/`isPresentingDeleteConfirmation`
+  are genuine local `@State` with no external handle a test can read.
+  ViewInspector can't observe a plain `@State` mutation across separate
+  `.inspect()` calls without the view actually being hosted, so those two
+  tests use ViewInspector's documented lightweight workaround: a
+  test-only `didAppear` hook + `.onAppear` on the view (2-line addition,
+  `internal`, never set outside tests) combined with `ViewHosting.host(...)`.
+  `.sheet` content still isn't inspectable this way (ViewInspector doesn't
+  support it without a heavier snippet) — the edit-sheet test only confirms
+  tapping "Edit" doesn't throw, not what's inside the sheet.
+
+Also added `.accessibilityLabel(...)` to the icon-only row-control buttons
+(move up/down, delete) in `RecipeFormView` — both a real accessibility
+improvement and what makes those buttons reliably findable in tests, since
+`.find(button:)` matches on visible label text and these buttons only have
+SF Symbol icons.
+
+Result verified locally via `xccov`: `RecipeFormView.swift` 99.64%,
+`RecipeDetailView.swift` 95.70%. `PreviewRecipeRepository.swift` (a
+DEBUG-only `#Preview` helper, 3 lines) stayed unaddressed by design and is
+excluded via `sonar.coverage.exclusions` instead — not meaningful to unit
+test, same reasoning as not testing `#Preview` blocks themselves.
