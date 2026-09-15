@@ -7,6 +7,10 @@ private struct FakeRecipeRepository: RecipeRepository {
     func fetchAll() throws -> [Recipe] {
         try result.get()
     }
+
+    func create(_ recipe: Recipe) throws {}
+    func update(_ recipe: Recipe) throws {}
+    func delete(id: UUID) throws {}
 }
 
 private struct RepositoryFailure: Error, Equatable {}

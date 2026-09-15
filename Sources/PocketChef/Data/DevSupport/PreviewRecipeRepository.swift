@@ -6,5 +6,9 @@ struct PreviewRecipeRepository: RecipeRepository {
     func fetchAll() throws -> [Recipe] {
         SampleData.recipes
     }
+
+    func create(_ recipe: Recipe) throws {}
+    func update(_ recipe: Recipe) throws {}
+    func delete(id: UUID) throws {}
 }
 #endif

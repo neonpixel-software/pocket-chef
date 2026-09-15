@@ -56,4 +56,85 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
 
         XCTAssertEqual(recipes.first?.source, .url(url))
     }
+
+    func testCreateInsertsRecipeRetrievableByFetchAll() throws {
+        let context = try makeInMemoryContext()
+        let repository = SwiftDataRecipeRepository(modelContext: context)
+        let recipe = Recipe(
+            id: UUID(),
+            title: "Waffles",
+            ingredients: [IngredientLine(id: UUID(), rawText: "2 cups flour", amount: 2, unit: "cup", ingredientName: "flour")],
+            steps: ["Cook in waffle iron"],
+            source: .typed,
+            tags: []
+        )
+
+        try repository.create(recipe)
+
+        let recipes = try repository.fetchAll()
+        XCTAssertEqual(recipes, [recipe])
+    }
+
+    func testUpdateReplacesFieldsAndIngredientsWithoutOrphaningOldRows() throws {
+        let context = try makeInMemoryContext()
+        let recipeID = UUID()
+        context.insert(RecipeModel(
+            id: recipeID,
+            title: "Original Title",
+            steps: ["Old step"],
+            isTypedSource: true,
+            ingredients: [IngredientLineModel(rawText: "1 old ingredient")]
+        ))
+        try context.save()
+
+        let repository = SwiftDataRecipeRepository(modelContext: context)
+        let updated = Recipe(
+            id: recipeID,
+            title: "New Title",
+            ingredients: [IngredientLine(id: UUID(), rawText: "2 cups sugar", amount: 2, unit: "cup", ingredientName: "sugar")],
+            steps: ["New step"],
+            source: .typed,
+            tags: []
+        )
+
+        try repository.update(updated)
+
+        let recipes = try repository.fetchAll()
+        XCTAssertEqual(recipes, [updated])
+
+        let remainingIngredients = try context.fetch(FetchDescriptor<IngredientLineModel>())
+        XCTAssertEqual(remainingIngredients.map(\.rawText), ["2 cups sugar"])
+    }
+
+    func testUpdateThrowsRecipeNotFoundForUnknownID() throws {
+        let context = try makeInMemoryContext()
+        let repository = SwiftDataRecipeRepository(modelContext: context)
+        let recipe = Recipe(id: UUID(), title: "Ghost", ingredients: [], steps: [], source: .typed, tags: [])
+
+        XCTAssertThrowsError(try repository.update(recipe)) { error in
+            XCTAssertEqual(error as? RecipeRepositoryError, .recipeNotFound)
+        }
+    }
+
+    func testDeleteRemovesRecipe() throws {
+        let context = try makeInMemoryContext()
+        let recipeID = UUID()
+        context.insert(RecipeModel(id: recipeID, title: "Waffles", steps: ["Cook"], isTypedSource: true))
+        try context.save()
+
+        let repository = SwiftDataRecipeRepository(modelContext: context)
+        try repository.delete(id: recipeID)
+
+        let recipes = try repository.fetchAll()
+        XCTAssertEqual(recipes, [])
+    }
+
+    func testDeleteThrowsRecipeNotFoundForUnknownID() throws {
+        let context = try makeInMemoryContext()
+        let repository = SwiftDataRecipeRepository(modelContext: context)
+
+        XCTAssertThrowsError(try repository.delete(id: UUID())) { error in
+            XCTAssertEqual(error as? RecipeRepositoryError, .recipeNotFound)
+        }
+    }
 }

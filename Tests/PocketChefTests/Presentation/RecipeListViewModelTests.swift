@@ -9,14 +9,42 @@ private struct FakeFetchRecipesUseCase: FetchRecipesUseCase {
     }
 }
 
+private struct NoOpCreateRecipeUseCase: CreateRecipeUseCase {
+    func execute(_ recipe: Recipe) throws {}
+}
+
+private struct NoOpUpdateRecipeUseCase: UpdateRecipeUseCase {
+    func execute(_ recipe: Recipe) throws {}
+}
+
+private struct FakeDeleteRecipeUseCase: DeleteRecipeUseCase {
+    var result: Result<Void, Error> = .success(())
+
+    func execute(id: UUID) throws {
+        try result.get()
+    }
+}
+
 private struct UseCaseFailure: LocalizedError {
     var errorDescription: String? { "Something went wrong" }
+}
+
+private func makeViewModel(
+    fetchResult: Result<[Recipe], Error> = .success([]),
+    deleteResult: Result<Void, Error> = .success(())
+) -> RecipeListViewModel {
+    RecipeListViewModel(
+        fetchRecipesUseCase: FakeFetchRecipesUseCase(result: fetchResult),
+        createRecipeUseCase: NoOpCreateRecipeUseCase(),
+        updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
+        deleteRecipeUseCase: FakeDeleteRecipeUseCase(result: deleteResult)
+    )
 }
 
 final class RecipeListViewModelTests: XCTestCase {
     func testLoadPopulatesRecipesOnSuccess() {
         let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
-        let viewModel = RecipeListViewModel(fetchRecipesUseCase: FakeFetchRecipesUseCase(result: .success([recipe])))
+        let viewModel = makeViewModel(fetchResult: .success([recipe]))
 
         viewModel.load()
 
@@ -25,7 +53,7 @@ final class RecipeListViewModelTests: XCTestCase {
     }
 
     func testLoadSetsErrorMessageOnFailureAndClearsRecipes() {
-        let viewModel = RecipeListViewModel(fetchRecipesUseCase: FakeFetchRecipesUseCase(result: .failure(UseCaseFailure())))
+        let viewModel = makeViewModel(fetchResult: .failure(UseCaseFailure()))
 
         viewModel.load()
 
@@ -41,7 +69,12 @@ final class RecipeListViewModelTests: XCTestCase {
             if call == 1 { throw UseCaseFailure() }
             return [recipe]
         }
-        let viewModel = RecipeListViewModel(fetchRecipesUseCase: useCase)
+        let viewModel = RecipeListViewModel(
+            fetchRecipesUseCase: useCase,
+            createRecipeUseCase: NoOpCreateRecipeUseCase(),
+            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
+            deleteRecipeUseCase: FakeDeleteRecipeUseCase()
+        )
 
         viewModel.load()
         XCTAssertNotNil(viewModel.errorMessage)
@@ -50,6 +83,46 @@ final class RecipeListViewModelTests: XCTestCase {
 
         XCTAssertNil(viewModel.errorMessage)
         XCTAssertEqual(viewModel.recipes, [recipe])
+    }
+
+    func testDeleteRemovesRecipeFromListOnSuccess() {
+        let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
+        let viewModel = makeViewModel(fetchResult: .success([recipe]))
+        viewModel.load()
+
+        viewModel.delete(recipe)
+
+        XCTAssertEqual(viewModel.recipes, [])
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testDeleteSetsErrorMessageOnFailureAndKeepsRecipe() {
+        let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
+        let viewModel = makeViewModel(fetchResult: .success([recipe]), deleteResult: .failure(UseCaseFailure()))
+        viewModel.load()
+
+        viewModel.delete(recipe)
+
+        XCTAssertEqual(viewModel.recipes, [recipe])
+        XCTAssertEqual(viewModel.errorMessage, "Something went wrong")
+    }
+
+    func testMakeNewRecipeFormViewModelStartsBlank() {
+        let viewModel = makeViewModel()
+
+        let formViewModel = viewModel.makeNewRecipeFormViewModel()
+
+        XCTAssertEqual(formViewModel.title, "")
+        XCTAssertFalse(formViewModel.canSave)
+    }
+
+    func testMakeDetailViewModelCarriesTheGivenRecipe() {
+        let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
+        let viewModel = makeViewModel()
+
+        let detailViewModel = viewModel.makeDetailViewModel(for: recipe)
+
+        XCTAssertEqual(detailViewModel.recipe, recipe)
     }
 }
 
