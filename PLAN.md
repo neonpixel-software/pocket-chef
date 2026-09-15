@@ -85,7 +85,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 **Checkpoint:** app runs on Mac, iPad, iPhone with the app's visual design applied; sample recipes persist and display. Review before continuing.
 
 ### Phase 2: Manual entry & review screen
-- [ ] **2.1 Structured entry/edit form** — title, ingredient lines (amount, unit, name, raw text), steps. This is both the no-AI fallback and the review screen every capture path lands on later.
+- [x] **2.1 Structured entry/edit form** — title, ingredient lines (amount, unit, name, raw text), steps. This is both the no-AI fallback and the review screen every capture path lands on later.
   Acceptance: a recipe can be created, edited, and deleted entirely by hand; changes persist via SwiftData.
 
 **Checkpoint:** full manual CRUD works end-to-end on all platforms.

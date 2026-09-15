@@ -21,10 +21,12 @@ struct PocketChefApp: App {
 
     var body: some Scene {
         WindowGroup {
+            let repository = SwiftDataRecipeRepository(modelContext: modelContainer.mainContext)
             RecipeListView(viewModel: RecipeListViewModel(
-                fetchRecipesUseCase: DefaultFetchRecipesUseCase(
-                    repository: SwiftDataRecipeRepository(modelContext: modelContainer.mainContext)
-                )
+                fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: repository),
+                createRecipeUseCase: DefaultCreateRecipeUseCase(repository: repository),
+                updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: repository),
+                deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: repository)
             ))
         }
         .modelContainer(modelContainer)

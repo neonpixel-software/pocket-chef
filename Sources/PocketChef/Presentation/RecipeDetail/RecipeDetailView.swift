@@ -1,7 +1,22 @@
 import SwiftUI
 
 struct RecipeDetailView: View {
-    let recipe: Recipe
+    @State private var viewModel: RecipeDetailViewModel
+    @State private var isPresentingEdit = false
+    @State private var isPresentingDeleteConfirmation = false
+    @Environment(\.dismiss) private var dismiss
+
+    /// Invoked whenever this recipe is edited or deleted, so the list that pushed this
+    /// screen can refresh — NavigationStack's `.onAppear` on pop-back isn't reliably
+    /// re-triggered on macOS, so the list can't rely on lifecycle events alone.
+    private let onRecipeChanged: () -> Void
+
+    init(viewModel: RecipeDetailViewModel, onRecipeChanged: @escaping () -> Void = {}) {
+        _viewModel = State(initialValue: viewModel)
+        self.onRecipeChanged = onRecipeChanged
+    }
+
+    private var recipe: Recipe { viewModel.recipe }
 
     var body: some View {
         ScrollView {
@@ -70,6 +85,34 @@ struct RecipeDetailView: View {
             PCHeader(title: recipe.title)
         }
         .navigationTitle("")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Edit") { isPresentingEdit = true }
+            }
+            ToolbarItem(placement: .destructiveAction) {
+                Button("Delete", role: .destructive) { isPresentingDeleteConfirmation = true }
+            }
+        }
+        .sheet(isPresented: $isPresentingEdit) {
+            RecipeFormView(viewModel: viewModel.makeEditFormViewModel()) { saved in
+                viewModel.recipe = saved
+                onRecipeChanged()
+            }
+        }
+        .confirmationDialog(
+            "Delete this recipe?",
+            isPresented: $isPresentingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) { viewModel.delete() }
+            Button("Cancel", role: .cancel) {}
+        }
+        .onChange(of: viewModel.isDeleted) { _, isDeleted in
+            if isDeleted {
+                onRecipeChanged()
+                dismiss()
+            }
+        }
         .tint(PCColor.pink)
     }
 
@@ -97,6 +140,11 @@ struct RecipeDetailView: View {
 #Preview {
     PCFontRegistrar.registerCustomFonts()
     return NavigationStack {
-        RecipeDetailView(recipe: SampleData.recipes[0])
+        RecipeDetailView(viewModel: RecipeDetailViewModel(
+            recipe: SampleData.recipes[0],
+            createRecipeUseCase: DefaultCreateRecipeUseCase(repository: PreviewRecipeRepository()),
+            updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: PreviewRecipeRepository()),
+            deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: PreviewRecipeRepository())
+        ))
     }
 }

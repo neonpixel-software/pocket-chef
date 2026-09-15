@@ -23,10 +23,14 @@ entirely by hand; changes persist via SwiftData.
   `RecipeDetailView`.
 - **Navigation**: `+` toolbar button on `RecipeListView` → sheet with a blank
   form. `RecipeDetailView` gets "Edit" (sheet, pre-filled) and "Delete"
-  (confirmation dialog) toolbar actions. List also gets swipe-to-delete on
-  rows. The list reloads via `.onAppear` (not `.task`) so it naturally
-  refreshes after any create/edit/delete flow completes, without needing
-  cross-view-model callbacks.
+  (confirmation dialog) toolbar actions. List rows get a context-menu delete
+  (native `.swipeActions` requires `List`, and this app's rows are custom
+  cards in a `ScrollView`, not `List`). The list refreshes via an explicit
+  `onRecipeChanged` callback passed down into `RecipeDetailView`, invoked on
+  successful edit/delete — confirmed by manual testing that `.onAppear`
+  alone is *not* reliably re-triggered when popping back from a pushed
+  `NavigationStack` destination on macOS, so relying on it left the list
+  showing stale data after an edit or delete.
 
 ## Domain layer
 
@@ -144,11 +148,19 @@ final class RecipeFormViewModel {
 
 `save()`:
 - No-ops (returns `nil`) if `!canSave`.
-- Builds `[IngredientLine]`: skips a draft row only if *all three* fields
-  are blank; otherwise composes `rawText` by joining the non-empty trimmed
-  parts with spaces (e.g. `"2 cups flour"`), parses `amount` via
-  `Double(trimmed)` (nil if unparseable — no error, it just won't structure
-  for unit conversion later).
+- Builds `[IngredientLine]`: if *all three* structured fields are blank, the
+  row is dropped **unless** it was hydrated from an existing line that had
+  a non-empty `rawText` with no structured data (e.g. a raw AI-captured
+  ingredient, or hand-seeded sample data) — that original `rawText` is
+  preserved as-is instead of being silently deleted. (Found via manual
+  testing: editing "Pancakes" from `SampleData`, which has a raw-only
+  `"1 egg"` line, and saving without touching that row used to drop the
+  egg entirely, since the structured-only UI has no field to represent a
+  line with no parseable amount/unit/name.) Otherwise composes `rawText`
+  by joining the non-empty trimmed parts with spaces (e.g.
+  `"2 cups flour"`), parses `amount` via `Double(trimmed)` (nil if
+  unparseable — no error, it just won't structure for unit conversion
+  later).
 - Filters `steps` to non-blank, trimmed entries.
 - `.create`: fresh `UUID()`, `source: .typed`, `tags: []`, calls
   `createRecipeUseCase.execute(recipe)`.
