@@ -45,14 +45,22 @@ jobs:
         run: |
           curl -sSLo build-wrapper-macosx-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-macosx-x86.zip
           unzip -q build-wrapper-macosx-x86.zip
-      - name: Build for analysis (iOS + macOS — the shared codebase has #if os(...) branches, so both must be compiled for build-wrapper to see all of it)
+      - name: Test for analysis and coverage (iOS + macOS — the shared codebase has #if os(...) branches, so both must be compiled for build-wrapper to see all of it; -enableCodeCoverage feeds SonarCloud's new-code coverage gate, which otherwise always reads 0%)
         run: |
           ./build-wrapper-macosx-x86/build-wrapper-macosx-x86 --out-dir bw-output \
             xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
-              -destination 'generic/platform=iOS Simulator' clean build
+              -destination 'platform=iOS Simulator,name=iPhone 17' \
+              -enableCodeCoverage YES -resultBundlePath ios.xcresult \
+              clean test
           ./build-wrapper-macosx-x86/build-wrapper-macosx-x86 --out-dir bw-output \
             xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
-              -destination 'platform=macOS' clean build
+              -destination 'platform=macOS' \
+              -enableCodeCoverage YES -resultBundlePath macos.xcresult \
+              clean test
+      - name: Convert coverage to SonarCloud's generic format
+        run: |
+          Scripts/xccov-to-sonarqube-generic.sh ios.xcresult > coverage-ios.xml
+          Scripts/xccov-to-sonarqube-generic.sh macos.xcresult > coverage-macos.xml
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v8
         timeout-minutes: 10
