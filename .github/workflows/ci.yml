@@ -11,8 +11,6 @@ jobs:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
       - name: Install xcodegen
         run: brew install xcodegen
       - name: Generate Xcode project
@@ -33,17 +31,36 @@ jobs:
         run: |
           Scripts/xccov-to-sonarqube-generic.sh ios.xcresult > coverage-ios.xml
           Scripts/xccov-to-sonarqube-generic.sh macos.xcresult > coverage-macos.xml
-      # Dependabot-triggered pull_request runs don't get repo secrets (GitHub
-      # security measure), so SONAR_TOKEN is unavailable and these steps would
-      # always fail — skip them for those PRs; the build/test steps above still run.
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage-ios.xml
+            coverage-macos.xml
+          retention-days: 1
+
+  sonarcloud:
+    runs-on: macos-26
+    needs: build
+    # Dependabot-triggered pull_request runs don't get repo secrets (GitHub
+    # security measure), so SONAR_TOKEN is unavailable and this job would
+    # always fail — skip it for those PRs; the build job still runs.
+    if: github.actor != 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Download coverage reports (built once by the build job, not regenerated here)
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
       - name: SonarCloud Scan
-        if: github.actor != 'dependabot[bot]'
         uses: SonarSource/sonarqube-scan-action@v8
         timeout-minutes: 10
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: SonarCloud Quality Gate
-        if: github.actor != 'dependabot[bot]'
         uses: SonarSource/sonarqube-quality-gate-action@v1
         timeout-minutes: 5
         env:
