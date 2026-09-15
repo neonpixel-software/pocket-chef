@@ -49,6 +49,32 @@ struct RecipeFormView: View {
                         }
                     }
 
+                    formSection(title: "Tags", accent: PCColor.deepTeal) {
+                        FlowLayout(spacing: 8) {
+                            ForEach(viewModel.allTags) { tag in
+                                TagChip(
+                                    title: tag.name,
+                                    isSelected: viewModel.selectedTagIDs.contains(tag.id),
+                                    action: { viewModel.toggleTag(tag) }
+                                )
+                            }
+
+                            if viewModel.isAddingNewTag {
+                                TextField("Tag name", text: $viewModel.newTagName)
+                                    .font(PCFont.body(13, weight: .semibold))
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(PCColor.surface, in: Capsule())
+                                    .frame(width: 120)
+                                    .onSubmit { viewModel.confirmNewTag() }
+                            } else {
+                                TagChip(title: "+ New Tag", isSelected: false) {
+                                    viewModel.beginAddingNewTag()
+                                }
+                            }
+                        }
+                    }
+
                     if let errorMessage = viewModel.errorMessage {
                         Text(errorMessage)
                             .font(PCFont.body(13))
@@ -59,6 +85,7 @@ struct RecipeFormView: View {
             }
             .background(PCColor.background)
             .navigationTitle("Recipe")
+            .task { viewModel.loadTags() }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -215,7 +242,9 @@ private struct RowControls: View {
         viewModel: RecipeFormViewModel(
             mode: .create,
             createRecipeUseCase: DefaultCreateRecipeUseCase(repository: PreviewRecipeRepository()),
-            updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: PreviewRecipeRepository())
+            updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: PreviewRecipeRepository()),
+            fetchTagsUseCase: DefaultFetchTagsUseCase(repository: PreviewTagRepository()),
+            findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: PreviewTagRepository())
         ),
         onSave: { _ in }
     )

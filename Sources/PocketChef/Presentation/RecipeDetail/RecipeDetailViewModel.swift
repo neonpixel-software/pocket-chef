@@ -12,24 +12,32 @@ final class RecipeDetailViewModel {
     private let createRecipeUseCase: CreateRecipeUseCase
     private let updateRecipeUseCase: UpdateRecipeUseCase
     private let deleteRecipeUseCase: DeleteRecipeUseCase
+    private let fetchTagsUseCase: FetchTagsUseCase
+    private let findOrCreateTagUseCase: FindOrCreateTagUseCase
 
     init(
         recipe: Recipe,
         createRecipeUseCase: CreateRecipeUseCase,
         updateRecipeUseCase: UpdateRecipeUseCase,
-        deleteRecipeUseCase: DeleteRecipeUseCase
+        deleteRecipeUseCase: DeleteRecipeUseCase,
+        fetchTagsUseCase: FetchTagsUseCase,
+        findOrCreateTagUseCase: FindOrCreateTagUseCase
     ) {
         self.recipe = recipe
         self.createRecipeUseCase = createRecipeUseCase
         self.updateRecipeUseCase = updateRecipeUseCase
         self.deleteRecipeUseCase = deleteRecipeUseCase
+        self.fetchTagsUseCase = fetchTagsUseCase
+        self.findOrCreateTagUseCase = findOrCreateTagUseCase
     }
 
     func makeEditFormViewModel() -> RecipeFormViewModel {
         RecipeFormViewModel(
             mode: .edit(recipe),
             createRecipeUseCase: createRecipeUseCase,
-            updateRecipeUseCase: updateRecipeUseCase
+            updateRecipeUseCase: updateRecipeUseCase,
+            fetchTagsUseCase: fetchTagsUseCase,
+            findOrCreateTagUseCase: findOrCreateTagUseCase
         )
     }
 
