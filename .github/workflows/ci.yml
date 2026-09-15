@@ -15,46 +15,48 @@ jobs:
         run: brew install xcodegen
       - name: Generate Xcode project
         run: xcodegen generate
-      - name: Build & test macOS
-        run: |
-          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
-            -destination 'platform=macOS' clean test
       - name: Build & test iOS
         run: |
           xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
-            -destination 'platform=iOS Simulator,name=iPhone 17' clean test
+            -destination 'platform=iOS Simulator,name=iPhone 17' \
+            -enableCodeCoverage YES -resultBundlePath ios.xcresult \
+            clean test
+      - name: Build & test macOS
+        run: |
+          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
+            -destination 'platform=macOS' \
+            -enableCodeCoverage YES -resultBundlePath macos.xcresult \
+            clean test
+      - name: Convert coverage to SonarCloud's generic format
+        run: |
+          Scripts/xccov-to-sonarqube-generic.sh ios.xcresult > coverage-ios.xml
+          Scripts/xccov-to-sonarqube-generic.sh macos.xcresult > coverage-macos.xml
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage-ios.xml
+            coverage-macos.xml
+          retention-days: 1
 
   sonarcloud:
     runs-on: macos-26
     needs: build
     # Dependabot-triggered pull_request runs don't get repo secrets (GitHub
     # security measure), so SONAR_TOKEN is unavailable and this job would
-    # always fail — skip it for those PRs; build/test still run.
+    # always fail — skip it for those PRs; the build job still runs.
     if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Install xcodegen
-        run: brew install xcodegen
-      - name: Generate Xcode project
-        run: xcodegen generate
-      - name: Ensure Rosetta is available (build-wrapper is x86_64-only)
-        run: softwareupdate --install-rosetta --agree-to-license
-      - name: Download build-wrapper
-        run: |
-          curl -sSLo build-wrapper-macosx-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-macosx-x86.zip
-          unzip -q build-wrapper-macosx-x86.zip
-      - name: Build for analysis (iOS + macOS — the shared codebase has #if os(...) branches, so both must be compiled for build-wrapper to see all of it)
-        run: |
-          ./build-wrapper-macosx-x86/build-wrapper-macosx-x86 --out-dir bw-output \
-            xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
-              -destination 'generic/platform=iOS Simulator' clean build
-          ./build-wrapper-macosx-x86/build-wrapper-macosx-x86 --out-dir bw-output \
-            xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
-              -destination 'platform=macOS' clean build
+      - name: Download coverage reports (built once by the build job, not regenerated here)
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v8
         timeout-minutes: 10
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
