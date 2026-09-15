@@ -54,7 +54,7 @@ jobs:
             xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
               -destination 'platform=macOS' clean build
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v8
         timeout-minutes: 10
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
