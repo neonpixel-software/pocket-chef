@@ -11,62 +11,39 @@ jobs:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v7
-      - name: Install xcodegen
-        run: brew install xcodegen
-      - name: Generate Xcode project
-        run: xcodegen generate
-      - name: Build & test macOS
-        run: |
-          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
-            -destination 'platform=macOS' clean test
-      - name: Build & test iOS
-        run: |
-          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
-            -destination 'platform=iOS Simulator,name=iPhone 17' clean test
-
-  sonarcloud:
-    runs-on: macos-26
-    needs: build
-    # Dependabot-triggered pull_request runs don't get repo secrets (GitHub
-    # security measure), so SONAR_TOKEN is unavailable and this job would
-    # always fail — skip it for those PRs; build/test still run.
-    if: github.actor != 'dependabot[bot]'
-    steps:
-      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Install xcodegen
         run: brew install xcodegen
       - name: Generate Xcode project
         run: xcodegen generate
-      - name: Ensure Rosetta is available (build-wrapper is x86_64-only)
-        run: softwareupdate --install-rosetta --agree-to-license
-      - name: Download build-wrapper
+      - name: Build & test iOS
         run: |
-          curl -sSLo build-wrapper-macosx-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-macosx-x86.zip
-          unzip -q build-wrapper-macosx-x86.zip
-      - name: Test for analysis and coverage (iOS + macOS — the shared codebase has #if os(...) branches, so both must be compiled for build-wrapper to see all of it; -enableCodeCoverage feeds SonarCloud's new-code coverage gate, which otherwise always reads 0%)
+          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
+            -destination 'platform=iOS Simulator,name=iPhone 17' \
+            -enableCodeCoverage YES -resultBundlePath ios.xcresult \
+            clean test
+      - name: Build & test macOS
         run: |
-          ./build-wrapper-macosx-x86/build-wrapper-macosx-x86 --out-dir bw-output \
-            xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
-              -destination 'platform=iOS Simulator,name=iPhone 17' \
-              -enableCodeCoverage YES -resultBundlePath ios.xcresult \
-              clean test
-          ./build-wrapper-macosx-x86/build-wrapper-macosx-x86 --out-dir bw-output \
-            xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
-              -destination 'platform=macOS' \
-              -enableCodeCoverage YES -resultBundlePath macos.xcresult \
-              clean test
+          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
+            -destination 'platform=macOS' \
+            -enableCodeCoverage YES -resultBundlePath macos.xcresult \
+            clean test
       - name: Convert coverage to SonarCloud's generic format
         run: |
           Scripts/xccov-to-sonarqube-generic.sh ios.xcresult > coverage-ios.xml
           Scripts/xccov-to-sonarqube-generic.sh macos.xcresult > coverage-macos.xml
+      # Dependabot-triggered pull_request runs don't get repo secrets (GitHub
+      # security measure), so SONAR_TOKEN is unavailable and these steps would
+      # always fail — skip them for those PRs; the build/test steps above still run.
       - name: SonarCloud Scan
+        if: github.actor != 'dependabot[bot]'
         uses: SonarSource/sonarqube-scan-action@v8
         timeout-minutes: 10
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: SonarCloud Quality Gate
+        if: github.actor != 'dependabot[bot]'
         uses: SonarSource/sonarqube-quality-gate-action@v1
         timeout-minutes: 5
         env:
