@@ -58,9 +58,14 @@ match or inserts+returns a new `TagModel(name:, isPreset: false)`.
 
 **Preset seeding**: `ModelContext.seedPresetTagsIfNeeded()` (mirrors the
 existing DEBUG-only `seedSampleDataIfNeeded()` shape, but called
-unconditionally from `PocketChefApp.init()`): if no `isPreset == true`
-tag exists yet, inserts the five presets. Idempotent — a second call is a
-no-op.
+unconditionally from `PocketChefApp.init()`): inserts each preset from
+`Tag.presetNames` whose name (case-insensitive) doesn't already exist
+among *any* tag, preset or custom — not gated on the `isPreset` flag. This
+means a pre-existing custom tag named "Snack" blocks the preset "Snack"
+from ever being seeded (keeping its `isPreset: false`) rather than the two
+coexisting as near-duplicates; deliberate, not an oversight — see the
+Addendum below for how this was arrived at. Idempotent — a second call is
+a no-op once every preset name is present under some tag.
 
 **Tag *assignment* persistence — the part that has to be careful**:
 `SwiftDataRecipeRepository.update()` currently has a comment saying tags
@@ -163,3 +168,21 @@ existing `Recipe.tags` field, saved through the existing
   selected id not (yet) found in `allTags`, so a save that somehow races
   ahead of `loadTags()` still preserves the recipe's original tags instead
   of silently dropping them.
+
+## Addendum: review round fixes (PR #14)
+
+- `Recipe.toModel()` no longer maps `tags` at all (was constructing
+  throwaway `TagModel` instances immediately overwritten by
+  `resolveTagModels` in `create()`) — `RecipeModel`'s `tags` defaults to
+  `[]`, and the repository always resolves tags explicitly.
+- `Tag.presetNames` is now the single source of truth for the preset list,
+  referenced by `seedPresetTagsIfNeeded()` instead of a second hardcoded
+  array.
+- `seedPresetTagsIfNeeded()`'s `save()` failure is now logged instead of
+  silently swallowed via `try?` — presets are load-bearing enough (an
+  empty filter row is a visible regression) to be worth surfacing even
+  without a logging framework in place yet.
+- Left as-is, per the review's own "not a blocker" framing: `findOrCreate`
+  fetching all tags per call (fine at this tag-count scale), and the
+  view models' pass-through-DI-container shape (same pattern already
+  deferred in PR #12's review, now at 6-7 dependencies).

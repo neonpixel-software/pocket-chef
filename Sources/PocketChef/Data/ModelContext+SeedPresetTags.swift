@@ -11,13 +11,19 @@ extension ModelContext {
     /// missing the newly-added presets.
     func seedPresetTagsIfNeeded() {
         let existingNames = Set(((try? fetch(FetchDescriptor<TagModel>())) ?? []).map { $0.name.lowercased() })
-        let missingPresets = ["Breakfast", "Lunch", "Dinner", "Dessert", "Snack"]
-            .filter { !existingNames.contains($0.lowercased()) }
+        let missingPresets = Tag.presetNames.filter { !existingNames.contains($0.lowercased()) }
         guard !missingPresets.isEmpty else { return }
 
         for name in missingPresets {
             insert(TagModel(name: name, isPreset: true))
         }
-        try? save()
+
+        do {
+            try save()
+        } catch {
+            // Presets are load-bearing (an empty filter row is a visible regression), so a
+            // silent failure here is worth surfacing even without a logging framework yet.
+            print("Failed to seed preset tags: \(error)")
+        }
     }
 }
