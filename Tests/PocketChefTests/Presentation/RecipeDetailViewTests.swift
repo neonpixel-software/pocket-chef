@@ -18,19 +18,38 @@ private final class RecordingDeleteRecipeUseCase: DeleteRecipeUseCase {
     }
 }
 
+private struct NoOpFetchTagsUseCase: FetchTagsUseCase {
+    func execute() throws -> [Tag] { [] }
+}
+
+private struct NoOpFindOrCreateTagUseCase: FindOrCreateTagUseCase {
+    func execute(name: String) throws -> Tag {
+        Tag(id: UUID(), name: name, isPreset: false)
+    }
+}
+
+private func makeViewModel(
+    recipe: Recipe,
+    deleteRecipeUseCase: DeleteRecipeUseCase = RecordingDeleteRecipeUseCase()
+) -> RecipeDetailViewModel {
+    RecipeDetailViewModel(
+        recipe: recipe,
+        createRecipeUseCase: NoOpCreateRecipeUseCase(),
+        updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
+        deleteRecipeUseCase: deleteRecipeUseCase,
+        fetchTagsUseCase: NoOpFetchTagsUseCase(),
+        findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
+    )
+}
+
 @MainActor
 final class RecipeDetailViewTests: XCTestCase {
-    private func makeRecipe(ingredients: [IngredientLine] = [], steps: [String] = []) -> Recipe {
-        Recipe(id: UUID(), title: "Waffles", ingredients: ingredients, steps: steps, source: .typed, tags: [])
+    private func makeRecipe(ingredients: [IngredientLine] = [], steps: [String] = [], tags: [Tag] = []) -> Recipe {
+        Recipe(id: UUID(), title: "Waffles", ingredients: ingredients, steps: steps, source: .typed, tags: tags)
     }
 
     func testEmptyIngredientsAndStepsShowPlaceholderText() throws {
-        let viewModel = RecipeDetailViewModel(
-            recipe: makeRecipe(),
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: RecordingDeleteRecipeUseCase()
-        )
+        let viewModel = makeViewModel(recipe: makeRecipe())
         let sut = RecipeDetailView(viewModel: viewModel)
 
         XCTAssertNoThrow(try sut.inspect().find(text: "No ingredients listed"))
@@ -42,12 +61,7 @@ final class RecipeDetailViewTests: XCTestCase {
             ingredients: [IngredientLine(id: UUID(), rawText: "2 cups flour")],
             steps: ["Mix", "Cook"]
         )
-        let viewModel = RecipeDetailViewModel(
-            recipe: recipe,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: RecordingDeleteRecipeUseCase()
-        )
+        let viewModel = makeViewModel(recipe: recipe)
         let sut = RecipeDetailView(viewModel: viewModel)
 
         XCTAssertNoThrow(try sut.inspect().find(text: "2 cups flour"))
@@ -55,15 +69,19 @@ final class RecipeDetailViewTests: XCTestCase {
         XCTAssertNoThrow(try sut.inspect().find(text: "Cook"))
     }
 
+    func testAssignedTagsRenderAsChips() throws {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let recipe = makeRecipe(tags: [breakfast])
+        let viewModel = makeViewModel(recipe: recipe)
+        let sut = RecipeDetailView(viewModel: viewModel)
+
+        XCTAssertNoThrow(try sut.inspect().find(text: "Breakfast"))
+    }
+
     func testTappingDeleteTogglesConfirmationDialogAndConfirmingItCallsDelete() throws {
         let deleteUseCase = RecordingDeleteRecipeUseCase()
         let recipe = makeRecipe()
-        let viewModel = RecipeDetailViewModel(
-            recipe: recipe,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: deleteUseCase
-        )
+        let viewModel = makeViewModel(recipe: recipe, deleteRecipeUseCase: deleteUseCase)
         let sut = RecipeDetailView(viewModel: viewModel)
 
         XCTAssertThrowsError(try sut.inspect().find(ViewType.ConfirmationDialog.self))
@@ -81,12 +99,7 @@ final class RecipeDetailViewTests: XCTestCase {
 
     func testCancellingConfirmationDialogDoesNotCallDelete() throws {
         let deleteUseCase = RecordingDeleteRecipeUseCase()
-        let viewModel = RecipeDetailViewModel(
-            recipe: makeRecipe(),
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: deleteUseCase
-        )
+        let viewModel = makeViewModel(recipe: makeRecipe(), deleteRecipeUseCase: deleteUseCase)
         let sut = RecipeDetailView(viewModel: viewModel)
 
         try sut.inspect().find(button: "Delete").tap()
@@ -98,12 +111,7 @@ final class RecipeDetailViewTests: XCTestCase {
     }
 
     func testTappingEditSetsPresentingEditOnViewModel() throws {
-        let viewModel = RecipeDetailViewModel(
-            recipe: makeRecipe(),
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: RecordingDeleteRecipeUseCase()
-        )
+        let viewModel = makeViewModel(recipe: makeRecipe())
         let sut = RecipeDetailView(viewModel: viewModel)
 
         XCTAssertFalse(viewModel.isPresentingEdit)

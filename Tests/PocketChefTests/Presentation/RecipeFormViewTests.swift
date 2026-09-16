@@ -15,18 +15,40 @@ private struct NoOpCreateRecipeUseCase: CreateRecipeUseCase {
     func execute(_ recipe: Recipe) throws {}
 }
 
+private struct FakeFetchTagsUseCase: FetchTagsUseCase {
+    var result: Result<[Tag], Error> = .success([])
+    func execute() throws -> [Tag] { try result.get() }
+}
+
+private final class FakeFindOrCreateTagUseCase: FindOrCreateTagUseCase {
+    var resultProvider: (String) -> Result<Tag, Error> = { name in .success(Tag(id: UUID(), name: name, isPreset: false)) }
+    func execute(name: String) throws -> Tag { try resultProvider(name).get() }
+}
+
 private struct UseCaseFailure: LocalizedError {
     var errorDescription: String? { "Something went wrong" }
+}
+
+private func makeViewModel(
+    mode: RecipeFormMode = .create,
+    createUseCase: CreateRecipeUseCase = NoOpCreateRecipeUseCase(),
+    updateUseCase: UpdateRecipeUseCase = NoOpUpdateRecipeUseCase(),
+    fetchTagsUseCase: FetchTagsUseCase = FakeFetchTagsUseCase(),
+    findOrCreateTagUseCase: FindOrCreateTagUseCase = FakeFindOrCreateTagUseCase()
+) -> RecipeFormViewModel {
+    RecipeFormViewModel(
+        mode: mode,
+        createRecipeUseCase: createUseCase,
+        updateRecipeUseCase: updateUseCase,
+        fetchTagsUseCase: fetchTagsUseCase,
+        findOrCreateTagUseCase: findOrCreateTagUseCase
+    )
 }
 
 @MainActor
 final class RecipeFormViewTests: XCTestCase {
     func testSaveButtonDisabledWhenTitleBlankEnabledWhenSet() throws {
-        let viewModel = RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase()
-        )
+        let viewModel = makeViewModel()
         let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
 
         let disabledSave = try sut.inspect().find(button: "Save")
@@ -38,11 +60,7 @@ final class RecipeFormViewTests: XCTestCase {
     }
 
     func testTappingSaveCallsOnSaveWithComposedRecipeAndDoesNotErrorOnSuccess() throws {
-        let viewModel = RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase()
-        )
+        let viewModel = makeViewModel()
         viewModel.title = "Waffles"
         nonisolated(unsafe) var saved: Recipe?
         let sut = RecipeFormView(viewModel: viewModel, onSave: { saved = $0 })
@@ -54,11 +72,7 @@ final class RecipeFormViewTests: XCTestCase {
     }
 
     func testTappingCancelDoesNotCallOnSave() throws {
-        let viewModel = RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase()
-        )
+        let viewModel = makeViewModel()
         viewModel.title = "Waffles"
         nonisolated(unsafe) var saveCalled = false
         let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in saveCalled = true })
@@ -71,11 +85,7 @@ final class RecipeFormViewTests: XCTestCase {
     func testSaveFailureDisplaysErrorMessage() throws {
         let createUseCase = RecordingCreateRecipeUseCase()
         createUseCase.result = .failure(UseCaseFailure())
-        let viewModel = RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: createUseCase,
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase()
-        )
+        let viewModel = makeViewModel(createUseCase: createUseCase)
         viewModel.title = "Waffles"
         let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
 
@@ -86,11 +96,7 @@ final class RecipeFormViewTests: XCTestCase {
     }
 
     func testAddIngredientButtonAddsRow() throws {
-        let viewModel = RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase()
-        )
+        let viewModel = makeViewModel()
         let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
 
         XCTAssertEqual(viewModel.ingredients.count, 0)
@@ -99,11 +105,7 @@ final class RecipeFormViewTests: XCTestCase {
     }
 
     func testAddStepButtonAddsRow() throws {
-        let viewModel = RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase()
-        )
+        let viewModel = makeViewModel()
         let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
 
         XCTAssertEqual(viewModel.steps.count, 0)
@@ -112,11 +114,7 @@ final class RecipeFormViewTests: XCTestCase {
     }
 
     func testIngredientRowControlsMoveAndDelete() throws {
-        let viewModel = RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase()
-        )
+        let viewModel = makeViewModel()
         viewModel.addIngredient()
         viewModel.addIngredient()
         let firstID = viewModel.ingredients[0].id
@@ -135,11 +133,7 @@ final class RecipeFormViewTests: XCTestCase {
     }
 
     func testStepRowControlsMoveAndDelete() throws {
-        let viewModel = RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase()
-        )
+        let viewModel = makeViewModel()
         viewModel.addStep()
         viewModel.addStep()
         viewModel.steps[0].text = "Mix"
@@ -165,16 +159,40 @@ final class RecipeFormViewTests: XCTestCase {
             source: .typed,
             tags: []
         )
-        let viewModel = RecipeFormViewModel(
-            mode: .edit(original),
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase()
-        )
+        let viewModel = makeViewModel(mode: .edit(original))
         let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
 
         // Rendering the fully-populated edit form shouldn't throw, and the Save
         // button should already be enabled since the pre-filled title is non-blank.
         let saveButton = try sut.inspect().find(button: "Save")
         XCTAssertFalse(saveButton.isDisabled())
+    }
+
+    // MARK: tags
+
+    func testTappingATagChipTogglesItsSelection() throws {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let viewModel = makeViewModel(fetchTagsUseCase: FakeFetchTagsUseCase(result: .success([breakfast])))
+        viewModel.loadTags() // .task doesn't run without real hosting; call directly
+        let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
+
+        XCTAssertFalse(viewModel.selectedTagIDs.contains(breakfast.id))
+        try sut.inspect().find(button: "Breakfast").tap()
+        XCTAssertTrue(viewModel.selectedTagIDs.contains(breakfast.id))
+    }
+
+    func testNewTagChipSwapsToTextFieldAndConfirmingAddsASelectedTag() throws {
+        let viewModel = makeViewModel()
+        viewModel.loadTags()
+        let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
+
+        try sut.inspect().find(button: "+ New Tag").tap()
+        XCTAssertTrue(viewModel.isAddingNewTag)
+
+        viewModel.newTagName = "Spicy"
+        viewModel.confirmNewTag()
+
+        XCTAssertEqual(viewModel.allTags.map(\.name), ["Spicy"])
+        XCTAssertTrue(viewModel.selectedTagIDs.contains(viewModel.allTags[0].id))
     }
 }

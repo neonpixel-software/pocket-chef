@@ -27,14 +27,16 @@ extension Recipe {
             url = sourceURL
         }
 
+        // tags is deliberately omitted (defaults to []): tags are a shared relationship
+        // resolved to already-persisted TagModel rows by SwiftDataRecipeRepository, never
+        // built via toModel() — see resolveTagModels(for:).
         return RecipeModel(
             id: id,
             title: title,
             steps: steps,
             isTypedSource: isTyped,
             sourceURL: url,
-            ingredients: ingredients.map { $0.toModel() },
-            tags: tags.map { $0.toModel() }
+            ingredients: ingredients.map { $0.toModel() }
         )
     }
 }

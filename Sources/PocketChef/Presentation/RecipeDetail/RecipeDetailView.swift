@@ -19,6 +19,19 @@ struct RecipeDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 32) {
+                if !recipe.tags.isEmpty {
+                    FlowLayout(spacing: 8) {
+                        ForEach(recipe.tags) { tag in
+                            Text(tag.name)
+                                .font(PCFont.body(12, weight: .bold))
+                                .foregroundStyle(PCColor.ink)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(PCColor.teal, in: Capsule())
+                        }
+                    }
+                }
+
                 section(title: "Ingredients", accent: PCColor.teal) {
                     Group {
                         if recipe.ingredients.isEmpty {
@@ -142,7 +155,9 @@ struct RecipeDetailView: View {
             recipe: SampleData.recipes[0],
             createRecipeUseCase: DefaultCreateRecipeUseCase(repository: PreviewRecipeRepository()),
             updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: PreviewRecipeRepository()),
-            deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: PreviewRecipeRepository())
+            deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: PreviewRecipeRepository()),
+            fetchTagsUseCase: DefaultFetchTagsUseCase(repository: PreviewTagRepository()),
+            findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: PreviewTagRepository())
         ))
     }
 }
