@@ -7,6 +7,13 @@ protocol RecipeRepository {
     func delete(id: UUID) throws
 }
 
-enum RecipeRepositoryError: Error, Equatable {
+enum RecipeRepositoryError: LocalizedError, Equatable {
     case recipeNotFound
+
+    var errorDescription: String? {
+        switch self {
+        case .recipeNotFound:
+            String(localized: "This recipe couldn't be found. It may have already been deleted.")
+        }
+    }
 }

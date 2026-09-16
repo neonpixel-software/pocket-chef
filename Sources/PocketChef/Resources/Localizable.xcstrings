@@ -1260,6 +1260,34 @@
           }
         }
       }
+    },
+    "This recipe couldn't be found. It may have already been deleted.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo encontrar esta receta. Puede que ya se haya eliminado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette recette est introuvable. Elle a peut-être déjà été supprimée."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Rezept konnte nicht gefunden werden. Es wurde möglicherweise bereits gelöscht."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit recept kon niet worden gevonden. Mogelijk is het al verwijderd."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
