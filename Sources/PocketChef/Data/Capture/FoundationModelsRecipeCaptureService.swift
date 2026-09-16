@@ -24,7 +24,10 @@ final class FoundationModelsRecipeCaptureService: RecipeCaptureService {
             let result = try await session.respond(to: text, generating: CapturedRecipeSchema.self)
             return result.content.toDomain()
         } catch {
-            throw RecipeCaptureError.captureFailed
+            // Preserve the original error (guardrail rejection, model unavailable, schema
+            // mismatch, etc.) so on-device verification can distinguish failure causes rather
+            // than seeing only a generic "capture failed".
+            throw RecipeCaptureError.captureFailed(underlying: error)
         }
     }
 }

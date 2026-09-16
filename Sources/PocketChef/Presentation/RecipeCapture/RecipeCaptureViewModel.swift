@@ -30,6 +30,12 @@ final class RecipeCaptureViewModel {
             errorMessage = nil
             return recipe
         } catch {
+            // Log the underlying cause (guardrail rejection, model unavailable, schema
+            // mismatch, etc.) for on-device verification; the user only sees the generic
+            // message below.
+            if case let RecipeCaptureError.captureFailed(underlying) = error {
+                print("Recipe capture failed: \(underlying)")
+            }
             errorMessage = "Couldn't extract a recipe from that text. Check it over and try again."
             return nil
         }

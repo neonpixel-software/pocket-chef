@@ -6,5 +6,5 @@ protocol RecipeCaptureService: Sendable {
 }
 
 enum RecipeCaptureError: Error {
-    case captureFailed
+    case captureFailed(underlying: Error)
 }
