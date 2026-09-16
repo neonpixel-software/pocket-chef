@@ -91,9 +91,9 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 **Checkpoint:** full manual CRUD works end-to-end on all platforms.
 
 ### Phase 3: Tagging
-- [ ] **3.1 Tag model + assignment UI** — preset tags shipped in-app, custom tag creation, multi-tag assignment on the entry/edit form.
+- [x] **3.1 Tag model + assignment UI** — preset tags shipped in-app, custom tag creation, multi-tag assignment on the entry/edit form.
   Acceptance: a recipe can carry multiple tags mixing presets and custom ones; tags persist.
-- [ ] **3.2 Filter recipe list by tag** — simple filter/segmented control on the list view.
+- [x] **3.2 Filter recipe list by tag** — simple filter/segmented control on the list view.
   Acceptance: selecting a tag narrows the list to matching recipes; clearing it restores the full list.
 
 **Checkpoint:** tagging usable end-to-end.

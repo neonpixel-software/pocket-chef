@@ -14,7 +14,9 @@ final class SwiftDataRecipeRepository: RecipeRepository {
     }
 
     func create(_ recipe: Recipe) throws {
-        modelContext.insert(recipe.toModel())
+        let model = recipe.toModel()
+        model.tags = try resolveTagModels(for: recipe.tags)
+        modelContext.insert(model)
         try modelContext.save()
     }
 
@@ -38,13 +40,24 @@ final class SwiftDataRecipeRepository: RecipeRepository {
 
         // The .cascade delete rule only fires on parent deletion, not on reassigning
         // the relationship array, so old children must be deleted explicitly here or
-        // they leak as orphaned rows. Tags are left untouched: Phase 2.1 has no
-        // tag-editing UI, and remapping recipe.tags would insert duplicate TagModel
-        // rows for tags that already exist.
+        // they leak as orphaned rows.
         model.ingredients.forEach { modelContext.delete($0) }
         model.ingredients = recipe.ingredients.map { $0.toModel() }
 
+        // Tags are a shared (non-owned) relationship: resolve to the existing,
+        // already-persisted TagModel rows by id rather than remapping via
+        // toModel(), which would insert duplicate rows conflicting with the
+        // unique id constraint.
+        model.tags = try resolveTagModels(for: recipe.tags)
+
         try modelContext.save()
+    }
+
+    private func resolveTagModels(for tags: [Tag]) throws -> [TagModel] {
+        guard !tags.isEmpty else { return [] }
+        let ids = Set(tags.map(\.id))
+        let descriptor = FetchDescriptor<TagModel>(predicate: #Predicate { ids.contains($0.id) })
+        return try modelContext.fetch(descriptor)
     }
 
     func delete(id: UUID) throws {

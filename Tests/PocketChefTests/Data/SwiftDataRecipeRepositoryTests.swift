@@ -106,6 +106,46 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
         XCTAssertEqual(remainingIngredients.map(\.rawText), ["2 cups sugar"])
     }
 
+    func testCreateResolvesTagsToExistingTagModelRowsWithoutDuplicating() throws {
+        let context = try makeInMemoryContext()
+        let tagID = UUID()
+        context.insert(TagModel(id: tagID, name: "Breakfast", isPreset: true))
+        try context.save()
+
+        let repository = SwiftDataRecipeRepository(modelContext: context)
+        let tag = Tag(id: tagID, name: "Breakfast", isPreset: true)
+        let recipe = Recipe(id: UUID(), title: "Waffles", ingredients: [], steps: [], source: .typed, tags: [tag])
+
+        try repository.create(recipe)
+
+        let recipes = try repository.fetchAll()
+        XCTAssertEqual(recipes.first?.tags, [tag])
+
+        let allTagRows = try context.fetch(FetchDescriptor<TagModel>())
+        XCTAssertEqual(allTagRows.count, 1)
+    }
+
+    func testUpdateResolvesTagsToExistingTagModelRowsWithoutDuplicating() throws {
+        let context = try makeInMemoryContext()
+        let recipeID = UUID()
+        let tagID = UUID()
+        context.insert(RecipeModel(id: recipeID, title: "Waffles", steps: [], isTypedSource: true))
+        context.insert(TagModel(id: tagID, name: "Breakfast", isPreset: true))
+        try context.save()
+
+        let repository = SwiftDataRecipeRepository(modelContext: context)
+        let tag = Tag(id: tagID, name: "Breakfast", isPreset: true)
+        let updated = Recipe(id: recipeID, title: "Waffles", ingredients: [], steps: [], source: .typed, tags: [tag])
+
+        try repository.update(updated)
+
+        let recipes = try repository.fetchAll()
+        XCTAssertEqual(recipes.first?.tags, [tag])
+
+        let allTagRows = try context.fetch(FetchDescriptor<TagModel>())
+        XCTAssertEqual(allTagRows.count, 1)
+    }
+
     func testUpdateThrowsRecipeNotFoundForUnknownID() throws {
         let context = try makeInMemoryContext()
         let repository = SwiftDataRecipeRepository(modelContext: context)
