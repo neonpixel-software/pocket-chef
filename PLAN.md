@@ -122,37 +122,47 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 
 **Checkpoint:** both capture paths (typed, URL) confirmed working; full v1 recipe-capture experience done.
 
-### Phase 7: Density API (.NET)
-- [ ] **7.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams-per-cup), basic persistence (Postgres or SQLite, whichever Nick prefers on the VPS).
+### Phase 7: Localization
+- [ ] **7.1 String Catalog + automatic UI string resolution** — `Localizable.xcstrings` covering every user-facing UI string (~50 literals across list/form/detail/capture screens), translated to Spanish, French, German, and Dutch alongside the English base.
+  Acceptance: switching the device/simulator language to any of the four translated locales shows translated UI chrome with no raw fallback keys or obviously broken layout. Translations are machine-generated in this environment and need a fluent-speaker quality pass before shipping — mechanism is verified here, not translation quality.
+- [ ] **7.2 Preset tag names localized, user tags untouched** — the 5 shipped preset tags (Breakfast, Lunch, Dinner, Dessert, Snack) display in the device's language via a stable English matching key; any tag a user creates or renames displays exactly as typed, never translated.
+  Acceptance: a preset tag's display name changes with device language; a custom or renamed tag's name does not.
+- [ ] **7.3 View-model error messages localized** — the 3 capture-failure messages in `RecipeCaptureViewModel`/`RecipeURLCaptureViewModel` resolve via the same String Catalog.
+  Acceptance: triggering a capture failure while the device language is set to a translated locale shows the translated message, not English.
+
+**Checkpoint:** app fully navigable in English, Spanish, French, German, and Dutch; mechanism verified manually, translation quality flagged for human review before ship.
+
+### Phase 8: Density API (.NET)
+- [ ] **8.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams-per-cup), basic persistence (Postgres or SQLite, whichever Nick prefers on the VPS).
   Acceptance: API runs locally, entries can be created/read directly against the database.
   Also add a `nuget` ecosystem entry to `.github/dependabot.yml` once this project exists — it currently only watches `github-actions`.
-- [ ] **7.2 Read endpoint + low-privilege key** — public-ish read endpoint gated by a read-only API key.
+- [ ] **8.2 Read endpoint + low-privilege key** — public-ish read endpoint gated by a read-only API key.
   Acceptance: requests with a valid read key succeed; requests without one, or with a write key used as read, still succeed only for reads — a request with no key fails.
-- [ ] **7.3 Write endpoints + high-privilege key** — add/edit density entries, gated by a separate write key.
+- [ ] **8.3 Write endpoints + high-privilege key** — add/edit density entries, gated by a separate write key.
   Acceptance: write endpoints reject the read key; only the write key can create/edit entries.
 
 **Checkpoint:** API works locally end-to-end with both key tiers enforced.
 
-### Phase 8: Seed & deploy
-- [ ] **8.1 Seed data import** — one-off script loading existing public ingredient-density data into the database.
+### Phase 9: Seed & deploy
+- [ ] **9.1 Seed data import** — one-off script loading existing public ingredient-density data into the database.
   Acceptance: common ingredients (flour, sugar, butter, etc.) return sensible density values from the read endpoint.
-- [ ] **8.2 Deploy to Ubuntu VPS** — API running as a service on the existing 26.04 VPS, reachable over HTTPS.
+- [ ] **9.2 Deploy to Ubuntu VPS** — API running as a service on the existing 26.04 VPS, reachable over HTTPS.
   Acceptance: read endpoint reachable from outside the VPS over HTTPS with the read key; write endpoints not reachable without the write key.
 
 **Checkpoint:** API live and seeded; ready for the client to consume.
 
-### Phase 9: Client density integration
-- [ ] **9.1 Local density cache** — client fetches entries from the read endpoint and caches them on-device (SwiftData or a lightweight store).
+### Phase 10: Client density integration
+- [ ] **10.1 Local density cache** — client fetches entries from the read endpoint and caches them on-device (SwiftData or a lightweight store).
   Acceptance: after one fetch, density lookups work with network off.
-- [ ] **9.2 Periodic + manual refresh** — background periodic check for new/changed entries, plus a manual "refresh now" action in Settings.
+- [ ] **10.2 Periodic + manual refresh** — background periodic check for new/changed entries, plus a manual "refresh now" action in Settings.
   Acceptance: adding a new entry via the write API and triggering manual refresh brings it into the app's cache without reinstalling.
 
 **Checkpoint:** density data flows from API to client cache reliably.
 
-### Phase 10: Unit conversion
-- [ ] **10.1 Volume/weight toggle on recipe view** — converts each ingredient line using its cached density entry.
+### Phase 11: Unit conversion
+- [ ] **11.1 Volume/weight toggle on recipe view** — converts each ingredient line using its cached density entry.
   Acceptance: toggling shows correct gram values for ingredients with density data.
-- [ ] **10.2 Missing-density fallback** — ingredients without a cached density entry show their original measurement plus a "conversion not available" note instead of a guess.
+- [ ] **11.2 Missing-density fallback** — ingredients without a cached density entry show their original measurement plus a "conversion not available" note instead of a guess.
   Acceptance: an ingredient known to be absent from the density table shows the fallback note, not a fabricated number.
 
 **Checkpoint:** full v1 feature set complete — capture, tag, store/sync, convert.
@@ -163,8 +173,8 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 |---|---|---|
 | Apple Intelligence extraction quality on messy recipe sites | Medium — bad parses land in review screen, so nothing saves silently wrong, but frequent bad parses hurt the "no fluff" promise | Review screen is mandatory by design (Phase 2); revisit prompt/approach if quality is poor in testing |
 | CloudKit sync edge cases (conflicts, migration) | Medium — sync bugs are hard to debug later | Test the Local↔iCloud switch explicitly in Phase 4 checkpoint across two devices before moving on |
-| Density data coverage gaps | Low — explicitly handled by the fallback note (Phase 10.2) rather than silent wrong answers | None needed beyond the fallback already designed |
-| VPS/API becomes a single point of failure for conversion | Low — client caches locally, so downtime only blocks *new* density data, not existing conversions | Local cache (Phase 9.1) already covers this |
+| Density data coverage gaps | Low — explicitly handled by the fallback note (Phase 11.2) rather than silent wrong answers | None needed beyond the fallback already designed |
+| VPS/API becomes a single point of failure for conversion | Low — client caches locally, so downtime only blocks *new* density data, not existing conversions | Local cache (Phase 10.1) already covers this |
 
 ## Open items / not yet decided
 
