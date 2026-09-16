@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: macos-26
+    defaults:
+      run:
+        working-directory: app
     steps:
       - uses: actions/checkout@v7
       - name: Install xcodegen
@@ -36,13 +39,16 @@ jobs:
         with:
           name: coverage-reports
           path: |
-            coverage-ios.xml
-            coverage-macos.xml
+            app/coverage-ios.xml
+            app/coverage-macos.xml
           retention-days: 1
 
   sonarcloud:
     runs-on: macos-26
     needs: build
+    defaults:
+      run:
+        working-directory: app
     # Dependabot-triggered pull_request runs don't get repo secrets (GitHub
     # security measure), so SONAR_TOKEN is unavailable and this job would
     # always fail — skip it for those PRs; the build job still runs.
@@ -55,13 +61,18 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: coverage-reports
+          path: app
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v8
         timeout-minutes: 10
+        with:
+          projectBaseDir: app
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: SonarCloud Quality Gate
         uses: SonarSource/sonarqube-quality-gate-action@v1
         timeout-minutes: 5
+        with:
+          scanMetadataReportFile: app/.scannerwork/report-task.txt
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
