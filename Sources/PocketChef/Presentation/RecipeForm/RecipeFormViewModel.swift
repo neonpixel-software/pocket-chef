@@ -4,6 +4,9 @@ import Observation
 enum RecipeFormMode {
     case create
     case edit(Recipe)
+    /// A freshly AI-captured recipe awaiting review before its first save — pre-fills like
+    /// .edit, but save() creates a new record with a fresh id rather than updating.
+    case capture(Recipe)
 }
 
 struct IngredientLineDraft: Identifiable, Equatable {
@@ -90,7 +93,7 @@ final class RecipeFormViewModel {
             ingredients = []
             steps = []
             initialTags = []
-        case .edit(let recipe):
+        case .edit(let recipe), .capture(let recipe):
             title = recipe.title
             ingredients = recipe.ingredients.map { IngredientLineDraft(ingredientLine: $0) }
             steps = recipe.steps.map { StepDraft(text: $0) }
@@ -192,7 +195,7 @@ final class RecipeFormViewModel {
 
         do {
             switch mode {
-            case .create:
+            case .create, .capture:
                 try createRecipeUseCase.execute(recipe)
             case .edit:
                 try updateRecipeUseCase.execute(recipe)
@@ -249,6 +252,15 @@ final class RecipeFormViewModel {
                 ingredients: builtIngredients,
                 steps: builtSteps,
                 source: .typed,
+                tags: selectedTags
+            )
+        case .capture(let original):
+            return Recipe(
+                id: UUID(), // fresh id: this is a new record, not an update to original
+                title: trimmedTitle,
+                ingredients: builtIngredients,
+                steps: builtSteps,
+                source: original.source,
                 tags: selectedTags
             )
         case .edit(let original):

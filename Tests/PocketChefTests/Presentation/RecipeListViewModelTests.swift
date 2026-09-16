@@ -39,6 +39,17 @@ private struct NoOpFindOrCreateTagUseCase: FindOrCreateTagUseCase {
     }
 }
 
+private struct NoOpCaptureRecipeUseCase: CaptureRecipeUseCase {
+    func execute(text: String) async throws -> Recipe {
+        Recipe(id: UUID(), title: "", ingredients: [], steps: [], source: .typed, tags: [])
+    }
+}
+
+private struct FakeCheckCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase {
+    var result = true
+    func execute() -> Bool { result }
+}
+
 private struct UseCaseFailure: LocalizedError {
     var errorDescription: String? { "Something went wrong" }
 }
@@ -46,7 +57,8 @@ private struct UseCaseFailure: LocalizedError {
 private func makeViewModel(
     fetchResult: Result<[Recipe], Error> = .success([]),
     deleteResult: Result<Void, Error> = .success(()),
-    fetchTagsResult: Result<[Tag], Error> = .success([])
+    fetchTagsResult: Result<[Tag], Error> = .success([]),
+    captureAvailable: Bool = true
 ) -> RecipeListViewModel {
     RecipeListViewModel(
         fetchRecipesUseCase: FakeFetchRecipesUseCase(result: fetchResult),
@@ -54,7 +66,9 @@ private func makeViewModel(
         updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
         deleteRecipeUseCase: FakeDeleteRecipeUseCase(result: deleteResult),
         fetchTagsUseCase: FakeFetchTagsUseCase(result: fetchTagsResult),
-        findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
+        findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase(),
+        captureRecipeUseCase: NoOpCaptureRecipeUseCase(),
+        checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(result: captureAvailable)
     )
 }
 
@@ -92,7 +106,9 @@ final class RecipeListViewModelTests: XCTestCase {
             updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
             deleteRecipeUseCase: FakeDeleteRecipeUseCase(),
             fetchTagsUseCase: FakeFetchTagsUseCase(),
-            findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
+            findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase(),
+            captureRecipeUseCase: NoOpCaptureRecipeUseCase(),
+            checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase()
         )
 
         viewModel.load()
@@ -178,6 +194,32 @@ final class RecipeListViewModelTests: XCTestCase {
 
         viewModel.selectTag(nil)
         XCTAssertEqual(viewModel.filteredRecipes, [pancakes, soup])
+    }
+
+    // MARK: capture
+
+    func testIsCaptureAvailableReflectsUseCase() {
+        XCTAssertTrue(makeViewModel(captureAvailable: true).isCaptureAvailable)
+        XCTAssertFalse(makeViewModel(captureAvailable: false).isCaptureAvailable)
+    }
+
+    @MainActor
+    func testMakeCaptureViewModelStartsBlank() {
+        let viewModel = makeViewModel()
+
+        let captureViewModel = viewModel.makeCaptureViewModel()
+
+        XCTAssertEqual(captureViewModel.rawText, "")
+        XCTAssertFalse(captureViewModel.canCapture)
+    }
+
+    func testMakeCaptureReviewFormViewModelPrefillsFromCapturedRecipe() {
+        let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
+        let viewModel = makeViewModel()
+
+        let formViewModel = viewModel.makeCaptureReviewFormViewModel(for: recipe)
+
+        XCTAssertEqual(formViewModel.title, "Pancakes")
     }
 }
 

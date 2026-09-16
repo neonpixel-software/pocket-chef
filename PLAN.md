@@ -107,7 +107,8 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 ### Phase 5: AI-powered capture — typed text
 - [ ] **5.1 "Type it" entry point** — text field for pasting/typing a raw recipe, feeds Apple Intelligence to structure it into title/ingredients/steps, lands on the Phase 2 review screen pre-filled.
   Acceptance: typing a real recipe produces a correctly structured, editable result; saving stores it like any manual recipe.
-- [ ] **5.2 No-Apple-Intelligence fallback** — detect unsupported devices, skip straight to the blank Phase 2 form.
+  All code/tests/UI built and passing; left unchecked because the actual on-device AI extraction quality hasn't been verified — no development machine here has Apple Intelligence enabled. Check off once verified on a real device.
+- [x] **5.2 No-Apple-Intelligence fallback** — detect unsupported devices, skip straight to the blank Phase 2 form.
   Acceptance: on a simulator/device without Apple Intelligence, the "Type it" flow opens the blank form instead of erroring.
 
 **Checkpoint:** typed capture works on supported and unsupported hardware.
