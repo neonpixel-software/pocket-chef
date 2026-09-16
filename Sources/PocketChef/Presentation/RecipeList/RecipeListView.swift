@@ -3,6 +3,13 @@ import SwiftUI
 struct RecipeListView: View {
     @State private var viewModel: RecipeListViewModel
     @State private var isPresentingNewRecipe = false
+    @State private var isPresentingAddChooser = false
+    @State private var isPresentingCapture = false
+    @State private var isPresentingCaptureUnavailableAlert = false
+    /// Staged between the capture sheet dismissing and the review sheet presenting, so the
+    /// two sheet transitions don't race (see the sheet's onDismiss below).
+    @State private var pendingCaptureReview: Recipe?
+    @State private var reviewingCapturedRecipe: Recipe?
 
     init(viewModel: RecipeListViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -58,14 +65,47 @@ struct RecipeListView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        isPresentingNewRecipe = true
+                        isPresentingAddChooser = true
                     } label: {
                         Image(systemName: "plus")
                     }
                 }
             }
+            .confirmationDialog("Add Recipe", isPresented: $isPresentingAddChooser, titleVisibility: .visible) {
+                Button("Type It") {
+                    if viewModel.isCaptureAvailable {
+                        isPresentingCapture = true
+                    } else {
+                        isPresentingCaptureUnavailableAlert = true
+                    }
+                }
+                Button("Enter Manually") { isPresentingNewRecipe = true }
+                Button("Cancel", role: .cancel) {}
+            }
+            .alert("AI Capture Unavailable", isPresented: $isPresentingCaptureUnavailableAlert) {
+                Button("OK") { isPresentingNewRecipe = true }
+            } message: {
+                Text("AI capture isn't available on this device. You can still enter the recipe by hand.")
+            }
             .sheet(isPresented: $isPresentingNewRecipe) {
                 RecipeFormView(viewModel: viewModel.makeNewRecipeFormViewModel()) { _ in
+                    viewModel.load()
+                    viewModel.loadTags()
+                }
+            }
+            .sheet(isPresented: $isPresentingCapture, onDismiss: {
+                if let recipe = pendingCaptureReview {
+                    pendingCaptureReview = nil
+                    reviewingCapturedRecipe = recipe
+                }
+            }) {
+                RecipeCaptureView(viewModel: viewModel.makeCaptureViewModel()) { recipe in
+                    pendingCaptureReview = recipe
+                    isPresentingCapture = false
+                }
+            }
+            .sheet(item: $reviewingCapturedRecipe) { recipe in
+                RecipeFormView(viewModel: viewModel.makeCaptureReviewFormViewModel(for: recipe)) { _ in
                     viewModel.load()
                     viewModel.loadTags()
                 }
@@ -145,6 +185,8 @@ private struct RecipeRow: View {
         updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: PreviewRecipeRepository()),
         deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: PreviewRecipeRepository()),
         fetchTagsUseCase: DefaultFetchTagsUseCase(repository: PreviewTagRepository()),
-        findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: PreviewTagRepository())
+        findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: PreviewTagRepository()),
+        captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: PreviewRecipeCaptureService()),
+        checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: PreviewRecipeCaptureService())
     ))
 }

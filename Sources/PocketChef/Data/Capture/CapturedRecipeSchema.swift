@@ -1,0 +1,54 @@
+import Foundation
+import FoundationModels
+
+@Generable
+struct CapturedRecipeSchema {
+    @Guide(description: "A short, descriptive title for the recipe")
+    let title: String
+    @Guide(description: "Each ingredient as a separate structured line")
+    let ingredients: [CapturedIngredientSchema]
+    @Guide(description: "Each preparation step in order, one instruction per entry")
+    let steps: [String]
+}
+
+@Generable
+struct CapturedIngredientSchema {
+    @Guide(description: "The ingredient exactly as written in the source text, e.g. '2 cups flour'")
+    let rawText: String
+    @Guide(description: "Numeric quantity as a plain number string (e.g. \"2\", \"1.5\") if stated, else empty")
+    let amount: String
+    @Guide(description: "Unit of measurement (e.g. \"cup\", \"tsp\", \"g\") if stated, else empty")
+    let unit: String
+    @Guide(description: "The ingredient's name alone, without quantity/unit, if identifiable, else empty")
+    let ingredientName: String
+}
+
+extension CapturedRecipeSchema {
+    func toDomain() -> Recipe {
+        Recipe(
+            id: UUID(),
+            title: title,
+            ingredients: ingredients.map { $0.toDomain() },
+            steps: steps
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty },
+            source: .typed,
+            tags: []
+        )
+    }
+}
+
+extension CapturedIngredientSchema {
+    func toDomain() -> IngredientLine {
+        let trimmedAmount = amount.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedUnit = unit.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedName = ingredientName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return IngredientLine(
+            id: UUID(),
+            rawText: rawText,
+            amount: Double(trimmedAmount),
+            unit: trimmedUnit.isEmpty ? nil : trimmedUnit,
+            ingredientName: trimmedName.isEmpty ? nil : trimmedName
+        )
+    }
+}

@@ -282,6 +282,54 @@ final class RecipeFormViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "Something went wrong")
     }
 
+    // MARK: save — capture
+
+    func testCaptureModePrefillsLikeEditMode() {
+        let captured = Recipe(
+            id: UUID(),
+            title: "Pancakes",
+            ingredients: [IngredientLine(id: UUID(), rawText: "2 cups flour", amount: 2, unit: "cup", ingredientName: "flour")],
+            steps: ["Mix", "Cook"],
+            source: .typed,
+            tags: []
+        )
+
+        let viewModel = makeViewModel(mode: .capture(captured))
+
+        XCTAssertEqual(viewModel.title, "Pancakes")
+        XCTAssertEqual(viewModel.steps.map(\.text), ["Mix", "Cook"])
+        XCTAssertEqual(viewModel.ingredients.first?.ingredientName, "flour")
+    }
+
+    func testSaveInCaptureModeCreatesANewRecordWithAFreshIDRatherThanUpdating() throws {
+        let capturedID = UUID()
+        let captured = Recipe(id: capturedID, title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
+        let createUseCase = FakeCreateRecipeUseCase()
+        let updateUseCase = FakeUpdateRecipeUseCase()
+        let viewModel = makeViewModel(mode: .capture(captured), createUseCase: createUseCase, updateUseCase: updateUseCase)
+
+        let saved = viewModel.save()
+
+        let recipe = try XCTUnwrap(saved)
+        XCTAssertNotEqual(recipe.id, capturedID)
+        XCTAssertEqual(recipe.title, "Pancakes")
+        XCTAssertEqual(recipe.source, .typed)
+        XCTAssertEqual(createUseCase.createdRecipes, [recipe])
+        XCTAssertTrue(updateUseCase.updatedRecipes.isEmpty)
+    }
+
+    func testSaveSetsErrorMessageAndReturnsNilOnCaptureModeCreateFailure() {
+        let captured = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
+        let createUseCase = FakeCreateRecipeUseCase()
+        createUseCase.result = .failure(UseCaseFailure())
+        let viewModel = makeViewModel(mode: .capture(captured), createUseCase: createUseCase)
+
+        let saved = viewModel.save()
+
+        XCTAssertNil(saved)
+        XCTAssertEqual(viewModel.errorMessage, "Something went wrong")
+    }
+
     // MARK: tags
 
     func testToggleTagAddsAndRemovesFromSelection() {

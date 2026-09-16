@@ -6,6 +6,7 @@ struct PocketChefApp: App {
     private let modelContainer: ModelContainer
     private let recipeRepository: RecipeRepository
     private let tagRepository: TagRepository
+    private let captureService: RecipeCaptureService
 
     init() {
         PCFontRegistrar.registerCustomFonts()
@@ -17,6 +18,7 @@ struct PocketChefApp: App {
         }
         recipeRepository = SwiftDataRecipeRepository(modelContext: modelContainer.mainContext)
         tagRepository = SwiftDataTagRepository(modelContext: modelContainer.mainContext)
+        captureService = FoundationModelsRecipeCaptureService()
 
         modelContainer.mainContext.seedPresetTagsIfNeeded()
 
@@ -33,7 +35,9 @@ struct PocketChefApp: App {
                 updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: recipeRepository),
                 deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: recipeRepository),
                 fetchTagsUseCase: DefaultFetchTagsUseCase(repository: tagRepository),
-                findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository)
+                findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository),
+                captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: captureService),
+                checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: captureService)
             ))
         }
         .modelContainer(modelContainer)
