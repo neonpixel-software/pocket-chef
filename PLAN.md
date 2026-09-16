@@ -116,7 +116,8 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 ### Phase 6: AI-powered capture — URL
 - [ ] **6.1 "Paste a link" entry point** — fetch page content, hand to Apple Intelligence to extract just the recipe, land on the same review screen pre-filled.
   Acceptance: pasting a real recipe URL produces a correctly structured, editable result with ads/backstory/comments excluded.
-- [ ] **6.2 Add-recipe screen shows both options clearly** — "Type it" / "Paste a link" presented side by side, not hidden.
+  All code/tests/UI built and passing; left unchecked because the actual on-device AI extraction quality hasn't been verified — no development machine here has Apple Intelligence enabled. Check off once verified on a real device (same constraint as 5.1).
+- [x] **6.2 Add-recipe screen shows both options clearly** — "Type it" / "Paste a link" presented side by side, not hidden.
   Acceptance: both entry points are visible without extra taps from the main add-recipe screen.
 
 **Checkpoint:** both capture paths (typed, URL) confirmed working; full v1 recipe-capture experience done.
