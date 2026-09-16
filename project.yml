@@ -4,6 +4,7 @@ options:
   deploymentTarget:
     iOS: "26.0"
     macOS: "26.0"
+  developmentLanguage: en
 
 settings:
   base:
@@ -12,6 +13,8 @@ settings:
     SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
+    CFBundleLocalizations: [en, es, fr, de, nl]
+    CFBundleDevelopmentRegion: en
 
 packages:
   ViewInspector:

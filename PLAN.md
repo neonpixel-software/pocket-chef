@@ -123,12 +123,12 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 **Checkpoint:** both capture paths (typed, URL) confirmed working; full v1 recipe-capture experience done.
 
 ### Phase 7: Localization
-- [ ] **7.1 String Catalog + automatic UI string resolution** — `Localizable.xcstrings` covering every user-facing UI string (~50 literals across list/form/detail/capture screens), translated to Spanish, French, German, and Dutch alongside the English base.
-  Acceptance: switching the device/simulator language to any of the four translated locales shows translated UI chrome with no raw fallback keys or obviously broken layout. Translations are machine-generated in this environment and need a fluent-speaker quality pass before shipping — mechanism is verified here, not translation quality.
-- [ ] **7.2 Preset tag names localized, user tags untouched** — the 5 shipped preset tags (Breakfast, Lunch, Dinner, Dessert, Snack) display in the device's language via a stable English matching key; any tag a user creates or renames displays exactly as typed, never translated.
-  Acceptance: a preset tag's display name changes with device language; a custom or renamed tag's name does not.
+- [ ] **7.1 String Catalog + automatic UI string resolution** — `Localizable.xcstrings` covering every user-facing UI string (45 keys across list/form/detail/capture screens), translated to Spanish, French, German, and Dutch alongside the English base.
+  Acceptance: switching the device/simulator language to any of the four translated locales shows translated UI chrome with no raw fallback keys or obviously broken layout. Manually verified on this Mac in Spanish and German (list, add-recipe chooser, recipe form) — no missing entries, no layout breakage, umlauts render fine. Left unchecked because translations are machine-generated in this environment and need a fluent-speaker quality pass before shipping — mechanism is verified here, not translation quality.
+- [x] **7.2 Preset tag names localized, user tags untouched** — the 5 shipped preset tags (Breakfast, Lunch, Dinner, Dessert, Snack) display in the device's language via a stable English matching key; any tag a user creates or renames displays exactly as typed, never translated.
+  Acceptance: a preset tag's display name changes with device language; a custom or renamed tag's name does not. Verified manually in Spanish and German: presets translated (e.g. "Frühstück"), the custom "Refreshing" sample tag stayed in English in both.
 - [ ] **7.3 View-model error messages localized** — the 3 capture-failure messages in `RecipeCaptureViewModel`/`RecipeURLCaptureViewModel` resolve via the same String Catalog.
-  Acceptance: triggering a capture failure while the device language is set to a translated locale shows the translated message, not English.
+  Acceptance: triggering a capture failure while the device language is set to a translated locale shows the translated message, not English. Catalog entries are unit-tested directly and confirmed correct (`LocalizedCaptureErrorMessagesTests`), but actually triggering these messages in the running app needs a real capture attempt — blocked by the same no-Apple-Intelligence constraint as 5.1/6.1 on this Mac (the capture screens never open here; the unavailable-alert shows instead). Check off once verified on a real device.
 
 **Checkpoint:** app fully navigable in English, Spanish, French, German, and Dutch; mechanism verified manually, translation quality flagged for human review before ship.
 

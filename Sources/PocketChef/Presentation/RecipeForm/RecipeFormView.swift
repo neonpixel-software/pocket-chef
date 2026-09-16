@@ -16,7 +16,7 @@ struct RecipeFormView: View {
                 VStack(alignment: .leading, spacing: 28) {
                     titleField
 
-                    formSection(title: "Ingredients", accent: PCColor.teal) {
+                    formSection(title: String(localized: "Ingredients"), accent: PCColor.teal) {
                         VStack(spacing: 12) {
                             ForEach(Array(viewModel.ingredients.enumerated()), id: \.element.id) { index, _ in
                                 IngredientRow(
@@ -28,11 +28,11 @@ struct RecipeFormView: View {
                                     onDelete: { viewModel.removeIngredient(at: index) }
                                 )
                             }
-                            addButton(title: "Add Ingredient") { viewModel.addIngredient() }
+                            addButton(title: String(localized: "Add Ingredient")) { viewModel.addIngredient() }
                         }
                     }
 
-                    formSection(title: "Steps", accent: PCColor.pink) {
+                    formSection(title: String(localized: "Steps"), accent: PCColor.pink) {
                         VStack(spacing: 12) {
                             ForEach(Array(viewModel.steps.enumerated()), id: \.element.id) { index, _ in
                                 StepRow(
@@ -45,15 +45,15 @@ struct RecipeFormView: View {
                                     onDelete: { viewModel.removeStep(at: index) }
                                 )
                             }
-                            addButton(title: "Add Step") { viewModel.addStep() }
+                            addButton(title: String(localized: "Add Step")) { viewModel.addStep() }
                         }
                     }
 
-                    formSection(title: "Tags", accent: PCColor.deepTeal) {
+                    formSection(title: String(localized: "Tags"), accent: PCColor.deepTeal) {
                         FlowLayout(spacing: 8) {
                             ForEach(viewModel.allTags) { tag in
                                 TagChip(
-                                    title: tag.name,
+                                    title: tag.localizedDisplayName(),
                                     isSelected: viewModel.selectedTagIDs.contains(tag.id),
                                     action: { viewModel.toggleTag(tag) }
                                 )
@@ -68,7 +68,7 @@ struct RecipeFormView: View {
                                     .frame(width: 120)
                                     .onSubmit { viewModel.confirmNewTag() }
                             } else {
-                                TagChip(title: "+ New Tag", isSelected: false) {
+                                TagChip(title: String(localized: "+ New Tag"), isSelected: false) {
                                     viewModel.beginAddingNewTag()
                                 }
                             }
@@ -217,17 +217,17 @@ private struct RowControls: View {
                 Image(systemName: "chevron.up")
             }
             .disabled(!canMoveUp)
-            .accessibilityLabel("Move up")
+            .accessibilityLabel(String(localized: "Move up"))
             Button(action: onMoveDown) {
                 Image(systemName: "chevron.down")
             }
             .disabled(!canMoveDown)
-            .accessibilityLabel("Move down")
+            .accessibilityLabel(String(localized: "Move down"))
             Button(action: onDelete) {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundStyle(PCColor.pink)
             }
-            .accessibilityLabel("Delete")
+            .accessibilityLabel(String(localized: "Delete"))
         }
         .font(.system(size: 15, weight: .semibold))
         .foregroundStyle(PCColor.textPrimary.opacity(0.55))

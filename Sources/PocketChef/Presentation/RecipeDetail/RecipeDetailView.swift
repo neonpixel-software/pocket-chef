@@ -22,7 +22,7 @@ struct RecipeDetailView: View {
                 if !recipe.tags.isEmpty {
                     FlowLayout(spacing: 8) {
                         ForEach(recipe.tags) { tag in
-                            Text(tag.name)
+                            Text(tag.localizedDisplayName())
                                 .font(PCFont.body(12, weight: .bold))
                                 .foregroundStyle(PCColor.ink)
                                 .padding(.horizontal, 10)
@@ -32,7 +32,7 @@ struct RecipeDetailView: View {
                     }
                 }
 
-                section(title: "Ingredients", accent: PCColor.teal) {
+                section(title: String(localized: "Ingredients"), accent: PCColor.teal) {
                     Group {
                         if recipe.ingredients.isEmpty {
                             Text("No ingredients listed")
@@ -65,7 +65,7 @@ struct RecipeDetailView: View {
                     .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
                 }
 
-                section(title: "Steps", accent: PCColor.pink) {
+                section(title: String(localized: "Steps"), accent: PCColor.pink) {
                     if recipe.steps.isEmpty {
                         Text("No steps listed")
                             .font(PCFont.body(15))

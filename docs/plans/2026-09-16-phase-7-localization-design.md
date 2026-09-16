@@ -22,43 +22,65 @@ verification.
   Apple standard, needs iOS 17+/macOS 14+ — this project targets 26, well
   past that. Gets native Xcode tooling and is the only mechanism SwiftUI's
   automatic `LocalizedStringKey` resolution targets.
-- **Automatic resolution covers most of the app for free.** SwiftUI's
+- **Automatic resolution covers direct SwiftUI API calls for free.** SwiftUI's
   `Text("...")`, `Button("...") { }`, `.navigationTitle("...")`,
   `TextField("...", text:)` etc. already take `LocalizedStringKey` when given
-  a string *literal*, and SwiftUI resolves that against the catalog at
-  runtime based on device language — no source changes needed for the ~50
-  View-layer literals the survey found. This explicitly excludes strings that
-  are the user's own content (recipe titles, ingredient text, steps, custom
-  tag names) — those display exactly as entered, never localized.
-- **Two exceptions need explicit `String(localized:)` code changes**, because
-  they pass a runtime `String` (not a literal) into `Text`/a property, which
-  bypasses automatic lookup:
+  a string *literal directly at that call site*, and SwiftUI resolves that
+  against the catalog at runtime based on device language — no source changes
+  needed for those. This explicitly excludes strings that are the user's own
+  content (recipe titles, ingredient text, steps, custom tag names) — those
+  display exactly as entered, never localized.
+- **Correction found during implementation**: several literals pass through
+  this app's own reusable components (`TagChip.title`, `PCHeader.title`,
+  `RecipeFormView.formSection(title:)`/`addButton(title:)`,
+  `RecipeDetailView.section(title:)`) whose parameter type is plain `String`,
+  not `LocalizedStringKey` — required, since those same parameters also carry
+  dynamic content (tag names, recipe titles) that must never be
+  catalog-looked-up. A literal passed into a `String`-typed parameter loses
+  the compile-time-literal context `LocalizedStringKey` needs, so it does
+  **not** auto-resolve. ~13 call sites (plus 3 `accessibilityLabel` calls,
+  wrapped to avoid relying on overload resolution) needed explicit
+  `String(localized:)` wrapping at the call site. The original "no source
+  changes needed" framing undersold this — it's still zero changes to
+  `TagChip`/`PCHeader`/`formSection`/`section` themselves (their `String`
+  parameter type is correct and unchanged), just call-site wrapping.
+- **Two further exceptions need explicit `String(localized:)` code changes**,
+  same underlying reason (runtime `String`, not a literal):
   - **View-model error messages** (`RecipeCaptureViewModel`,
     `RecipeURLCaptureViewModel` — 3 messages total): wrapped with
     `String(localized:)` at the assignment site.
   - **Preset tag display names**: `Tag.name` stays the stored/matching key
     exactly as today (`"Breakfast"`, etc.) — untouched, so
     `FindOrCreateTagUseCase`'s case-insensitive matching and existing
-    SwiftData rows keep working unchanged. A new `Tag.localizedDisplayName`
-    computed property maps the canonical English key to a localized string
-    only when `isPreset == true`; unknown/future preset names fall back to
-    the stored key. User-created or user-renamed tags are never localized —
-    `name` displays as typed, same as any other free-form user content.
+    SwiftData rows keep working unchanged. A new `Tag.localizedDisplayName()`
+    method maps the canonical English key to a localized string only when
+    `isPreset == true`; unknown/future preset names fall back to the stored
+    key. User-created or user-renamed tags are never localized — `name`
+    displays as typed, same as any other free-form user content.
 
 ## Testing plan
 
-- **Automated, locale-pinned unit tests** for the two exception cases (8
-  strings × 4 new locales = 32 assertions), using `String(localized:
-  locale:)`'s explicit locale override — deterministic regardless of the
-  test runner's system language:
-  ```swift
-  XCTAssertEqual(String(localized: "Breakfast", locale: Locale(identifier: "es")), "Desayuno")
-  ```
-  This catches missing/typo'd catalog entries with full automation, unlike
-  the AI-dependent phases.
-- **Not unit tested**: the ~50 View-layer strings resolved automatically by
-  SwiftUI/Foundation — testing those would just be re-testing the platform's
-  own localization mechanism, not app logic.
+- **Correction found during implementation**: the original plan was to pin
+  translations in tests via `String(localized:locale:)`'s `locale:`
+  parameter. Empirically, that parameter affects in-string formatting
+  (plurals, numbers) but does **not** select which translation is used —
+  selection follows `Bundle.preferredLocalizations` (the process's actual
+  system language), which an explicit `locale:` argument doesn't override.
+  Confirmed by direct experiment: `String(localized: "Breakfast", locale:
+  Locale(identifier: "es"))` returned `"Breakfast"`, not `"Desayuno"`, even
+  with `bundle:` also passed explicitly. Switched to reading the compiled
+  catalog output directly — `Bundle(path: "<lang>.lproj").localizedString
+  (forKey:value:table:)`, the same lower-level API SwiftUI's own
+  localization machinery is built on — via a shared `LocalizationTestHelper`.
+  This is deterministic regardless of the test runner's system language and
+  doesn't depend on the unreliable `locale:` override.
+- **Automated tests** using that helper for the two exception cases (8
+  strings × 4 new locales = 32 assertions) — catches missing/typo'd catalog
+  entries with full automation, unlike the AI-dependent phases.
+- **Not unit tested**: the strings resolved automatically by SwiftUI/
+  Foundation via direct `Text("...")`/`Button("...")`/etc. literals —
+  testing those would just be re-testing the platform's own localization
+  mechanism, not app logic.
 - **Manual verification**: run the built macOS app forcing Spanish (`-
   AppleLanguages "(es)"` launch argument), screenshot the recipe list,
   add-recipe chooser, capture screen, and recipe form — checking for no raw

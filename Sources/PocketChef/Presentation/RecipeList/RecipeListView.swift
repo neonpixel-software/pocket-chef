@@ -61,7 +61,7 @@ struct RecipeListView: View {
             }
             .background(PCColor.background)
             .safeAreaInset(edge: .top, spacing: 0) {
-                PCHeader(title: "Recipes")
+                PCHeader(title: String(localized: "Recipes"))
             }
             .navigationTitle("")
             .toolbar {
@@ -141,11 +141,11 @@ struct RecipeListView: View {
     private var tagFilterRow: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                TagChip(title: "All", isSelected: viewModel.selectedTagID == nil) {
+                TagChip(title: String(localized: "All"), isSelected: viewModel.selectedTagID == nil) {
                     viewModel.selectTag(nil)
                 }
                 ForEach(viewModel.allTags) { tag in
-                    TagChip(title: tag.name, isSelected: viewModel.selectedTagID == tag.id) {
+                    TagChip(title: tag.localizedDisplayName(), isSelected: viewModel.selectedTagID == tag.id) {
                         viewModel.selectTag(tag.id)
                     }
                 }
@@ -171,7 +171,7 @@ private struct RecipeRow: View {
                 if !recipe.tags.isEmpty {
                     FlowLayout(spacing: 6) {
                         ForEach(recipe.tags) { tag in
-                            Text(tag.name)
+                            Text(tag.localizedDisplayName())
                                 .font(PCFont.body(11, weight: .bold))
                                 .foregroundStyle(PCColor.ink)
                                 .padding(.horizontal, 9)
