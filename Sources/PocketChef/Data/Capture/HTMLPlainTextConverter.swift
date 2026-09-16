@@ -7,8 +7,11 @@ import AppKit
 
 /// The HTML-importing `NSAttributedString` initializer used below is declared by
 /// UIKit/AppKit, not plain Foundation, hence the platform import above even though
-/// this type otherwise has no UI dependency.
+/// this type otherwise has no UI dependency. It uses WebKit internally and Apple's
+/// documentation requires it to run on the main thread, hence @MainActor rather than
+/// letting it run on whatever thread an async caller happens to be on.
 enum HTMLPlainTextConverter {
+    @MainActor
     static func plainText(fromHTML html: String) -> String? {
         guard let data = html.data(using: .utf8) else { return nil }
         guard let attributed = try? NSAttributedString(

@@ -13,7 +13,7 @@ final class URLSessionWebPageFetcher: WebPageFetcher {
         }
 
         guard let html = String(data: data, encoding: .utf8),
-              let plainText = HTMLPlainTextConverter.plainText(fromHTML: html) else {
+              let plainText = await HTMLPlainTextConverter.plainText(fromHTML: html) else {
             throw WebPageFetchError.emptyContent
         }
         return plainText
