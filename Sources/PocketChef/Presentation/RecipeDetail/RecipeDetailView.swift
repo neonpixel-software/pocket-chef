@@ -9,7 +9,7 @@ struct RecipeDetailView: View {
     /// re-triggered on macOS, so the list can't rely on lifecycle events alone.
     private let onRecipeChanged: () -> Void
 
-    init(viewModel: RecipeDetailViewModel, onRecipeChanged: @escaping () -> Void = {}) {
+    init(viewModel: RecipeDetailViewModel, onRecipeChanged: @escaping () -> Void = { /* no-op: not every caller needs to react to changes */ }) {
         _viewModel = Bindable(viewModel)
         self.onRecipeChanged = onRecipeChanged
     }
@@ -116,7 +116,7 @@ struct RecipeDetailView: View {
             titleVisibility: .visible
         ) {
             Button("Delete", role: .destructive) { viewModel.delete() }
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) { /* no-op: the dialog dismisses on its own */ }
         }
         .onChange(of: viewModel.isDeleted) { _, isDeleted in
             if isDeleted {

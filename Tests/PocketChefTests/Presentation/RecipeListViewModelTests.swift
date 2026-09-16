@@ -66,7 +66,7 @@ private func makeViewModel(
     fetchTagsResult: Result<[Tag], Error> = .success([]),
     captureAvailable: Bool = true
 ) -> RecipeListViewModel {
-    RecipeListViewModel(
+    RecipeListViewModel(dependencies: .init(
         fetchRecipesUseCase: FakeFetchRecipesUseCase(result: fetchResult),
         createRecipeUseCase: NoOpCreateRecipeUseCase(),
         updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
@@ -76,7 +76,7 @@ private func makeViewModel(
         captureRecipeUseCase: NoOpCaptureRecipeUseCase(),
         checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(result: captureAvailable),
         captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase()
-    )
+    ))
 }
 
 final class RecipeListViewModelTests: XCTestCase {
@@ -107,7 +107,7 @@ final class RecipeListViewModelTests: XCTestCase {
             if call == 1 { throw UseCaseFailure() }
             return [recipe]
         }
-        let viewModel = RecipeListViewModel(
+        let viewModel = RecipeListViewModel(dependencies: .init(
             fetchRecipesUseCase: useCase,
             createRecipeUseCase: NoOpCreateRecipeUseCase(),
             updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
@@ -117,7 +117,7 @@ final class RecipeListViewModelTests: XCTestCase {
             captureRecipeUseCase: NoOpCaptureRecipeUseCase(),
             checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(),
             captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase()
-        )
+        ))
 
         viewModel.load()
         XCTAssertNotNil(viewModel.errorMessage)

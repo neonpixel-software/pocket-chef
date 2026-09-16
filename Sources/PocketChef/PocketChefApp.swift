@@ -8,6 +8,7 @@ struct PocketChefApp: App {
     private let tagRepository: TagRepository
     private let captureService: RecipeCaptureService
     private let webPageFetcher: WebPageFetcher
+    private let captureRecipeUseCase: CaptureRecipeUseCase
 
     init() {
         PCFontRegistrar.registerCustomFonts()
@@ -21,6 +22,7 @@ struct PocketChefApp: App {
         tagRepository = SwiftDataTagRepository(modelContext: modelContainer.mainContext)
         captureService = FoundationModelsRecipeCaptureService()
         webPageFetcher = URLSessionWebPageFetcher()
+        captureRecipeUseCase = DefaultCaptureRecipeUseCase(captureService: captureService)
 
         modelContainer.mainContext.seedPresetTagsIfNeeded()
 
@@ -31,20 +33,20 @@ struct PocketChefApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RecipeListView(viewModel: RecipeListViewModel(
+            RecipeListView(viewModel: RecipeListViewModel(dependencies: .init(
                 fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: recipeRepository),
                 createRecipeUseCase: DefaultCreateRecipeUseCase(repository: recipeRepository),
                 updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: recipeRepository),
                 deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: recipeRepository),
                 fetchTagsUseCase: DefaultFetchTagsUseCase(repository: tagRepository),
                 findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository),
-                captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: captureService),
+                captureRecipeUseCase: captureRecipeUseCase,
                 checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: captureService),
                 captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
                     webPageFetcher: webPageFetcher,
-                    captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: captureService)
+                    captureRecipeUseCase: captureRecipeUseCase
                 )
-            ))
+            )))
         }
         .modelContainer(modelContainer)
     }

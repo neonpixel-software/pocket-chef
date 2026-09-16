@@ -3,41 +3,31 @@ import Observation
 
 @Observable
 final class RecipeListViewModel {
+    /// Bundles the view model's use case dependencies into one parameter so the initializer
+    /// stays under SonarCloud's constructor-arity limit. Relies on Swift's synthesized
+    /// memberwise initializer rather than writing one by hand, since a hand-written
+    /// initializer here would just move the same arity problem into this struct.
+    struct Dependencies {
+        let fetchRecipesUseCase: FetchRecipesUseCase
+        let createRecipeUseCase: CreateRecipeUseCase
+        let updateRecipeUseCase: UpdateRecipeUseCase
+        let deleteRecipeUseCase: DeleteRecipeUseCase
+        let fetchTagsUseCase: FetchTagsUseCase
+        let findOrCreateTagUseCase: FindOrCreateTagUseCase
+        let captureRecipeUseCase: CaptureRecipeUseCase
+        let checkCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase
+        let captureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase
+    }
+
     private(set) var recipes: [Recipe] = []
     private(set) var allTags: [Tag] = []
     var selectedTagID: UUID?
     private(set) var errorMessage: String?
 
-    private let fetchRecipesUseCase: FetchRecipesUseCase
-    private let createRecipeUseCase: CreateRecipeUseCase
-    private let updateRecipeUseCase: UpdateRecipeUseCase
-    private let deleteRecipeUseCase: DeleteRecipeUseCase
-    private let fetchTagsUseCase: FetchTagsUseCase
-    private let findOrCreateTagUseCase: FindOrCreateTagUseCase
-    private let captureRecipeUseCase: CaptureRecipeUseCase
-    private let checkCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase
-    private let captureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase
+    private let dependencies: Dependencies
 
-    init(
-        fetchRecipesUseCase: FetchRecipesUseCase,
-        createRecipeUseCase: CreateRecipeUseCase,
-        updateRecipeUseCase: UpdateRecipeUseCase,
-        deleteRecipeUseCase: DeleteRecipeUseCase,
-        fetchTagsUseCase: FetchTagsUseCase,
-        findOrCreateTagUseCase: FindOrCreateTagUseCase,
-        captureRecipeUseCase: CaptureRecipeUseCase,
-        checkCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase,
-        captureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase
-    ) {
-        self.fetchRecipesUseCase = fetchRecipesUseCase
-        self.createRecipeUseCase = createRecipeUseCase
-        self.updateRecipeUseCase = updateRecipeUseCase
-        self.deleteRecipeUseCase = deleteRecipeUseCase
-        self.fetchTagsUseCase = fetchTagsUseCase
-        self.findOrCreateTagUseCase = findOrCreateTagUseCase
-        self.captureRecipeUseCase = captureRecipeUseCase
-        self.checkCaptureAvailabilityUseCase = checkCaptureAvailabilityUseCase
-        self.captureRecipeFromURLUseCase = captureRecipeFromURLUseCase
+    init(dependencies: Dependencies) {
+        self.dependencies = dependencies
     }
 
     var filteredRecipes: [Recipe] {
@@ -46,12 +36,12 @@ final class RecipeListViewModel {
     }
 
     var isCaptureAvailable: Bool {
-        checkCaptureAvailabilityUseCase.execute()
+        dependencies.checkCaptureAvailabilityUseCase.execute()
     }
 
     func load() {
         do {
-            recipes = try fetchRecipesUseCase.execute()
+            recipes = try dependencies.fetchRecipesUseCase.execute()
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
@@ -60,7 +50,7 @@ final class RecipeListViewModel {
 
     func loadTags() {
         do {
-            allTags = try fetchTagsUseCase.execute().sortedPresetsFirst()
+            allTags = try dependencies.fetchTagsUseCase.execute().sortedPresetsFirst()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -72,7 +62,7 @@ final class RecipeListViewModel {
 
     func delete(_ recipe: Recipe) {
         do {
-            try deleteRecipeUseCase.execute(id: recipe.id)
+            try dependencies.deleteRecipeUseCase.execute(id: recipe.id)
             recipes.removeAll { $0.id == recipe.id }
             errorMessage = nil
         } catch {
@@ -83,41 +73,41 @@ final class RecipeListViewModel {
     func makeNewRecipeFormViewModel() -> RecipeFormViewModel {
         RecipeFormViewModel(
             mode: .create,
-            createRecipeUseCase: createRecipeUseCase,
-            updateRecipeUseCase: updateRecipeUseCase,
-            fetchTagsUseCase: fetchTagsUseCase,
-            findOrCreateTagUseCase: findOrCreateTagUseCase
+            createRecipeUseCase: dependencies.createRecipeUseCase,
+            updateRecipeUseCase: dependencies.updateRecipeUseCase,
+            fetchTagsUseCase: dependencies.fetchTagsUseCase,
+            findOrCreateTagUseCase: dependencies.findOrCreateTagUseCase
         )
     }
 
     func makeCaptureReviewFormViewModel(for recipe: Recipe) -> RecipeFormViewModel {
         RecipeFormViewModel(
             mode: .capture(recipe),
-            createRecipeUseCase: createRecipeUseCase,
-            updateRecipeUseCase: updateRecipeUseCase,
-            fetchTagsUseCase: fetchTagsUseCase,
-            findOrCreateTagUseCase: findOrCreateTagUseCase
+            createRecipeUseCase: dependencies.createRecipeUseCase,
+            updateRecipeUseCase: dependencies.updateRecipeUseCase,
+            fetchTagsUseCase: dependencies.fetchTagsUseCase,
+            findOrCreateTagUseCase: dependencies.findOrCreateTagUseCase
         )
     }
 
     func makeDetailViewModel(for recipe: Recipe) -> RecipeDetailViewModel {
         RecipeDetailViewModel(
             recipe: recipe,
-            createRecipeUseCase: createRecipeUseCase,
-            updateRecipeUseCase: updateRecipeUseCase,
-            deleteRecipeUseCase: deleteRecipeUseCase,
-            fetchTagsUseCase: fetchTagsUseCase,
-            findOrCreateTagUseCase: findOrCreateTagUseCase
+            createRecipeUseCase: dependencies.createRecipeUseCase,
+            updateRecipeUseCase: dependencies.updateRecipeUseCase,
+            deleteRecipeUseCase: dependencies.deleteRecipeUseCase,
+            fetchTagsUseCase: dependencies.fetchTagsUseCase,
+            findOrCreateTagUseCase: dependencies.findOrCreateTagUseCase
         )
     }
 
     @MainActor
     func makeCaptureViewModel() -> RecipeCaptureViewModel {
-        RecipeCaptureViewModel(captureRecipeUseCase: captureRecipeUseCase)
+        RecipeCaptureViewModel(captureRecipeUseCase: dependencies.captureRecipeUseCase)
     }
 
     @MainActor
     func makeURLCaptureViewModel() -> RecipeURLCaptureViewModel {
-        RecipeURLCaptureViewModel(captureRecipeFromURLUseCase: captureRecipeFromURLUseCase)
+        RecipeURLCaptureViewModel(captureRecipeFromURLUseCase: dependencies.captureRecipeFromURLUseCase)
     }
 }

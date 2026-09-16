@@ -5,12 +5,12 @@ import SwiftUI
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8
 
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache _: inout ()) -> CGSize {
         let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
         return Self.packedSize(for: sizes, maxWidth: proposal.width ?? .infinity, spacing: spacing)
     }
 
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+    func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
         let sizes = subviews.map { $0.sizeThatFits(.unspecified) }
         let positions = Self.positions(for: sizes, maxWidth: bounds.width, spacing: spacing)
         for index in subviews.indices {
