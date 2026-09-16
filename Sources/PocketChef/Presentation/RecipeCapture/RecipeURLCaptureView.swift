@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct RecipeURLCaptureView: View {
+    /// Example placeholder text for the URL field, not a real endpoint.
+    private static let urlFieldPlaceholder = "https://example.com/recipe"
+
     @Bindable private var viewModel: RecipeURLCaptureViewModel
     @Environment(\.dismiss) private var dismiss
     let onCaptured: (Recipe) -> Void
@@ -17,7 +20,7 @@ struct RecipeURLCaptureView: View {
                     .font(PCFont.body(14))
                     .foregroundStyle(PCColor.textPrimary.opacity(0.7))
 
-                TextField("https://example.com/recipe", text: $viewModel.urlText)
+                TextField(Self.urlFieldPlaceholder, text: $viewModel.urlText)
                     .font(PCFont.body(15))
                     .foregroundStyle(PCColor.textPrimary)
                     .padding(16)
