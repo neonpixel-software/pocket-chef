@@ -5,7 +5,7 @@ import Foundation
 struct PreviewRecipeCaptureService: RecipeCaptureService {
     func isAvailable() -> Bool { true }
 
-    func captureRecipe(from text: String) async throws -> Recipe {
+    func captureRecipe(from _: String) async throws -> Recipe {
         SampleData.recipes[0]
     }
 }

@@ -89,7 +89,7 @@ struct RecipeListView: View {
                     }
                 }
                 Button("Enter Manually") { isPresentingNewRecipe = true }
-                Button("Cancel", role: .cancel) {}
+                Button("Cancel", role: .cancel) { /* no-op: the dialog dismisses on its own */ }
             }
             .alert("AI Capture Unavailable", isPresented: $isPresentingCaptureUnavailableAlert) {
                 Button("OK") { isPresentingNewRecipe = true }
@@ -199,7 +199,7 @@ private struct RecipeRow: View {
 
 #Preview {
     PCFontRegistrar.registerCustomFonts()
-    return RecipeListView(viewModel: RecipeListViewModel(
+    return RecipeListView(viewModel: RecipeListViewModel(dependencies: .init(
         fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: PreviewRecipeRepository()),
         createRecipeUseCase: DefaultCreateRecipeUseCase(repository: PreviewRecipeRepository()),
         updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: PreviewRecipeRepository()),
@@ -212,5 +212,5 @@ private struct RecipeRow: View {
             webPageFetcher: PreviewWebPageFetcher(),
             captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: PreviewRecipeCaptureService())
         )
-    ))
+    )))
 }
