@@ -36,7 +36,7 @@ final class RecipeCaptureViewModel {
             if case let RecipeCaptureError.captureFailed(underlying) = error {
                 print("Recipe capture failed: \(underlying)")
             }
-            errorMessage = "Couldn't extract a recipe from that text. Check it over and try again."
+            errorMessage = String(localized: "Couldn't extract a recipe from that text. Check it over and try again.")
             return nil
         }
     }

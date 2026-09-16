@@ -32,9 +32,9 @@ final class RecipeURLCaptureViewModel {
         } catch {
             print("Recipe URL capture failed: \(error)")
             if error is WebPageFetchError {
-                errorMessage = "Couldn't load that page. Check the link and try again."
+                errorMessage = String(localized: "Couldn't load that page. Check the link and try again.")
             } else {
-                errorMessage = "Couldn't find a recipe on that page. Check it over and try again."
+                errorMessage = String(localized: "Couldn't find a recipe on that page. Check it over and try again.")
             }
             return nil
         }
