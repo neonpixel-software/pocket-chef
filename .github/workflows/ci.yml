@@ -32,7 +32,7 @@ jobs:
           Scripts/xccov-to-sonarqube-generic.sh ios.xcresult > coverage-ios.xml
           Scripts/xccov-to-sonarqube-generic.sh macos.xcresult > coverage-macos.xml
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-reports
           path: |
