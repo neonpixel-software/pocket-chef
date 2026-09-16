@@ -21,6 +21,21 @@ private final class FakeUpdateRecipeUseCase: UpdateRecipeUseCase {
     }
 }
 
+private final class FakeFetchTagsUseCase: FetchTagsUseCase {
+    var result: Result<[Tag], Error> = .success([])
+    func execute() throws -> [Tag] { try result.get() }
+}
+
+private final class FakeFindOrCreateTagUseCase: FindOrCreateTagUseCase {
+    var resultProvider: (String) -> Result<Tag, Error> = { name in .success(Tag(id: UUID(), name: name, isPreset: false)) }
+    private(set) var requestedNames: [String] = []
+
+    func execute(name: String) throws -> Tag {
+        requestedNames.append(name)
+        return try resultProvider(name).get()
+    }
+}
+
 private struct UseCaseFailure: LocalizedError {
     var errorDescription: String? { "Something went wrong" }
 }
@@ -267,13 +282,132 @@ final class RecipeFormViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "Something went wrong")
     }
 
+    // MARK: tags
+
+    func testToggleTagAddsAndRemovesFromSelection() {
+        let viewModel = makeViewModel(mode: .create)
+        let tag = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+
+        viewModel.toggleTag(tag)
+        XCTAssertTrue(viewModel.selectedTagIDs.contains(tag.id))
+
+        viewModel.toggleTag(tag)
+        XCTAssertFalse(viewModel.selectedTagIDs.contains(tag.id))
+    }
+
+    func testLoadTagsPopulatesAllTagsSortedPresetsFirst() {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let spicy = Tag(id: UUID(), name: "Spicy", isPreset: false)
+        let fetchTagsUseCase = FakeFetchTagsUseCase()
+        fetchTagsUseCase.result = .success([spicy, breakfast])
+        let viewModel = makeViewModel(mode: .create, fetchTagsUseCase: fetchTagsUseCase)
+
+        viewModel.loadTags()
+
+        XCTAssertEqual(viewModel.allTags, [breakfast, spicy])
+    }
+
+    func testEditModePreselectsExistingRecipeTagsAndMergesMissingOnesIntoAllTags() {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let original = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [breakfast])
+        let fetchTagsUseCase = FakeFetchTagsUseCase()
+        fetchTagsUseCase.result = .success([]) // simulates a fetch that hasn't caught up yet
+        let viewModel = makeViewModel(mode: .edit(original), fetchTagsUseCase: fetchTagsUseCase)
+
+        XCTAssertTrue(viewModel.selectedTagIDs.contains(breakfast.id))
+
+        viewModel.loadTags()
+
+        XCTAssertEqual(viewModel.allTags, [breakfast])
+        XCTAssertTrue(viewModel.selectedTagIDs.contains(breakfast.id))
+    }
+
+    func testConfirmNewTagCreatesAddsAndSelectsTag() {
+        let viewModel = makeViewModel(mode: .create)
+        viewModel.newTagName = "  Spicy  "
+        viewModel.isAddingNewTag = true
+
+        viewModel.confirmNewTag()
+
+        XCTAssertEqual(viewModel.allTags.map(\.name), ["Spicy"])
+        XCTAssertTrue(viewModel.selectedTagIDs.contains(viewModel.allTags[0].id))
+        XCTAssertEqual(viewModel.newTagName, "")
+        XCTAssertFalse(viewModel.isAddingNewTag)
+    }
+
+    func testConfirmNewTagDoesNothingWhenNameIsBlank() {
+        let viewModel = makeViewModel(mode: .create)
+        viewModel.newTagName = "   "
+        viewModel.isAddingNewTag = true
+
+        viewModel.confirmNewTag()
+
+        XCTAssertTrue(viewModel.allTags.isEmpty)
+        XCTAssertFalse(viewModel.isAddingNewTag)
+    }
+
+    func testConfirmNewTagReusesExistingTagWithoutDuplicatingInAllTags() {
+        let existing = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let fetchTagsUseCase = FakeFetchTagsUseCase()
+        fetchTagsUseCase.result = .success([existing])
+        let findOrCreateTagUseCase = FakeFindOrCreateTagUseCase()
+        findOrCreateTagUseCase.resultProvider = { _ in .success(existing) }
+        let viewModel = makeViewModel(mode: .create, fetchTagsUseCase: fetchTagsUseCase, findOrCreateTagUseCase: findOrCreateTagUseCase)
+        viewModel.loadTags()
+
+        viewModel.newTagName = "breakfast"
+        viewModel.confirmNewTag()
+
+        XCTAssertEqual(viewModel.allTags, [existing])
+        XCTAssertTrue(viewModel.selectedTagIDs.contains(existing.id))
+    }
+
+    func testSaveIncludesOnlySelectedTags() throws {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let lunch = Tag(id: UUID(), name: "Lunch", isPreset: true)
+        let fetchTagsUseCase = FakeFetchTagsUseCase()
+        fetchTagsUseCase.result = .success([breakfast, lunch])
+        let createUseCase = FakeCreateRecipeUseCase()
+        let viewModel = makeViewModel(mode: .create, createUseCase: createUseCase, fetchTagsUseCase: fetchTagsUseCase)
+        viewModel.title = "Pancakes"
+        viewModel.loadTags()
+        viewModel.toggleTag(breakfast)
+
+        let saved = viewModel.save()
+
+        let recipe = try XCTUnwrap(saved)
+        XCTAssertEqual(recipe.tags, [breakfast])
+    }
+
+    func testEditModeSaveReflectsDeselectingAnOriginalTag() throws {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let original = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [breakfast])
+        let updateUseCase = FakeUpdateRecipeUseCase()
+        let viewModel = makeViewModel(mode: .edit(original), updateUseCase: updateUseCase)
+        viewModel.loadTags()
+
+        viewModel.toggleTag(breakfast)
+        let saved = viewModel.save()
+
+        let recipe = try XCTUnwrap(saved)
+        XCTAssertEqual(recipe.tags, [])
+    }
+
     // MARK: helpers
 
     private func makeViewModel(
         mode: RecipeFormMode,
         createUseCase: FakeCreateRecipeUseCase = FakeCreateRecipeUseCase(),
-        updateUseCase: FakeUpdateRecipeUseCase = FakeUpdateRecipeUseCase()
+        updateUseCase: FakeUpdateRecipeUseCase = FakeUpdateRecipeUseCase(),
+        fetchTagsUseCase: FakeFetchTagsUseCase = FakeFetchTagsUseCase(),
+        findOrCreateTagUseCase: FakeFindOrCreateTagUseCase = FakeFindOrCreateTagUseCase()
     ) -> RecipeFormViewModel {
-        RecipeFormViewModel(mode: mode, createRecipeUseCase: createUseCase, updateRecipeUseCase: updateUseCase)
+        RecipeFormViewModel(
+            mode: mode,
+            createRecipeUseCase: createUseCase,
+            updateRecipeUseCase: updateUseCase,
+            fetchTagsUseCase: fetchTagsUseCase,
+            findOrCreateTagUseCase: findOrCreateTagUseCase
+        )
     }
 }

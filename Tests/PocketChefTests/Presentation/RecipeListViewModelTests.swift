@@ -25,19 +25,36 @@ private struct FakeDeleteRecipeUseCase: DeleteRecipeUseCase {
     }
 }
 
+private struct FakeFetchTagsUseCase: FetchTagsUseCase {
+    var result: Result<[Tag], Error> = .success([])
+
+    func execute() throws -> [Tag] {
+        try result.get()
+    }
+}
+
+private struct NoOpFindOrCreateTagUseCase: FindOrCreateTagUseCase {
+    func execute(name: String) throws -> Tag {
+        Tag(id: UUID(), name: name, isPreset: false)
+    }
+}
+
 private struct UseCaseFailure: LocalizedError {
     var errorDescription: String? { "Something went wrong" }
 }
 
 private func makeViewModel(
     fetchResult: Result<[Recipe], Error> = .success([]),
-    deleteResult: Result<Void, Error> = .success(())
+    deleteResult: Result<Void, Error> = .success(()),
+    fetchTagsResult: Result<[Tag], Error> = .success([])
 ) -> RecipeListViewModel {
     RecipeListViewModel(
         fetchRecipesUseCase: FakeFetchRecipesUseCase(result: fetchResult),
         createRecipeUseCase: NoOpCreateRecipeUseCase(),
         updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-        deleteRecipeUseCase: FakeDeleteRecipeUseCase(result: deleteResult)
+        deleteRecipeUseCase: FakeDeleteRecipeUseCase(result: deleteResult),
+        fetchTagsUseCase: FakeFetchTagsUseCase(result: fetchTagsResult),
+        findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
     )
 }
 
@@ -73,7 +90,9 @@ final class RecipeListViewModelTests: XCTestCase {
             fetchRecipesUseCase: useCase,
             createRecipeUseCase: NoOpCreateRecipeUseCase(),
             updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: FakeDeleteRecipeUseCase()
+            deleteRecipeUseCase: FakeDeleteRecipeUseCase(),
+            fetchTagsUseCase: FakeFetchTagsUseCase(),
+            findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
         )
 
         viewModel.load()
@@ -123,6 +142,42 @@ final class RecipeListViewModelTests: XCTestCase {
         let detailViewModel = viewModel.makeDetailViewModel(for: recipe)
 
         XCTAssertEqual(detailViewModel.recipe, recipe)
+    }
+
+    // MARK: tag filtering
+
+    func testLoadTagsPopulatesAllTagsSortedPresetsFirst() {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let spicy = Tag(id: UUID(), name: "Spicy", isPreset: false)
+        let viewModel = makeViewModel(fetchTagsResult: .success([spicy, breakfast]))
+
+        viewModel.loadTags()
+
+        XCTAssertEqual(viewModel.allTags, [breakfast, spicy])
+    }
+
+    func testFilteredRecipesReturnsAllRecipesWhenNoTagSelected() {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let pancakes = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [breakfast])
+        let soup = Recipe(id: UUID(), title: "Soup", ingredients: [], steps: [], source: .typed, tags: [])
+        let viewModel = makeViewModel(fetchResult: .success([pancakes, soup]))
+        viewModel.load()
+
+        XCTAssertEqual(viewModel.filteredRecipes, [pancakes, soup])
+    }
+
+    func testSelectingATagNarrowsFilteredRecipesAndClearingRestoresFullList() {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let pancakes = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [breakfast])
+        let soup = Recipe(id: UUID(), title: "Soup", ingredients: [], steps: [], source: .typed, tags: [])
+        let viewModel = makeViewModel(fetchResult: .success([pancakes, soup]))
+        viewModel.load()
+
+        viewModel.selectTag(breakfast.id)
+        XCTAssertEqual(viewModel.filteredRecipes, [pancakes])
+
+        viewModel.selectTag(nil)
+        XCTAssertEqual(viewModel.filteredRecipes, [pancakes, soup])
     }
 }
 
