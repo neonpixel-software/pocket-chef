@@ -5,10 +5,12 @@ struct RecipeListView: View {
     @State private var isPresentingNewRecipe = false
     @State private var isPresentingAddChooser = false
     @State private var isPresentingCapture = false
+    @State private var isPresentingURLCapture = false
     @State private var isPresentingCaptureUnavailableAlert = false
     /// Staged between the capture sheet dismissing and the review sheet presenting, so the
     /// two sheet transitions don't race (see the sheet's onDismiss below).
     @State private var pendingCaptureReview: Recipe?
+    @State private var pendingURLCaptureReview: Recipe?
     @State private var reviewingCapturedRecipe: Recipe?
 
     init(viewModel: RecipeListViewModel) {
@@ -79,6 +81,13 @@ struct RecipeListView: View {
                         isPresentingCaptureUnavailableAlert = true
                     }
                 }
+                Button("Paste a Link") {
+                    if viewModel.isCaptureAvailable {
+                        isPresentingURLCapture = true
+                    } else {
+                        isPresentingCaptureUnavailableAlert = true
+                    }
+                }
                 Button("Enter Manually") { isPresentingNewRecipe = true }
                 Button("Cancel", role: .cancel) {}
             }
@@ -102,6 +111,17 @@ struct RecipeListView: View {
                 RecipeCaptureView(viewModel: viewModel.makeCaptureViewModel()) { recipe in
                     pendingCaptureReview = recipe
                     isPresentingCapture = false
+                }
+            }
+            .sheet(isPresented: $isPresentingURLCapture, onDismiss: {
+                if let recipe = pendingURLCaptureReview {
+                    pendingURLCaptureReview = nil
+                    reviewingCapturedRecipe = recipe
+                }
+            }) {
+                RecipeURLCaptureView(viewModel: viewModel.makeURLCaptureViewModel()) { recipe in
+                    pendingURLCaptureReview = recipe
+                    isPresentingURLCapture = false
                 }
             }
             .sheet(item: $reviewingCapturedRecipe) { recipe in
@@ -187,6 +207,10 @@ private struct RecipeRow: View {
         fetchTagsUseCase: DefaultFetchTagsUseCase(repository: PreviewTagRepository()),
         findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: PreviewTagRepository()),
         captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: PreviewRecipeCaptureService()),
-        checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: PreviewRecipeCaptureService())
+        checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: PreviewRecipeCaptureService()),
+        captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
+            webPageFetcher: PreviewWebPageFetcher(),
+            captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: PreviewRecipeCaptureService())
+        )
     ))
 }

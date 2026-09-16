@@ -50,6 +50,12 @@ private struct FakeCheckCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseC
     func execute() -> Bool { result }
 }
 
+private struct NoOpCaptureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase {
+    func execute(urlString: String) async throws -> Recipe {
+        Recipe(id: UUID(), title: "", ingredients: [], steps: [], source: .typed, tags: [])
+    }
+}
+
 private struct UseCaseFailure: LocalizedError {
     var errorDescription: String? { "Something went wrong" }
 }
@@ -68,7 +74,8 @@ private func makeViewModel(
         fetchTagsUseCase: FakeFetchTagsUseCase(result: fetchTagsResult),
         findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase(),
         captureRecipeUseCase: NoOpCaptureRecipeUseCase(),
-        checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(result: captureAvailable)
+        checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(result: captureAvailable),
+        captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase()
     )
 }
 
@@ -108,7 +115,8 @@ final class RecipeListViewModelTests: XCTestCase {
             fetchTagsUseCase: FakeFetchTagsUseCase(),
             findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase(),
             captureRecipeUseCase: NoOpCaptureRecipeUseCase(),
-            checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase()
+            checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(),
+            captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase()
         )
 
         viewModel.load()
@@ -220,6 +228,16 @@ final class RecipeListViewModelTests: XCTestCase {
         let formViewModel = viewModel.makeCaptureReviewFormViewModel(for: recipe)
 
         XCTAssertEqual(formViewModel.title, "Pancakes")
+    }
+
+    @MainActor
+    func testMakeURLCaptureViewModelStartsBlank() {
+        let viewModel = makeViewModel()
+
+        let urlCaptureViewModel = viewModel.makeURLCaptureViewModel()
+
+        XCTAssertEqual(urlCaptureViewModel.urlText, "")
+        XCTAssertFalse(urlCaptureViewModel.canCapture)
     }
 }
 

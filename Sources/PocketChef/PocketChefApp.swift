@@ -7,6 +7,7 @@ struct PocketChefApp: App {
     private let recipeRepository: RecipeRepository
     private let tagRepository: TagRepository
     private let captureService: RecipeCaptureService
+    private let webPageFetcher: WebPageFetcher
 
     init() {
         PCFontRegistrar.registerCustomFonts()
@@ -19,6 +20,7 @@ struct PocketChefApp: App {
         recipeRepository = SwiftDataRecipeRepository(modelContext: modelContainer.mainContext)
         tagRepository = SwiftDataTagRepository(modelContext: modelContainer.mainContext)
         captureService = FoundationModelsRecipeCaptureService()
+        webPageFetcher = URLSessionWebPageFetcher()
 
         modelContainer.mainContext.seedPresetTagsIfNeeded()
 
@@ -37,7 +39,11 @@ struct PocketChefApp: App {
                 fetchTagsUseCase: DefaultFetchTagsUseCase(repository: tagRepository),
                 findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository),
                 captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: captureService),
-                checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: captureService)
+                checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: captureService),
+                captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
+                    webPageFetcher: webPageFetcher,
+                    captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: captureService)
+                )
             ))
         }
         .modelContainer(modelContainer)

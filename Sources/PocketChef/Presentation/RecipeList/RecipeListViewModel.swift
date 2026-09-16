@@ -16,6 +16,7 @@ final class RecipeListViewModel {
     private let findOrCreateTagUseCase: FindOrCreateTagUseCase
     private let captureRecipeUseCase: CaptureRecipeUseCase
     private let checkCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase
+    private let captureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase
 
     init(
         fetchRecipesUseCase: FetchRecipesUseCase,
@@ -25,7 +26,8 @@ final class RecipeListViewModel {
         fetchTagsUseCase: FetchTagsUseCase,
         findOrCreateTagUseCase: FindOrCreateTagUseCase,
         captureRecipeUseCase: CaptureRecipeUseCase,
-        checkCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase
+        checkCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase,
+        captureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase
     ) {
         self.fetchRecipesUseCase = fetchRecipesUseCase
         self.createRecipeUseCase = createRecipeUseCase
@@ -35,6 +37,7 @@ final class RecipeListViewModel {
         self.findOrCreateTagUseCase = findOrCreateTagUseCase
         self.captureRecipeUseCase = captureRecipeUseCase
         self.checkCaptureAvailabilityUseCase = checkCaptureAvailabilityUseCase
+        self.captureRecipeFromURLUseCase = captureRecipeFromURLUseCase
     }
 
     var filteredRecipes: [Recipe] {
@@ -111,5 +114,10 @@ final class RecipeListViewModel {
     @MainActor
     func makeCaptureViewModel() -> RecipeCaptureViewModel {
         RecipeCaptureViewModel(captureRecipeUseCase: captureRecipeUseCase)
+    }
+
+    @MainActor
+    func makeURLCaptureViewModel() -> RecipeURLCaptureViewModel {
+        RecipeURLCaptureViewModel(captureRecipeFromURLUseCase: captureRecipeFromURLUseCase)
     }
 }
