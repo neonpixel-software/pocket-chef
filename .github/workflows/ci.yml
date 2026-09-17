@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       app: ${{ steps.filter.outputs.app }}
+      api: ${{ steps.filter.outputs.api }}
     steps:
       - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
@@ -19,6 +20,9 @@ jobs:
           filters: |
             app:
               - 'app/**'
+              - '.github/workflows/ci.yml'
+            api:
+              - 'api/**'
               - '.github/workflows/ci.yml'
 
   build:
@@ -53,43 +57,104 @@ jobs:
       - name: Upload coverage reports
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-reports
+          name: swift-coverage-reports
           path: |
             app/coverage-ios.xml
             app/coverage-macos.xml
           retention-days: 1
 
-  sonarcloud:
-    needs: [changes, build]
-    # An explicit `if:` here replaces the default `needs`-implied success()
-    # check, so build's success (which also covers app/ having changed,
-    # per the `changes` job/`build`'s own `if:`) must be listed explicitly
-    # alongside the dependabot-secrets skip below.
-    if: needs.build.result == 'success' && github.actor != 'dependabot[bot]'
-    runs-on: macos-26
+  build-api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: app
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+      - name: Test
+        # Testcontainers.PostgreSql needs a Docker-compatible daemon — ubuntu-latest runners
+        # have Docker preinstalled, so this works unmodified (local dev here uses Podman
+        # instead; see docs/plans for why).
+        run: dotnet test --no-build --configuration Release
+
+  sonarcloud:
+    needs: [changes, build, build-api]
+    # One combined SonarCloud project for both Swift (app/) and .NET (api/) — not two
+    # separate projects. Runs whenever either side changed (or neither build job failed
+    # outright — a job that didn't need to run reports "skipped", which is fine here; only
+    # an actual "failure" should block this). Dependabot PRs get no repo secrets, so
+    # SONAR_TOKEN is unavailable — skipped for those, matching the build jobs' own behavior.
+    if: |
+      always() &&
+      (needs.changes.outputs.app == 'true' || needs.changes.outputs.api == 'true') &&
+      needs.build.result != 'failure' && needs.build-api.result != 'failure' &&
+      github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Download coverage reports (built once by the build job, not regenerated here)
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Download Swift coverage reports
+        if: needs.build.result == 'success'
         uses: actions/download-artifact@v8
         with:
-          name: coverage-reports
+          name: swift-coverage-reports
           path: app
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v8
-        timeout-minutes: 10
-        with:
-          projectBaseDir: app
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Install SonarScanner for .NET
+        run: dotnet tool install --global dotnet-sonarscanner
+      - name: Begin SonarCloud analysis
+        # dotnet-sonarscanner (not the generic sonar-scanner action) because C# analysis
+        # needs the MSBuild-integrated build wrapper for full semantic/Roslyn-powered rules —
+        # confirmed the generic scanner can't do this for C# (Phase 8's first attempt at a
+        # *separate* API project used it and caught real issues only because of this
+        # wrapping). It still scans Swift files under sonar.sources generically, same as
+        # before — the wrapping only affects how *.NET* build data is captured.
+        #
+        # Properties passed inline via /d: flags, not sonar-project.properties — the .NET
+        # scanner doesn't read that file at all, it's specific to the generic scanner.
+        run: |
+          $HOME/.dotnet/tools/dotnet-sonarscanner begin \
+            /k:"neonpixel-software_pocket-chef" \
+            /o:"neonpixel-software" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.sources="app/Sources,api/src" \
+            /d:sonar.tests="app/Tests,api/tests" \
+            /d:sonar.coverageReportPaths="app/coverage-ios.xml,app/coverage-macos.xml" \
+            /d:sonar.cs.opencover.reportsPaths="api/**/coverage.opencover.xml" \
+            /d:sonar.cs.vstest.reportsPaths="api/**/*.trx" \
+            /d:sonar.coverage.exclusions="app/Sources/PocketChef/Data/DevSupport/**,app/Sources/PocketChef/Data/Capture/FoundationModelsRecipeCaptureService.swift,app/Sources/PocketChef/Data/Capture/URLSessionWebPageFetcher.swift" \
+            /d:sonar.issue.ignore.multicriteria="e1" \
+            /d:sonar.issue.ignore.multicriteria.e1.ruleKey="swift:S1075" \
+            /d:sonar.issue.ignore.multicriteria.e1.resourceKey="app/Sources/PocketChef/Presentation/RecipeCapture/RecipeURLCaptureView.swift"
+      - name: Build .NET API (captures C# semantic data for the scanner)
+        run: dotnet build api/PocketChef.DensityApi.slnx --configuration Release
+      - name: Test .NET API with coverage
+        run: |
+          dotnet test api/PocketChef.DensityApi.slnx --configuration Release --logger trx \
+            --collect:"XPlat Code Coverage" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+      - name: End SonarCloud analysis
+        run: $HOME/.dotnet/tools/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - name: SonarCloud Quality Gate
         uses: SonarSource/sonarqube-quality-gate-action@v1
         timeout-minutes: 5
         with:
-          scanMetadataReportFile: app/.scannerwork/report-task.txt
+          scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
