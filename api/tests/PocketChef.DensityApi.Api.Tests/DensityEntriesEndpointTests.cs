@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.Http.Json;
+using PocketChef.DensityApi.Api.Endpoints;
 
 namespace PocketChef.DensityApi.Api.Tests;
 
@@ -30,6 +32,27 @@ public class DensityEntriesAuthorizationTests : IClassFixture<DensityApiWebAppli
         client.DefaultRequestHeaders.Add("X-Api-Key", "not-a-real-key");
 
         var response = await client.GetAsync("/density-entries");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_WithNoApiKey_ReturnsUnauthorized()
+    {
+        var client = _factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 200));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_WithReadApiKey_ReturnsUnauthorized()
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.ReadApiKey);
+
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 200));
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }

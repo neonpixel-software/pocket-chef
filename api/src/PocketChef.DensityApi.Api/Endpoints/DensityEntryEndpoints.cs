@@ -14,6 +14,19 @@ public static class DensityEntryEndpoints
             return Results.Ok(response);
         }).RequireApiKey(ApiKeyTier.Read);
 
+        endpoints.MapPost("/density-entries", async (UpsertDensityEntryRequest request, IDensityEntryService service, CancellationToken cancellationToken) =>
+        {
+            try
+            {
+                var entry = await service.UpsertAsync(request.IngredientName, request.GramsPerCup, cancellationToken);
+                return Results.Ok(new DensityEntryResponse(entry.IngredientName, entry.GramsPerCup));
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(new { error = ex.Message });
+            }
+        }).RequireApiKey(ApiKeyTier.Write);
+
         return endpoints;
     }
 }
