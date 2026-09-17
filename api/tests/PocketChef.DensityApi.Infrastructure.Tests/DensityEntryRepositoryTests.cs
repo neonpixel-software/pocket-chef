@@ -7,6 +7,8 @@ namespace PocketChef.DensityApi.Infrastructure.Tests;
 
 public class DensityEntryRepositoryTests : IAsyncLifetime
 {
+    private static readonly DateTimeOffset SomeLastModifiedUtc = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:17")
         .Build();
 
@@ -34,7 +36,7 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
     public async Task UpsertAsync_InsertsANewEntry()
     {
         var repository = new DensityEntryRepository(_context);
-        var entry = new DensityEntry(Guid.NewGuid(), "Flour", 120);
+        var entry = new DensityEntry(Guid.NewGuid(), "Flour", 120, SomeLastModifiedUtc);
 
         await repository.UpsertAsync(entry, CancellationToken.None);
 
@@ -45,25 +47,42 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task UpsertAsync_PersistsLastModifiedUtcAndReadsItBackAsTheSameInstant()
+    {
+        var repository = new DensityEntryRepository(_context);
+        var entry = new DensityEntry(Guid.NewGuid(), "Cinnamon", 100, SomeLastModifiedUtc);
+
+        await repository.UpsertAsync(entry, CancellationToken.None);
+
+        var all = await repository.GetAllAsync(CancellationToken.None);
+        var stored = Assert.Single(all);
+        // Postgres's timestamptz normalizes to UTC internally and Npgsql reads it back with a
+        // UTC offset regardless of what was written — compare the instant, not the raw Offset.
+        Assert.Equal(SomeLastModifiedUtc.ToUniversalTime(), stored.LastModifiedUtc.ToUniversalTime());
+    }
+
+    [Fact]
     public async Task UpsertAsync_UpdatesAnExistingEntryInPlaceRatherThanDuplicating()
     {
         var repository = new DensityEntryRepository(_context);
-        var original = new DensityEntry(Guid.NewGuid(), "Sugar", 190);
+        var original = new DensityEntry(Guid.NewGuid(), "Sugar", 190, SomeLastModifiedUtc);
         await repository.UpsertAsync(original, CancellationToken.None);
 
-        var updated = new DensityEntry(original.Id, "Sugar", 200);
+        var newerLastModifiedUtc = SomeLastModifiedUtc.AddMinutes(5);
+        var updated = new DensityEntry(original.Id, "Sugar", 200, newerLastModifiedUtc);
         await repository.UpsertAsync(updated, CancellationToken.None);
 
         var all = await repository.GetAllAsync(CancellationToken.None);
-        Assert.Single(all);
-        Assert.Equal(200, all[0].GramsPerCup);
+        var stored = Assert.Single(all);
+        Assert.Equal(200, stored.GramsPerCup);
+        Assert.Equal(newerLastModifiedUtc.ToUniversalTime(), stored.LastModifiedUtc.ToUniversalTime());
     }
 
     [Fact]
     public async Task FindByNameAsync_IsCaseInsensitive()
     {
         var repository = new DensityEntryRepository(_context);
-        await repository.UpsertAsync(new DensityEntry(Guid.NewGuid(), "Butter", 227), CancellationToken.None);
+        await repository.UpsertAsync(new DensityEntry(Guid.NewGuid(), "Butter", 227, SomeLastModifiedUtc), CancellationToken.None);
 
         var found = await repository.FindByNameAsync("BUTTER", CancellationToken.None);
 
@@ -85,14 +104,14 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
     public async Task IngredientName_UniqueConstraintIsEnforcedAtTheDatabaseLevel()
     {
         var repository = new DensityEntryRepository(_context);
-        await repository.UpsertAsync(new DensityEntry(Guid.NewGuid(), "Honey", 340), CancellationToken.None);
+        await repository.UpsertAsync(new DensityEntry(Guid.NewGuid(), "Honey", 340, SomeLastModifiedUtc), CancellationToken.None);
 
         // A second, distinct entry with the same (case-insensitive) name bypasses the
         // Application-layer upsert logic entirely, to prove the database itself — not just
         // the service — refuses the duplicate. The repository translates the raw
         // DbUpdateException into DensityEntryConflictException so callers above it never need
         // to know this is backed by Postgres.
-        var duplicate = new DensityEntry(Guid.NewGuid(), "HONEY", 300);
+        var duplicate = new DensityEntry(Guid.NewGuid(), "HONEY", 300, SomeLastModifiedUtc);
 
         await Assert.ThrowsAsync<DensityEntryConflictException>(async () =>
         {
@@ -120,8 +139,8 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
         var repositoryA = new DensityEntryRepository(contextA);
         var repositoryB = new DensityEntryRepository(contextB);
 
-        var entryA = new DensityEntry(Guid.NewGuid(), "Cocoa", 90);
-        var entryB = new DensityEntry(Guid.NewGuid(), "COCOA", 95);
+        var entryA = new DensityEntry(Guid.NewGuid(), "Cocoa", 90, SomeLastModifiedUtc);
+        var entryB = new DensityEntry(Guid.NewGuid(), "COCOA", 95, SomeLastModifiedUtc);
 
         var outcomes = await Task.WhenAll(
             UpsertAndReportOutcome(repositoryA, entryA),

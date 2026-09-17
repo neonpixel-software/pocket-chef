@@ -17,7 +17,11 @@ public sealed class DensityEntryService : IDensityEntryService
     public async Task<DensityEntry> UpsertAsync(string ingredientName, double gramsPerCup, CancellationToken cancellationToken)
     {
         var existing = await _repository.FindByNameAsync(ingredientName, cancellationToken);
-        var entry = new DensityEntry(existing?.Id ?? Guid.NewGuid(), ingredientName, gramsPerCup);
+        // LastModifiedUtc is always "now" on a write, whether this creates a new row or
+        // updates an existing one — it exists so a future client (Phase 10.2's periodic
+        // refresh) can ask "what changed since I last synced?" without downloading the whole
+        // table every time.
+        var entry = new DensityEntry(existing?.Id ?? Guid.NewGuid(), ingredientName, gramsPerCup, DateTimeOffset.UtcNow);
         return await _repository.UpsertAsync(entry, cancellationToken);
     }
 }
