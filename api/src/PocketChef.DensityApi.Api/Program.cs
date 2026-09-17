@@ -17,9 +17,10 @@ var app = builder.Build();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 app.MapDensityEntryEndpoints();
 
-app.Run();
+await app.RunAsync();
 
 // Exposed for WebApplicationFactory<Program> in Api.Tests.
 public partial class Program
 {
+    protected Program() { }
 }
