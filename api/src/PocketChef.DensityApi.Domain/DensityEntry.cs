@@ -5,8 +5,9 @@ public sealed class DensityEntry
     public Guid Id { get; }
     public string IngredientName { get; }
     public double GramsPerCup { get; }
+    public DateTimeOffset LastModifiedUtc { get; }
 
-    public DensityEntry(Guid id, string ingredientName, double gramsPerCup)
+    public DensityEntry(Guid id, string ingredientName, double gramsPerCup, DateTimeOffset lastModifiedUtc)
     {
         if (string.IsNullOrWhiteSpace(ingredientName))
         {
@@ -21,5 +22,6 @@ public sealed class DensityEntry
         Id = id;
         IngredientName = ingredientName.Trim();
         GramsPerCup = gramsPerCup;
+        LastModifiedUtc = lastModifiedUtc;
     }
 }

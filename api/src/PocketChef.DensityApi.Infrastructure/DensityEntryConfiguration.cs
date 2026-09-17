@@ -29,5 +29,8 @@ public sealed class DensityEntryConfiguration : IEntityTypeConfiguration<Density
 
         builder.Property(entry => entry.GramsPerCup)
             .IsRequired();
+
+        builder.Property(entry => entry.LastModifiedUtc)
+            .IsRequired();
     }
 }

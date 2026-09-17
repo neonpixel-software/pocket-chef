@@ -13,6 +13,8 @@ namespace PocketChef.DensityApi.Api.Tests;
 
 public class DensityEntriesDataTests : IAsyncLifetime
 {
+    private static readonly DateTimeOffset SeededLastModifiedUtc = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:17")
         .Build();
 
@@ -27,7 +29,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
             .Options;
         await using var context = new DensityApiDbContext(options);
         await context.Database.MigrateAsync();
-        context.DensityEntries.Add(new DensityEntry(Guid.NewGuid(), "Flour", 120));
+        context.DensityEntries.Add(new DensityEntry(Guid.NewGuid(), "Flour", 120, SeededLastModifiedUtc));
         await context.SaveChangesAsync();
 
         _factory = new DensityApiWebApplicationFactory { ConnectionString = _container.GetConnectionString() };
@@ -52,6 +54,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var entry = Assert.Single(entries!);
         Assert.Equal("Flour", entry.IngredientName);
         Assert.Equal(120, entry.GramsPerCup);
+        Assert.Equal(SeededLastModifiedUtc, entry.LastModifiedUtc);
     }
 
     [Fact]
@@ -71,12 +74,14 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
 
+        var before = DateTimeOffset.UtcNow;
         var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 200));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<DensityEntryResponse>();
         Assert.Equal("Sugar", body!.IngredientName);
         Assert.Equal(200, body.GramsPerCup);
+        Assert.InRange(body.LastModifiedUtc, before, DateTimeOffset.UtcNow);
 
         var options = new DbContextOptionsBuilder<DensityApiDbContext>()
             .UseNpgsql(_container.GetConnectionString())
@@ -96,6 +101,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<DensityEntryResponse>();
         Assert.Equal(130, body!.GramsPerCup);
+        Assert.True(body.LastModifiedUtc > SeededLastModifiedUtc);
 
         var options = new DbContextOptionsBuilder<DensityApiDbContext>()
             .UseNpgsql(_container.GetConnectionString())
