@@ -121,6 +121,15 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
+          # sonar.coverageReportPaths is only included when the Swift coverage files actually
+          # exist — build is skipped entirely on api-only PRs (nothing under app/** changed),
+          # so app/coverage-*.xml never gets downloaded then. Pointing the scanner at a
+          # nonexistent file isn't a graceful no-op: it's a hard parse error that aborts the
+          # whole analysis (confirmed the hard way on an api-only PR).
+          SWIFT_COVERAGE_ARG=""
+          if [ -f app/coverage-ios.xml ] && [ -f app/coverage-macos.xml ]; then
+            SWIFT_COVERAGE_ARG='/d:sonar.coverageReportPaths=app/coverage-ios.xml,app/coverage-macos.xml'
+          fi
           $HOME/.dotnet/tools/dotnet-sonarscanner begin \
             /k:"neonpixel-software_pocket-chef" \
             /o:"neonpixel-software" \
@@ -128,7 +137,7 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.sources="app/Sources,api/src" \
             /d:sonar.tests="app/Tests,api/tests" \
-            /d:sonar.coverageReportPaths="app/coverage-ios.xml,app/coverage-macos.xml" \
+            $SWIFT_COVERAGE_ARG \
             /d:sonar.cs.opencover.reportsPaths="api/**/coverage.opencover.xml" \
             /d:sonar.cs.vstest.reportsPaths="api/**/*.trx" \
             /d:sonar.coverage.exclusions="app/Sources/PocketChef/Data/DevSupport/**,app/Sources/PocketChef/Data/Capture/FoundationModelsRecipeCaptureService.swift,app/Sources/PocketChef/Data/Capture/URLSessionWebPageFetcher.swift,api/src/PocketChef.DensityApi.Api/Program.cs,api/src/PocketChef.DensityApi.Infrastructure/Migrations/**,api/src/PocketChef.DensityApi.Api/Authentication/ServiceCollectionExtensions.cs,api/src/PocketChef.DensityApi.Infrastructure/ServiceCollectionExtensions.cs,api/src/PocketChef.DensityApi.Application/ServiceCollectionExtensions.cs" \
