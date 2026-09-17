@@ -25,6 +25,10 @@ public static class DensityEntryEndpoints
             {
                 return Results.BadRequest(new { error = ex.Message });
             }
+            catch (DensityEntryConflictException ex)
+            {
+                return Results.Conflict(new { error = ex.Message });
+            }
         }).RequireApiKey(ApiKeyTier.Write);
 
         return endpoints;
