@@ -71,7 +71,7 @@ jobs:
             --collect:"XPlat Code Coverage" \
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
       - name: End SonarCloud analysis
-        run: "$HOME/.dotnet/tools/dotnet-sonarscanner" end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        run: $HOME/.dotnet/tools/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
       - name: SonarCloud Quality Gate
         uses: SonarSource/sonarqube-quality-gate-action@v1
         timeout-minutes: 5
