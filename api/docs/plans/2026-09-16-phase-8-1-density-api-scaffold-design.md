@@ -20,10 +20,12 @@ just in CI.
 
 ## Scope decisions
 
-- **.NET 10** (matches the SDK already installed here).
-- **Solution layout**: `api/PocketChef.DensityApi.sln` with `src/` (Domain,
-  Application, Infrastructure, Api) and `tests/` (one test project per
-  src layer). Mirrors the Swift app's Clean Architecture layering.
+- **.NET 10** (matches the SDK already installed here). `dotnet new sln`
+  on .NET 10 defaults to the new XML `.slnx` format rather than the classic
+  `.sln` — `api/PocketChef.DensityApi.slnx`.
+- **Solution layout**: `src/` (Domain, Application, Infrastructure, Api) and
+  `tests/` (one test project per src layer). Mirrors the Swift app's Clean
+  Architecture layering.
 - **Repository interface lives in Application, not Domain** — Domain stays
   a pure model + validation rules with zero dependencies; Application
   declares what it needs from Infrastructure (`IDensityEntryRepository`)
@@ -31,11 +33,15 @@ just in CI.
   convention (e.g. the widely-used Jason Taylor template), matching what
   `PLAN.md`'s architecture section is drawing from.
 - **One model, not two**: `DensityEntry` is both the domain entity and the
-  EF Core-mapped type (no separate persistence DTO). Validation
-  (non-blank trimmed name, positive grams-per-cup) lives in the
-  constructor; EF Core is configured to use a private parameterless
-  constructor + backing fields so the public constructor's validation
-  can't be bypassed by materialization.
+  EF Core-mapped type (no separate persistence DTO). Validation (non-blank
+  trimmed name, positive grams-per-cup) lives in the one public
+  constructor. No parameterless constructor exists — EF Core 10's
+  constructor-binding materializes entities through the same validating
+  constructor by matching parameter names to mapped properties, and
+  updates use `ChangeTracker.Entry(...).CurrentValues.SetValues(...)`,
+  which writes backing fields directly for properties with no setter.
+  Confirmed working end to end via the real migration + Testcontainers
+  tests below, not just assumed.
 - **Case-insensitive unique ingredient name**: enforced via a Postgres
   `citext` column + unique index in Infrastructure — mirrors the Swift
   app's case-insensitive tag-name matching (`FindOrCreateTagUseCase`).
@@ -45,11 +51,14 @@ just in CI.
   wiring for the DbContext/repository/service, and a `/health` endpoint.
   The actual density read/write endpoints (with API-key enforcement) are
   Phase 8.2/8.3 per `PLAN.md`'s own phasing — out of scope here.
-- **Local dev**: `podman-compose.yml` (Podman's compose tooling, not
-  Docker's) runs a Postgres container for `dotnet run` against locally.
-  A `Dockerfile` for the Api host is included now (used for eventual VPS
-  deployment in Phase 9.2) but not exercised by this PR beyond `docker
-  build`-style validation.
+- **Local dev**: `compose.yml` (the modern filename both `docker compose`
+  and `podman compose` look for by default — not the older, separate
+  `podman-compose` Python tool) runs a Postgres container on host port
+  **5433**, not 5432 — this machine already has an unrelated native
+  PostgreSQL 18 install bound to 5432. A `Dockerfile` for the Api host is
+  included for eventual VPS deployment (Phase 9.2) — actually built and
+  run locally via `podman build` + `podman run` against the compose
+  Postgres to confirm it works, not just written on faith.
 - **CI**: new GitHub Actions workflow (`api-ci.yml`), scoped via
   `paths: [api/**]` so it doesn't run on Swift-only PRs, on `ubuntu-latest`
   (has Docker preinstalled, so Testcontainers works there unmodified even
