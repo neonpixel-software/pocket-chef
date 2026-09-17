@@ -16,4 +16,7 @@ WORKDIR /app
 COPY --from=build /app .
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
+# Non-root: $APP_UID is the non-root user baked into Microsoft's official ASP.NET Core image
+# specifically for this purpose, rather than running as root/containerAdministrator.
+USER $APP_UID
 ENTRYPOINT ["dotnet", "PocketChef.DensityApi.Api.dll"]
