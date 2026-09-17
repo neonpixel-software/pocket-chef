@@ -14,7 +14,7 @@ jobs:
       api: ${{ steps.filter.outputs.api }}
     steps:
       - uses: actions/checkout@v7
-      - uses: dorny/paths-filter@v4
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
         id: filter
         with:
           filters: |
@@ -127,11 +127,17 @@ jobs:
         #
         # Properties passed inline via /d: flags, not sonar-project.properties — the .NET
         # scanner doesn't read that file at all, it's specific to the generic scanner.
+        #
+        # SONAR_TOKEN comes in via env:, not expanded directly into the run: script (that's
+        # flagged by SonarCloud's own GitHub Actions security analysis, githubactions:S7636 —
+        # a secret expanded straight into a shell command can end up echoed/logged).
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           $HOME/.dotnet/tools/dotnet-sonarscanner begin \
             /k:"neonpixel-software_pocket-chef" \
             /o:"neonpixel-software" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.sources="app/Sources,api/src" \
             /d:sonar.tests="app/Tests,api/tests" \
@@ -150,9 +156,11 @@ jobs:
             --collect:"XPlat Code Coverage" \
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
       - name: End SonarCloud analysis
-        run: $HOME/.dotnet/tools/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: $HOME/.dotnet/tools/dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
       - name: SonarCloud Quality Gate
-        uses: SonarSource/sonarqube-quality-gate-action@v1
+        uses: SonarSource/sonarqube-quality-gate-action@7a5fffe8e523c40e0c740b6bc2712ab503e52efa # v1
         timeout-minutes: 5
         with:
           scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
