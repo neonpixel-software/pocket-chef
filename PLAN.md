@@ -136,8 +136,8 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 - [x] **8.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams-per-cup), basic persistence. PostgreSQL chosen (via Docker/Podman), not SQLite.
   Acceptance: API runs locally, entries can be created/read directly against the database. Verified end-to-end: real migration applied to a locally running Postgres (via Podman), entry inserted and read back via `psql`, the `/health` endpoint responds, and the Dockerfile image builds and runs correctly against the same Postgres.
   `nuget` ecosystem entry added to `.github/dependabot.yml`.
-- [ ] **8.2 Read endpoint + low-privilege key** — public-ish read endpoint gated by a read-only API key.
-  Acceptance: requests with a valid read key succeed; requests without one, or with a write key used as read, still succeed only for reads — a request with no key fails.
+- [x] **8.2 Read endpoint + low-privilege key** — public-ish read endpoint gated by a read-only API key.
+  Acceptance: requests with a valid read key succeed; requests without one, or with a write key used as read, still succeed only for reads — a request with no key fails. Verified via automated tests (unit + `WebApplicationFactory` integration tests covering all four cases) and manually end-to-end against the real running app and a real local Postgres.
 - [ ] **8.3 Write endpoints + high-privilege key** — add/edit density entries, gated by a separate write key.
   Acceptance: write endpoints reject the read key; only the write key can create/edit entries.
 

@@ -14,8 +14,11 @@ only for reads — a request with no key fails.
   10.1's "client fetches entries from the read endpoint and caches them
   on-device" describes a bulk fetch-then-cache pattern, not per-ingredient
   calls; not adding an endpoint nothing calls yet.
-- **API key check is an `IEndpointFilter`**, not the full ASP.NET Core
-  authentication/authorization pipeline — matches the project's "no
+- **API key check is a `RequireApiKey(tier)` extension method on
+  `RouteHandlerBuilder`** (an inline `AddEndpointFilter` lambda resolving
+  `ApiKeyAuthorizer` from `HttpContext.RequestServices` per request), not
+  the full ASP.NET Core authentication/authorization pipeline or a
+  standalone `IEndpointFilter` class — matches the project's "no
   unnecessary ceremony" stance (same reasoning as skipping MediatR).
   Reads the key from an `X-Api-Key` header, compares against configured
   keys with `CryptographicOperations.FixedTimeEquals` (avoids timing
@@ -47,12 +50,32 @@ proving read/write API key enforcement, not just happy-path responses."
   - Garbage/wrong key → 401.
   - Valid read key → 200.
   - Valid write key → 200 (proves the tier logic, not just "a key works").
-- The three failure/no-op-before-DB cases reuse the existing dummy
-  connection string from `HealthEndpointTests` — the filter runs before
-  the handler, so a rejected request never touches the database.
-- The 200-with-real-data case uses `Testcontainers.PostgreSql` (same
-  pattern as `Infrastructure.Tests`) — seeds a couple of entries, asserts
-  the response body matches. Runnable locally via Podman, not just in CI.
+- The failure/no-DB-needed cases reuse a shared dummy connection string —
+  the filter runs before the handler, so a rejected request never touches
+  the database.
+- The 200-with-real-data cases use `Testcontainers.PostgreSql` (same
+  pattern as `Infrastructure.Tests`) — seeds an entry, asserts the response
+  body matches for both a read key and a write key. Runnable locally via
+  Podman, not just in CI.
 - Small unit tests for the tier-comparison logic itself
   (`ApiKeyTier.Write` satisfies a `Read` requirement, `ApiKeyTier.Read`
   does not satisfy a `Write` requirement) — pure logic, no host needed.
+
+## Correction found during implementation
+
+`WebApplicationFactory`'s usual `ConfigureWebHost(b => b.ConfigureAppConfiguration(...))` +
+`AddInMemoryCollection(...)` pattern — used successfully for
+`HealthEndpointTests`' connection-string override in 8.1 — turned out to
+be a false positive: `/health` never touches configuration values beyond
+what's needed to construct (not use) the `DbContext`, so that test never
+actually exercised whether the override took effect. It doesn't:
+confirmed empirically (a throwaway test asserting on the resolved
+`ApiKeyOptions` showed `appsettings.Development.json`'s values winning
+over the in-memory override), because `Program.cs` reads configuration
+*eagerly* (`GetConnectionString(...)`, `GetSection(...).Get<T>()`) at
+top-level-statement time, before `ConfigureAppConfiguration`'s override
+is layered in. Switched `DensityApiWebApplicationFactory` to
+`IWebHostBuilder.UseSetting(key, value)`, which writes directly into the
+host builder's settings *before* the app's builder is constructed, so
+eager reads see it correctly. Verified by rerunning the previously-failing
+tests, which passed once switched.
