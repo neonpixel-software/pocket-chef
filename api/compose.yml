@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: docker.io/library/postgres:17
+    environment:
+      POSTGRES_DB: densityapi
+      POSTGRES_USER: densityapi
+      POSTGRES_PASSWORD: densityapi-local-dev
+    ports:
+      # Host port 5433, not 5432 — avoids clashing with any other local Postgres install.
+      - "5433:5432"
+    volumes:
+      - density-api-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  density-api-postgres-data:

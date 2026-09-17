@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PocketChef.DensityApi.Api/PocketChef.DensityApi.Api.csproj" />
+    <Project Path="src/PocketChef.DensityApi.Application/PocketChef.DensityApi.Application.csproj" />
+    <Project Path="src/PocketChef.DensityApi.Domain/PocketChef.DensityApi.Domain.csproj" />
+    <Project Path="src/PocketChef.DensityApi.Infrastructure/PocketChef.DensityApi.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PocketChef.DensityApi.Api.Tests/PocketChef.DensityApi.Api.Tests.csproj" />
+    <Project Path="tests/PocketChef.DensityApi.Application.Tests/PocketChef.DensityApi.Application.Tests.csproj" />
+    <Project Path="tests/PocketChef.DensityApi.Domain.Tests/PocketChef.DensityApi.Domain.Tests.csproj" />
+    <Project Path="tests/PocketChef.DensityApi.Infrastructure.Tests/PocketChef.DensityApi.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -7,7 +7,23 @@ on:
     branches: [main]
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.filter.outputs.app }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app:
+              - 'app/**'
+              - '.github/workflows/ci.yml'
+
   build:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: macos-26
     defaults:
       run:
@@ -44,15 +60,16 @@ jobs:
           retention-days: 1
 
   sonarcloud:
+    needs: [changes, build]
+    # An explicit `if:` here replaces the default `needs`-implied success()
+    # check, so build's success (which also covers app/ having changed,
+    # per the `changes` job/`build`'s own `if:`) must be listed explicitly
+    # alongside the dependabot-secrets skip below.
+    if: needs.build.result == 'success' && github.actor != 'dependabot[bot]'
     runs-on: macos-26
-    needs: build
     defaults:
       run:
         working-directory: app
-    # Dependabot-triggered pull_request runs don't get repo secrets (GitHub
-    # security measure), so SONAR_TOKEN is unavailable and this job would
-    # always fail — skip it for those PRs; the build job still runs.
-    if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v7
         with:

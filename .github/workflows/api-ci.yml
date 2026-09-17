@@ -1,0 +1,34 @@
+name: API CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "api/**"
+      - ".github/workflows/api-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "api/**"
+      - ".github/workflows/api-ci.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+      - name: Test
+        # Testcontainers.PostgreSql needs a Docker-compatible daemon — ubuntu-latest runners
+        # have Docker preinstalled, so this works unmodified (local dev here uses Podman
+        # instead; see docs/plans for why).
+        run: dotnet test --no-build --configuration Release
