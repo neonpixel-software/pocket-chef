@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PocketChef.DensityApi.Application;
 using PocketChef.DensityApi.Domain;
 using Testcontainers.PostgreSql;
 
@@ -88,12 +89,61 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
 
         // A second, distinct entry with the same (case-insensitive) name bypasses the
         // Application-layer upsert logic entirely, to prove the database itself — not just
-        // the service — refuses the duplicate.
+        // the service — refuses the duplicate. The repository translates the raw
+        // DbUpdateException into DensityEntryConflictException so callers above it never need
+        // to know this is backed by Postgres.
         var duplicate = new DensityEntry(Guid.NewGuid(), "HONEY", 300);
 
-        await Assert.ThrowsAsync<DbUpdateException>(async () =>
+        await Assert.ThrowsAsync<DensityEntryConflictException>(async () =>
         {
             await repository.UpsertAsync(duplicate, CancellationToken.None);
         });
+    }
+
+    [Fact]
+    public async Task UpsertAsync_TrueConcurrentInsertsForCaseVariantNames_ExactlyOneThrowsConflictException()
+    {
+        // Two independent connections/DbContexts (unlike the sequential test above) racing via
+        // Task.WhenAll, so this is a genuine concurrent write, not a simulated one — Postgres's
+        // unique index guarantees exactly one commits regardless of which "wins". This only
+        // proves the conflict path if B's FindByNameAsync actually runs before A's insert
+        // commits; if the two tasks fully serialize under CI load, both take the update path
+        // and this flakes on the `Assert.Single(outcomes, outcome => !outcome)` line below. The
+        // 23505 -> DensityEntryConflictException translation is already proven deterministically
+        // by the sequential test above, so if this ever flakes, look here first before
+        // suspecting the translation logic itself.
+        var options = new DbContextOptionsBuilder<DensityApiDbContext>()
+            .UseNpgsql(_container.GetConnectionString())
+            .Options;
+        await using var contextA = new DensityApiDbContext(options);
+        await using var contextB = new DensityApiDbContext(options);
+        var repositoryA = new DensityEntryRepository(contextA);
+        var repositoryB = new DensityEntryRepository(contextB);
+
+        var entryA = new DensityEntry(Guid.NewGuid(), "Cocoa", 90);
+        var entryB = new DensityEntry(Guid.NewGuid(), "COCOA", 95);
+
+        var outcomes = await Task.WhenAll(
+            UpsertAndReportOutcome(repositoryA, entryA),
+            UpsertAndReportOutcome(repositoryB, entryB));
+
+        Assert.Single(outcomes, outcome => outcome);
+        Assert.Single(outcomes, outcome => !outcome);
+
+        var all = await repositoryA.GetAllAsync(CancellationToken.None);
+        Assert.Single(all);
+
+        static async Task<bool> UpsertAndReportOutcome(DensityEntryRepository repository, DensityEntry entry)
+        {
+            try
+            {
+                await repository.UpsertAsync(entry, CancellationToken.None);
+                return true;
+            }
+            catch (DensityEntryConflictException)
+            {
+                return false;
+            }
+        }
     }
 }

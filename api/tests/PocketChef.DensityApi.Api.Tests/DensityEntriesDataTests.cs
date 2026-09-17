@@ -1,7 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using PocketChef.DensityApi.Api.Endpoints;
+using PocketChef.DensityApi.Application;
 using PocketChef.DensityApi.Domain;
 using PocketChef.DensityApi.Infrastructure;
 using Testcontainers.PostgreSql;
@@ -124,5 +127,39 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 0));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_WhenServiceReportsAConflict_ReturnsConflict()
+    {
+        // A real concurrent-write race (two requests both passing FindByNameAsync before either
+        // commits) is proven deterministically at the repository level in
+        // DensityEntryRepositoryTests — it isn't reliably reproducible by racing two HTTP
+        // requests through an in-process TestServer. This test instead swaps in a fake
+        // IDensityEntryService that always throws DensityEntryConflictException, to
+        // deterministically verify the endpoint's own translation of that exception into 409.
+        await using var factory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<IDensityEntryService>();
+                services.AddScoped<IDensityEntryService>(_ => new AlwaysConflictingDensityEntryService());
+            });
+        });
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
+
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Cocoa", 90));
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    private sealed class AlwaysConflictingDensityEntryService : IDensityEntryService
+    {
+        public Task<IReadOnlyList<DensityEntry>> GetAllAsync(CancellationToken cancellationToken)
+            => throw new NotSupportedException();
+
+        public Task<DensityEntry> UpsertAsync(string ingredientName, double gramsPerCup, CancellationToken cancellationToken)
+            => throw new DensityEntryConflictException(ingredientName);
     }
 }

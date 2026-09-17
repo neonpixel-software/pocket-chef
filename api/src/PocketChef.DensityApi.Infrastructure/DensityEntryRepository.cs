@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using PocketChef.DensityApi.Application;
 using PocketChef.DensityApi.Domain;
 
@@ -33,7 +34,26 @@ public sealed class DensityEntryRepository : IDensityEntryRepository
             _context.Entry(existing).CurrentValues.SetValues(entry);
         }
 
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation,
+            ConstraintName: DensityEntryConfiguration.IngredientNameUniqueIndexName
+        })
+        {
+            // Two concurrent writes for the same (case-insensitive) name can both pass the
+            // service's FindByNameAsync-then-insert check before either commits — only the
+            // database's unique index actually catches the second one. Translate the raw
+            // Npgsql/EF exception into something the Api layer can map to a clean response
+            // without depending on persistence-specific exception types. Scoped to this
+            // specific index by name so a violation on some future, unrelated unique
+            // constraint isn't misreported as a name conflict.
+            throw new DensityEntryConflictException(entry.IngredientName);
+        }
+
         return entry;
     }
 }
