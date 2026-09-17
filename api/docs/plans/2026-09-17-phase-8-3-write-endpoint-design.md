@@ -29,6 +29,18 @@ write key can create/edit entries.
 - **No admin UI** — `PLAN.md`'s own Backend section already says "No
   admin UI needed yet; a script is enough for now." Out of scope here by
   design, not an oversight.
+- **Concurrent writes can lose a race → `409 Conflict`**: `IngredientName`
+  is a `citext` column with a unique index (Phase 8.1), so case-insensitive
+  duplicates are impossible at the database level regardless of write
+  order. But two concurrent `POST`s for the same brand-new name can both
+  pass `UpsertAsync`'s `FindByNameAsync`-not-found check before either
+  commits — the unique index still catches the second one, and
+  `DensityEntryRepository` translates that specific violation into
+  `DensityEntryConflictException`, which the endpoint maps to `409`.
+  Callers that hit this should retry the request (a retry will find the
+  now-committed row via `FindByNameAsync` and update it in place instead).
+  Added in a follow-up PR after review flagged the raw 500 this produced
+  before the translation existed.
 
 ## Testing plan
 

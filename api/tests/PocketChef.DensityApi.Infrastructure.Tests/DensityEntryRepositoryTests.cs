@@ -105,7 +105,13 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
     {
         // Two independent connections/DbContexts (unlike the sequential test above) racing via
         // Task.WhenAll, so this is a genuine concurrent write, not a simulated one — Postgres's
-        // unique index guarantees exactly one commits regardless of which "wins".
+        // unique index guarantees exactly one commits regardless of which "wins". This only
+        // proves the conflict path if B's FindByNameAsync actually runs before A's insert
+        // commits; if the two tasks fully serialize under CI load, both take the update path
+        // and this flakes on the `Assert.Single(outcomes, outcome => !outcome)` line below. The
+        // 23505 -> DensityEntryConflictException translation is already proven deterministically
+        // by the sequential test above, so if this ever flakes, look here first before
+        // suspecting the translation logic itself.
         var options = new DbContextOptionsBuilder<DensityApiDbContext>()
             .UseNpgsql(_container.GetConnectionString())
             .Options;

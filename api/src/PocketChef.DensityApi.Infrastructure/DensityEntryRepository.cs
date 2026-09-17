@@ -38,13 +38,19 @@ public sealed class DensityEntryRepository : IDensityEntryRepository
         {
             await _context.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation,
+            ConstraintName: DensityEntryConfiguration.IngredientNameUniqueIndexName
+        })
         {
             // Two concurrent writes for the same (case-insensitive) name can both pass the
             // service's FindByNameAsync-then-insert check before either commits — only the
             // database's unique index actually catches the second one. Translate the raw
             // Npgsql/EF exception into something the Api layer can map to a clean response
-            // without depending on persistence-specific exception types.
+            // without depending on persistence-specific exception types. Scoped to this
+            // specific index by name so a violation on some future, unrelated unique
+            // constraint isn't misreported as a name conflict.
             throw new DensityEntryConflictException(entry.IngredientName);
         }
 

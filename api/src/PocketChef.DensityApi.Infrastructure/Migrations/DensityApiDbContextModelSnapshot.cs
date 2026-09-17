@@ -39,7 +39,8 @@ namespace PocketChef.DensityApi.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IngredientName")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("IX_density_entries_IngredientName");
 
                     b.ToTable("density_entries", (string)null);
                 });
