@@ -118,19 +118,6 @@ jobs:
       - name: Install SonarScanner for .NET
         run: dotnet tool install --global dotnet-sonarscanner
       - name: Begin SonarCloud analysis
-        # dotnet-sonarscanner (not the generic sonar-scanner action) because C# analysis
-        # needs the MSBuild-integrated build wrapper for full semantic/Roslyn-powered rules —
-        # confirmed the generic scanner can't do this for C# (Phase 8's first attempt at a
-        # *separate* API project used it and caught real issues only because of this
-        # wrapping). It still scans Swift files under sonar.sources generically, same as
-        # before — the wrapping only affects how *.NET* build data is captured.
-        #
-        # Properties passed inline via /d: flags, not sonar-project.properties — the .NET
-        # scanner doesn't read that file at all, it's specific to the generic scanner.
-        #
-        # SONAR_TOKEN comes in via env:, not expanded directly into the run: script (that's
-        # flagged by SonarCloud's own GitHub Actions security analysis, githubactions:S7636 —
-        # a secret expanded straight into a shell command can end up echoed/logged).
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
@@ -144,7 +131,7 @@ jobs:
             /d:sonar.coverageReportPaths="app/coverage-ios.xml,app/coverage-macos.xml" \
             /d:sonar.cs.opencover.reportsPaths="api/**/coverage.opencover.xml" \
             /d:sonar.cs.vstest.reportsPaths="api/**/*.trx" \
-            /d:sonar.coverage.exclusions="app/Sources/PocketChef/Data/DevSupport/**,app/Sources/PocketChef/Data/Capture/FoundationModelsRecipeCaptureService.swift,app/Sources/PocketChef/Data/Capture/URLSessionWebPageFetcher.swift" \
+            /d:sonar.coverage.exclusions="app/Sources/PocketChef/Data/DevSupport/**,app/Sources/PocketChef/Data/Capture/FoundationModelsRecipeCaptureService.swift,app/Sources/PocketChef/Data/Capture/URLSessionWebPageFetcher.swift,api/src/PocketChef.DensityApi.Api/Program.cs,api/src/PocketChef.DensityApi.Infrastructure/Migrations/**,api/src/PocketChef.DensityApi.Api/Authentication/ServiceCollectionExtensions.cs,api/src/PocketChef.DensityApi.Infrastructure/ServiceCollectionExtensions.cs,api/src/PocketChef.DensityApi.Application/ServiceCollectionExtensions.cs" \
             /d:sonar.issue.ignore.multicriteria="e1" \
             /d:sonar.issue.ignore.multicriteria.e1.ruleKey="swift:S1075" \
             /d:sonar.issue.ignore.multicriteria.e1.resourceKey="app/Sources/PocketChef/Presentation/RecipeCapture/RecipeURLCaptureView.swift"
