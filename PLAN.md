@@ -138,8 +138,8 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
   `nuget` ecosystem entry added to `.github/dependabot.yml`.
 - [x] **8.2 Read endpoint + low-privilege key** — public-ish read endpoint gated by a read-only API key.
   Acceptance: requests with a valid read key succeed; requests without one, or with a write key used as read, still succeed only for reads — a request with no key fails. Verified via automated tests (unit + `WebApplicationFactory` integration tests covering all four cases) and manually end-to-end against the real running app and a real local Postgres.
-- [ ] **8.3 Write endpoints + high-privilege key** — add/edit density entries, gated by a separate write key.
-  Acceptance: write endpoints reject the read key; only the write key can create/edit entries.
+- [x] **8.3 Write endpoints + high-privilege key** — add/edit density entries, gated by a separate write key.
+  Acceptance: write endpoints reject the read key; only the write key can create/edit entries. Verified via automated tests (`WebApplicationFactory` integration tests covering no key/read key/valid write key/invalid body, plus Testcontainers-backed insert and update-in-place cases) and manually end-to-end against the real running app and a real local Postgres via Podman — confirmed via `psql` that an upsert to an existing ingredient name updates the row in place rather than duplicating it.
 
 **Checkpoint:** API works locally end-to-end with both key tiers enforced.
 

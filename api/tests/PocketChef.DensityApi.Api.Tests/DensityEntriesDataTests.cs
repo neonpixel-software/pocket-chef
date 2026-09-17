@@ -61,4 +61,68 @@ public class DensityEntriesDataTests : IAsyncLifetime
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+    [Fact]
+    public async Task Post_WithValidWriteKey_CreatesNewEntry()
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
+
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 200));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<DensityEntryResponse>();
+        Assert.Equal("Sugar", body!.IngredientName);
+        Assert.Equal(200, body.GramsPerCup);
+
+        var options = new DbContextOptionsBuilder<DensityApiDbContext>()
+            .UseNpgsql(_container.GetConnectionString())
+            .Options;
+        await using var context = new DensityApiDbContext(options);
+        Assert.Equal(2, await context.DensityEntries.CountAsync());
+    }
+
+    [Fact]
+    public async Task Post_WithValidWriteKey_ExistingIngredientName_UpdatesInPlace()
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
+
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Flour", 130));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<DensityEntryResponse>();
+        Assert.Equal(130, body!.GramsPerCup);
+
+        var options = new DbContextOptionsBuilder<DensityApiDbContext>()
+            .UseNpgsql(_container.GetConnectionString())
+            .Options;
+        await using var context = new DensityApiDbContext(options);
+        var entries = await context.DensityEntries.ToListAsync();
+        var entry = Assert.Single(entries);
+        Assert.Equal("Flour", entry.IngredientName);
+        Assert.Equal(130, entry.GramsPerCup);
+    }
+
+    [Fact]
+    public async Task Post_WithValidWriteKey_BlankIngredientName_ReturnsBadRequest()
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
+
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("   ", 200));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_WithValidWriteKey_NonPositiveGramsPerCup_ReturnsBadRequest()
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
+
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 0));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 }
