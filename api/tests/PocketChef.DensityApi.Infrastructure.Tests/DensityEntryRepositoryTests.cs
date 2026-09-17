@@ -6,8 +6,7 @@ namespace PocketChef.DensityApi.Infrastructure.Tests;
 
 public class DensityEntryRepositoryTests : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
-        .WithImage("postgres:17")
+    private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:17")
         .Build();
 
     private DensityApiDbContext _context = null!;
