@@ -32,3 +32,50 @@ jobs:
         # have Docker preinstalled, so this works unmodified (local dev here uses Podman
         # instead; see docs/plans for why).
         run: dotnet test --no-build --configuration Release
+
+  sonarcloud:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    # Dependabot-triggered pull_request runs don't get repo secrets, so SONAR_TOKEN is
+    # unavailable and this job would always fail — skip it for those PRs, matching ci.yml.
+    if: github.actor != 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install SonarScanner for .NET
+        run: dotnet tool install --global dotnet-sonarscanner
+      - name: Begin SonarCloud analysis
+        run: |
+          "$HOME/.dotnet/tools/dotnet-sonarscanner" begin \
+            /k:"neonpixel-software_pocket-chef-api" \
+            /o:"neonpixel-software" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.cs.vstest.reportsPaths="**/*.trx" \
+            /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
+      - name: Build
+        run: dotnet build --configuration Release
+      - name: Test with coverage
+        run: |
+          dotnet test --configuration Release --logger trx \
+            --collect:"XPlat Code Coverage" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+      - name: End SonarCloud analysis
+        run: $HOME/.dotnet/tools/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      - name: SonarCloud Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        timeout-minutes: 5
+        with:
+          scanMetadataReportFile: api/.sonarqube/out/.sonar/report-task.txt
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
