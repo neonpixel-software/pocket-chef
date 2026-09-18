@@ -1,5 +1,6 @@
 using PocketChef.DensityApi.Api.Authentication;
 using PocketChef.DensityApi.Api.Endpoints;
+using PocketChef.DensityApi.Api.RateLimiting;
 using PocketChef.DensityApi.Application;
 using PocketChef.DensityApi.Infrastructure;
 
@@ -11,8 +12,11 @@ var connectionString = builder.Configuration.GetConnectionString("DensityApi")
 builder.Services.AddDensityApiApplication();
 builder.Services.AddDensityApiInfrastructure(connectionString);
 builder.Services.AddApiKeyAuthentication(builder.Configuration);
+builder.Services.AddDensityApiRateLimiting();
 
 var app = builder.Build();
+
+app.UseRateLimiter();
 
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 app.MapDensityEntryEndpoints();
