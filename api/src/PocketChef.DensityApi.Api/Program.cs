@@ -12,7 +12,7 @@ var connectionString = builder.Configuration.GetConnectionString("DensityApi")
 builder.Services.AddDensityApiApplication();
 builder.Services.AddDensityApiInfrastructure(connectionString);
 builder.Services.AddApiKeyAuthentication(builder.Configuration);
-builder.Services.AddDensityApiRateLimiting();
+builder.Services.AddDensityApiRateLimiting(builder.Configuration);
 
 var app = builder.Build();
 

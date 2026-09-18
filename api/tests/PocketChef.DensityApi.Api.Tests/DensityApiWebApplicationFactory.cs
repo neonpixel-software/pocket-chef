@@ -22,6 +22,12 @@ public class DensityApiWebApplicationFactory : WebApplicationFactory<Program>
     public const string ReadApiKey = "test-read-key";
     public const string WriteApiKey = "test-write-key";
 
+    /// Overridden down from production's 60/minute (RateLimiting/ReadRateLimitOptions.cs)
+    /// so DensityEntriesRateLimitTests doesn't need 61 real requests to trip the limiter.
+    /// The window stays at 60s (long enough not to reset mid-test) — only the permit count
+    /// shrinks, since that's what determines how many requests the test has to send.
+    public const int ReadRateLimitPermitLimit = 3;
+
     public string ConnectionString { get; set; } = "Host=localhost;Port=5432;Database=densityapi_test;Username=test;Password=test";
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -29,5 +35,7 @@ public class DensityApiWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseSetting("ConnectionStrings:DensityApi", ConnectionString);
         builder.UseSetting("ApiKeys:ReadApiKey", ReadApiKey);
         builder.UseSetting("ApiKeys:WriteApiKey", WriteApiKey);
+        builder.UseSetting("RateLimiting:Read:PermitLimit", ReadRateLimitPermitLimit.ToString());
+        builder.UseSetting("RateLimiting:Read:WindowSeconds", "60");
     }
 }

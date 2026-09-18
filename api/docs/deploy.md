@@ -80,10 +80,18 @@ actually protect against doesn't justify it at this scale, and if the
 worst happens, the data can also be re-seeded from Phase 9.1's source
 data as a fallback.
 
-A systemd timer running nightly:
+A systemd timer running nightly, dumping from *inside* the Postgres
+container via `compose exec` rather than from the host — sidesteps both
+the host-vs-container port question (local dev publishes Postgres on
+5433, not 5432; production's published port may differ again) and
+authentication (the official Postgres image trusts local Unix-socket
+connections by default, so a dump run this way needs no password at
+all — confirmed locally: `podman compose exec -T postgres pg_dump -U
+densityapi densityapi` succeeds with no `-h`/`-p`/password of any kind):
 
 ```sh
-pg_dump -Fc -h localhost -U densityapi densityapi \
+cd /opt/pocket-chef-density-api
+podman compose exec -T postgres pg_dump -U densityapi densityapi \
   > /var/backups/pocket-chef-density-api/densityapi-$(date +%F).dump
 find /var/backups/pocket-chef-density-api -name '*.dump' -mtime +14 -delete
 ```
@@ -107,12 +115,26 @@ endpoint via `.RequireRateLimiting(RateLimitPolicies.Read)` — the write
 endpoint stays unlimited, since it's already gated behind a key only Nick
 holds and is low-volume by design. Uses ASP.NET Core's built-in
 `Microsoft.AspNetCore.RateLimiting` (part of the shared framework via
-`Microsoft.NET.Sdk.Web` — no new package). 60 requests/minute,
+`Microsoft.NET.Sdk.Web` — no new package), 60 requests/minute per client,
 `QueueLimit: 0` (reject immediately over the limit rather than queueing —
-simplest behavior for a read-only endpoint), returns 429. Covered by
-`DensityEntriesRateLimitTests`.
+simplest behavior for a read-only endpoint), returns 429 with a
+`Retry-After` header. Covered by `DensityEntriesRateLimitTests`.
 
-Nothing to configure on the VPS for this — it's in-process.
+**Partitioned per client, not global** — the limiter runs before the API
+key filter (confirmed by the ordering below), so it trips on *any*
+request to the read endpoint, authenticated or not; it is not narrowly
+"protection against a scraper using the extracted key," it's a budget
+that applies to every caller. Partitioning by client IP (read from
+`X-Forwarded-For`, which the nginx config in §1 forwards, falling back to
+the connection's remote IP) means one noisy client's budget doesn't
+starve everyone else sharing the same VPS-facing endpoint.
+
+Nothing to configure on the VPS for this — it's in-process. The limit is
+configuration-driven (`RateLimiting:Read:PermitLimit`/`WindowSeconds`,
+defaulting to 60/60 if unset), same pattern as `ApiKeys` and
+`ConnectionStrings` — not because production needs to tune it, but so
+tests can override it to a small number instead of needing 61 real
+requests to trip a 60/minute window.
 
 ## 5. Process supervision
 
@@ -140,10 +162,13 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-`/opt/pocket-chef-density-api/compose.yml` on the VPS extends the
-repo's local-dev `compose.yml` with the API service (publishing
-`127.0.0.1:8080:8080`, per §1) and a `healthcheck:` wired to the existing
-`/health` endpoint:
+`/opt/pocket-chef-density-api/compose.yml` on the VPS is a copy of the
+repo's local-dev `api/compose.yml` with the `api:` service below added
+to it directly (not a Compose `extends:`/`include:` reference back into
+the repo checkout — one self-contained file on the VPS is simpler to
+reason about than keeping a deploy directory in sync with a moving repo
+path). Publishes `127.0.0.1:8080:8080` (per §1) and adds a
+`healthcheck:` wired to the existing `/health` endpoint:
 
 ```yaml
 services:
