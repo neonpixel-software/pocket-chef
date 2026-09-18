@@ -68,6 +68,16 @@ Seeded once from existing public ingredient-density data, then curated by hand o
 
 **Refresh cadence:** the app checks for new/changed density entries periodically in the background, and also lets the user trigger a manual refresh. Either way, results are cached locally so conversion keeps working offline.
 
+## Licensing
+
+**MIT**, one root `LICENSE` covering the whole repo (`app/` + `api/`).
+
+The repo originally shipped as GPL-3.0, which conflicts with the App Store: Apple's distribution terms (no redistribution of modified copies, DRM/signing lock-in) are incompatible with the freedoms GPLv3 grants, and the FSF documents the App Store as an unsupported channel for GPLv3 software. On iOS/iPadOS the App Store is effectively the only realistic distribution route, so this had to be resolved before Phase 4's sync work and the eventual store submission (issue #46).
+
+MIT rather than Apache 2.0 — both are permissive and resolve the App Store conflict, the only substantive difference being Apache's patent grant: at solo-author scale that clause is dormant, MIT is the more idiomatic choice in the Swift/App Store ecosystem, and it's the shortest license (least friction for anyone adopting or vendoring pieces). Revisit the choice if the project ever grows a team of contributors.
+
+One license for the whole monorepo: the API is never distributed via the App Store (own VPS, own app), but a per-component split would only add maintenance surface for no benefit. Relicensed as sole copyright holder — no third-party contributions existed, so no consents were needed; the repo's earlier commits retain the old GPL-3.0 `LICENSE` in git history.
+
 ## Implementation plan
 
 Ordered as vertical slices — each phase leaves the app in a working, testable state rather than building all data layer, then all UI, then all AI.
@@ -149,6 +159,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
   Acceptance: common ingredients (flour, sugar, butter, etc.) return sensible density values from the read endpoint.
 - [ ] **9.2 Deploy to Ubuntu VPS** — API running as a service on the existing 26.04 VPS, reachable over HTTPS.
   Acceptance: read endpoint reachable from outside the VPS over HTTPS with the read key; write endpoints not reachable without the write key.
+  Note: TLS termination (via the VPS's existing nginx + certbot), production key storage, Postgres backups, and process supervision are documented in `api/docs/deploy.md` (issue #47). A fixed-window rate limiter on the read endpoint (60 req/min, since the read key ships inside the app binary and is extractable) is already implemented and covered by `DensityEntriesRateLimitTests`. Still open: actually running this runbook against the real VPS — needs whoever has access to it.
 
 **Checkpoint:** API live and seeded; ready for the client to consume.
 
@@ -169,6 +180,18 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 
 **Checkpoint:** full v1 feature set complete — capture, tag, store/sync, convert.
 
+### Phase 12: Release & distribution
+- [ ] **12.1 App Store Connect setup + App Privacy labels** — register the app in App Store Connect and complete the mandatory App Privacy labels. The labels must be truthful: this app collects no user data (see the plan's privacy stance above), so the declaration is "data not collected".
+  Acceptance: privacy labels submitted and passing review with a truthful no-data-collection declaration for all three platforms.
+- [ ] **12.2 Store assets** — app icon plus per-platform screenshot sets at every required size (macOS, iPadOS, iOS), built from real app captures, not mockups.
+  Acceptance: every required screenshot slot for each platform is filled and renders correctly in a TestFlight build.
+- [ ] **12.3 Versioning, signing, notarization** — version/scheme management, signing identities, and a macOS notarization flow wired into a single command or CI job, so producing a distributable build is one step.
+  Acceptance: one command produces a signed, notarized macOS build and an App Store build for iOS/iPadOS.
+- [ ] **12.4 TestFlight → production rollout** — internal testing, then beta, then public release, with a short runbook for what to verify at each stage.
+  Acceptance: v1 live in the public App Store on all three platforms.
+
+**Checkpoint:** Pocket Chef is publicly available on the App Store (macOS, iPadOS, iOS).
+
 ## Risks and open questions
 
 | Risk | Impact | Mitigation |
@@ -176,6 +199,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 | Apple Intelligence extraction quality on messy recipe sites | Medium — bad parses land in review screen, so nothing saves silently wrong, but frequent bad parses hurt the "no fluff" promise | Review screen is mandatory by design (Phase 2); revisit prompt/approach if quality is poor in testing |
 | CloudKit sync edge cases (conflicts, migration) | Medium — sync bugs are hard to debug later | Schema made CloudKit-compatible ahead of Phase 4 (issue #48), while no real user data exists, avoiding a later local-store migration; test the Local↔iCloud switch explicitly in Phase 4 checkpoint across two devices before moving on |
 | Density data coverage gaps | Low — explicitly handled by the fallback note (Phase 11.2) rather than silent wrong answers | None needed beyond the fallback already designed |
+| Density Postgres data loss on the VPS (disk failure, accidental drop) | Low — the density table is small, hand-curated data, not user data; re-seeding from Phase 9.1's source is a viable fallback | Nightly `pg_dump` backup documented in `api/docs/deploy.md` (issue #47) |
 | VPS/API becomes a single point of failure for conversion | Low — client caches locally, so downtime only blocks *new* density data, not existing conversions | Local cache (Phase 10.1) already covers this |
 
 ## Open items / not yet decided
