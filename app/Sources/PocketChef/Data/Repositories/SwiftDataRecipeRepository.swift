@@ -46,8 +46,7 @@ final class SwiftDataRecipeRepository: RecipeRepository {
 
         // Tags are a shared (non-owned) relationship: resolve to the existing,
         // already-persisted TagModel rows by id rather than remapping via
-        // toModel(), which would insert duplicate rows conflicting with the
-        // unique id constraint.
+        // toModel(), which would insert duplicate rows for the same tag.
         model.tags = try resolveTagModels(for: recipe.tags)
 
         try modelContext.save()
