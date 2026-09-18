@@ -5,13 +5,8 @@ namespace PocketChef.DensityApi.Api.Tests;
 /// The rate limiter middleware runs before the API key filter, so unauthenticated requests
 /// are enough to exercise it — no database needed, matching the auth-rejection tests' approach.
 ///
-/// DensityApiWebApplicationFactory overrides the permit limit down to
-/// ReadRateLimitPermitLimit (3) specifically so this test doesn't need 61 real requests to
-/// trip a 60/minute window. That override applies to every test sharing this factory
-/// instance (IClassFixture is one instance per test class) — a second test method added to
-/// this class would immediately see 429s on its first request, since the shared limiter's
-/// budget carries over within the class. Keep this class to the one test, or give any
-/// additional rate-limit test its own factory instance.
+/// DensityApiWebApplicationFactory.ReadRateLimitPermitLimit documents the shared-budget
+/// constraint this relies on (this test alone consumes it entirely by design).
 public class DensityEntriesRateLimitTests : IClassFixture<DensityApiWebApplicationFactory>
 {
     private readonly DensityApiWebApplicationFactory _factory;
