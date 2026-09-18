@@ -149,6 +149,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
   Acceptance: common ingredients (flour, sugar, butter, etc.) return sensible density values from the read endpoint.
 - [ ] **9.2 Deploy to Ubuntu VPS** — API running as a service on the existing 26.04 VPS, reachable over HTTPS.
   Acceptance: read endpoint reachable from outside the VPS over HTTPS with the read key; write endpoints not reachable without the write key.
+  Note: TLS termination (via the VPS's existing nginx + certbot), production key storage, Postgres backups, and process supervision are documented in `api/docs/deploy.md` (issue #47). A fixed-window rate limiter on the read endpoint (60 req/min, since the read key ships inside the app binary and is extractable) is already implemented and covered by `DensityEntriesRateLimitTests`. Still open: actually running this runbook against the real VPS — needs whoever has access to it.
 
 **Checkpoint:** API live and seeded; ready for the client to consume.
 
@@ -176,6 +177,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 | Apple Intelligence extraction quality on messy recipe sites | Medium — bad parses land in review screen, so nothing saves silently wrong, but frequent bad parses hurt the "no fluff" promise | Review screen is mandatory by design (Phase 2); revisit prompt/approach if quality is poor in testing |
 | CloudKit sync edge cases (conflicts, migration) | Medium — sync bugs are hard to debug later | Schema made CloudKit-compatible ahead of Phase 4 (issue #48), while no real user data exists, avoiding a later local-store migration; test the Local↔iCloud switch explicitly in Phase 4 checkpoint across two devices before moving on |
 | Density data coverage gaps | Low — explicitly handled by the fallback note (Phase 11.2) rather than silent wrong answers | None needed beyond the fallback already designed |
+| Density Postgres data loss on the VPS (disk failure, accidental drop) | Low — the density table is small, hand-curated data, not user data; re-seeding from Phase 9.1's source is a viable fallback | Nightly `pg_dump` backup documented in `api/docs/deploy.md` (issue #47) |
 | VPS/API becomes a single point of failure for conversion | Low — client caches locally, so downtime only blocks *new* density data, not existing conversions | Local cache (Phase 10.1) already covers this |
 
 ## Open items / not yet decided
