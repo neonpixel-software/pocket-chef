@@ -5,11 +5,11 @@ extension RecipeModel {
         Recipe(
             id: id,
             title: title,
-            ingredients: ingredients.map { $0.toDomain() },
+            ingredients: (ingredients ?? []).map { $0.toDomain() },
             steps: steps,
             // isTypedSource/sourceURL are only ever set together via toModel(), so this pairing always holds.
             source: isTypedSource ? .typed : .url(sourceURL!),
-            tags: tags.map { $0.toDomain() }
+            tags: (tags ?? []).map { $0.toDomain() }
         )
     }
 }

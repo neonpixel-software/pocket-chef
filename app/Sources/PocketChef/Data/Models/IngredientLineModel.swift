@@ -3,11 +3,12 @@ import SwiftData
 
 @Model
 final class IngredientLineModel {
-    @Attribute(.unique) var id: UUID
-    var rawText: String
+    var id: UUID = UUID()
+    var rawText: String = ""
     var amount: Double?
     var unit: String?
     var ingredientName: String?
+    @Relationship(inverse: \RecipeModel.ingredients) var recipe: RecipeModel?
 
     init(
         id: UUID = UUID(),

@@ -41,10 +41,10 @@ final class RecipeModelPersistenceTests: XCTestCase {
         XCTAssertEqual(fetched.count, 1)
         let fetchedRecipe = try XCTUnwrap(fetched.first)
         XCTAssertEqual(fetchedRecipe.title, "Pancakes")
-        XCTAssertEqual(fetchedRecipe.ingredients.count, 1)
-        XCTAssertEqual(fetchedRecipe.ingredients.first?.ingredientName, "flour")
-        XCTAssertEqual(fetchedRecipe.tags.count, 1)
-        XCTAssertEqual(fetchedRecipe.tags.first?.name, "Breakfast")
+        XCTAssertEqual(fetchedRecipe.ingredients?.count, 1)
+        XCTAssertEqual(fetchedRecipe.ingredients?.first?.ingredientName, "flour")
+        XCTAssertEqual(fetchedRecipe.tags?.count, 1)
+        XCTAssertEqual(fetchedRecipe.tags?.first?.name, "Breakfast")
     }
 
     func testRecipeWithURLSourcePersists() throws {
