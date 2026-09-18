@@ -3,13 +3,13 @@ import SwiftData
 
 @Model
 final class RecipeModel {
-    @Attribute(.unique) var id: UUID
-    var title: String
-    var steps: [String]
-    var isTypedSource: Bool
+    var id: UUID = UUID()
+    var title: String = ""
+    var steps: [String] = []
+    var isTypedSource: Bool = false
     var sourceURL: URL?
-    @Relationship(deleteRule: .cascade) var ingredients: [IngredientLineModel]
-    @Relationship var tags: [TagModel]
+    @Relationship(deleteRule: .cascade) var ingredients: [IngredientLineModel]? = []
+    @Relationship var tags: [TagModel]? = []
 
     init(
         id: UUID = UUID(),

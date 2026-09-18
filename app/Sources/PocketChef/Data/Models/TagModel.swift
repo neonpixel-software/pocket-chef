@@ -3,9 +3,9 @@ import SwiftData
 
 @Model
 final class TagModel {
-    @Attribute(.unique) var id: UUID
-    var name: String
-    var isPreset: Bool
+    var id: UUID = UUID()
+    var name: String = ""
+    var isPreset: Bool = false
     @Relationship(inverse: \RecipeModel.tags) var recipes: [RecipeModel]?
 
     init(

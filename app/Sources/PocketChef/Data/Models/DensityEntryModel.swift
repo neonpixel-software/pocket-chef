@@ -3,9 +3,9 @@ import SwiftData
 
 @Model
 final class DensityEntryModel {
-    @Attribute(.unique) var id: UUID
-    var ingredientName: String
-    var gramsPerCup: Double
+    var id: UUID = UUID()
+    var ingredientName: String = ""
+    var gramsPerCup: Double = 0
 
     init(
         id: UUID = UUID(),

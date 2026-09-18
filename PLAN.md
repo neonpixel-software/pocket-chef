@@ -101,6 +101,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 ### Phase 4: Settings & iCloud sync
 - [ ] **4.1 Settings screen with storage toggle** — Local vs. iCloud choice, wired to SwiftData's CloudKit-backed store.
   Acceptance: switching to iCloud migrates existing recipes and they appear on a second signed-in device/simulator; switching back leaves a local-only copy.
+  Note: the model schema (`RecipeModel`, `IngredientLineModel`, `TagModel`, `DensityEntryModel`) was reworked ahead of this phase (issue #48) to be CloudKit-compatible — no `.unique` attributes, every attribute has a default, every relationship is optional with an inverse declared on both sides. Verified via a regression test (`CloudKitSchemaCompatibilityTests`) that loads all four models into a CloudKit-backed `ModelContainer` without throwing. Still open for this phase: the actual dual `ModelConfiguration` (plain store + CloudKit-backed store) plus data-copy routine for the Local↔iCloud toggle, and the CloudKit prerequisites (Apple Developer account, iCloud capability in `project.yml`, container registration for `com.neonpixel.pocketchef`) — none of that is wired up yet.
 
 **Checkpoint:** sync verified across two devices/simulators.
 
@@ -173,7 +174,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 | Risk | Impact | Mitigation |
 |---|---|---|
 | Apple Intelligence extraction quality on messy recipe sites | Medium — bad parses land in review screen, so nothing saves silently wrong, but frequent bad parses hurt the "no fluff" promise | Review screen is mandatory by design (Phase 2); revisit prompt/approach if quality is poor in testing |
-| CloudKit sync edge cases (conflicts, migration) | Medium — sync bugs are hard to debug later | Test the Local↔iCloud switch explicitly in Phase 4 checkpoint across two devices before moving on |
+| CloudKit sync edge cases (conflicts, migration) | Medium — sync bugs are hard to debug later | Schema made CloudKit-compatible ahead of Phase 4 (issue #48), while no real user data exists, avoiding a later local-store migration; test the Local↔iCloud switch explicitly in Phase 4 checkpoint across two devices before moving on |
 | Density data coverage gaps | Low — explicitly handled by the fallback note (Phase 11.2) rather than silent wrong answers | None needed beyond the fallback already designed |
 | VPS/API becomes a single point of failure for conversion | Low — client caches locally, so downtime only blocks *new* density data, not existing conversions | Local cache (Phase 10.1) already covers this |
 

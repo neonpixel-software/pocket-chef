@@ -41,7 +41,7 @@ final class SwiftDataRecipeRepository: RecipeRepository {
         // The .cascade delete rule only fires on parent deletion, not on reassigning
         // the relationship array, so old children must be deleted explicitly here or
         // they leak as orphaned rows.
-        model.ingredients.forEach { modelContext.delete($0) }
+        (model.ingredients ?? []).forEach { modelContext.delete($0) }
         model.ingredients = recipe.ingredients.map { $0.toModel() }
 
         // Tags are a shared (non-owned) relationship: resolve to the existing,
