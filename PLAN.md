@@ -128,7 +128,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 - [ ] **6.1 "Paste a link" entry point** — fetch page content, hand to Apple Intelligence to extract just the recipe, land on the same review screen pre-filled.
   Acceptance: pasting a real recipe URL produces a correctly structured, editable result with ads/backstory/comments excluded.
   All code/tests/UI built and passing; left unchecked because the actual on-device AI extraction quality hasn't been verified — no development machine here has Apple Intelligence enabled. Check off once verified on a real device (same constraint as 5.1).
-  Also verify the fetch-layer limits (#49) on device: a very large page (>2 MB) shows the "too large" message; a windows-1252 page (e.g. an old recipe blog) decodes with accents intact; a plain-HTTP-only site shows the "secure connection" message. Plain text is truncated to 12,000 characters before the model call.
+  Also verify the fetch-layer limits (#49) on device — deferred until all phases are done, then test together with the rest of the real-device checks: a very large page (>2 MB) shows the "too large" message; a windows-1252 page (e.g. an old recipe blog) decodes with accents intact; a plain-HTTP-only site shows the "secure connection" message. Plain text is truncated to 12,000 characters before the model call.
 - [x] **6.2 Add-recipe screen shows both options clearly** — "Type it" / "Paste a link" presented side by side, not hidden.
   Acceptance: both entry points are visible without extra taps from the main add-recipe screen.
 
