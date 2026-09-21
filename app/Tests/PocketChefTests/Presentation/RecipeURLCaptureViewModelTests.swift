@@ -60,6 +60,26 @@ final class RecipeURLCaptureViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "Couldn't load that page. Check the link and try again.")
     }
 
+    func testCaptureSetsTooLargeMessageOnTooLargeError() async {
+        let viewModel = RecipeURLCaptureViewModel(captureRecipeFromURLUseCase: FakeCaptureRecipeFromURLUseCase(result: .failure(WebPageFetchError.tooLarge)))
+        viewModel.urlText = "https://example.com/recipe"
+
+        let result = await viewModel.capture()
+
+        XCTAssertNil(result)
+        XCTAssertEqual(viewModel.errorMessage, "That page is too large to read. Try a link to just the recipe.")
+    }
+
+    func testCaptureSetsInsecureConnectionMessageOnInsecureConnectionError() async {
+        let viewModel = RecipeURLCaptureViewModel(captureRecipeFromURLUseCase: FakeCaptureRecipeFromURLUseCase(result: .failure(WebPageFetchError.insecureConnection)))
+        viewModel.urlText = "http://example.com/recipe"
+
+        let result = await viewModel.capture()
+
+        XCTAssertNil(result)
+        XCTAssertEqual(viewModel.errorMessage, "That site doesn't use a secure connection (https), so it can't be opened.")
+    }
+
     func testCaptureSetsExtractionMessageOnNonFetchError() async {
         let viewModel = RecipeURLCaptureViewModel(captureRecipeFromURLUseCase: FakeCaptureRecipeFromURLUseCase(result: .failure(AICaptureFailure())))
         viewModel.urlText = "https://example.com/recipe"
