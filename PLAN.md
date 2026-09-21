@@ -31,7 +31,7 @@ Priority for this project: maintainable, testable, scalable over fastest-to-ship
 - Apple Intelligence capture service: tested via a fake conforming to the same protocol for use-case tests (output isn't fully deterministic); real device checks with sample recipes handled as manual/semi-automated verification, not strict pass-fail units.
 - .NET API layer: integration tests against the actual Minimal API endpoints, specifically proving read/write API key enforcement, not just happy-path responses.
 
-**Tooling:** SwiftLint + SwiftFormat on the Swift side, `.editorconfig` + `dotnet format` on the .NET side, both enforced in CI (GitHub Actions) alongside tests and coverage on every push/PR. No specific linter config decided yet — pull one in when it actually comes up rather than pre-deciding.
+**Tooling:** SwiftLint + SwiftFormat on the Swift side, `.editorconfig` + `dotnet format` on the .NET side, both enforced in CI (GitHub Actions) alongside tests and coverage on every push/PR. The configs are checked in (`app/.swiftformat`, `app/.swiftlint.yml`, `api/.editorconfig`) and written to match the conventions each codebase already uses rather than re-styling it (issue #51); CI pins the tool version each config was validated against.
 
 ## Data model
 
