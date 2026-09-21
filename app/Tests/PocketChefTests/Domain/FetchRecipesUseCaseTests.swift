@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private struct FakeRecipeRepository: RecipeRepository {
     var result: Result<[Recipe], Error>
@@ -8,9 +8,9 @@ private struct FakeRecipeRepository: RecipeRepository {
         try result.get()
     }
 
-    func create(_ recipe: Recipe) throws {}
-    func update(_ recipe: Recipe) throws {}
-    func delete(id: UUID) throws {}
+    func create(_: Recipe) throws {}
+    func update(_: Recipe) throws {}
+    func delete(id _: UUID) throws {}
 }
 
 private struct RepositoryFailure: Error, Equatable {}

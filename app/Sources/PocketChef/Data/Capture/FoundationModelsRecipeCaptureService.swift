@@ -17,8 +17,8 @@ final class FoundationModelsRecipeCaptureService: RecipeCaptureService {
     func captureRecipe(from text: String) async throws -> Recipe {
         let session = LanguageModelSession(instructions: {
             "Extract this recipe into a structured title, ingredient lines, and steps. " +
-            "Preserve the ingredient's exact original wording in rawText even when you " +
-            "also identify amount/unit/name."
+                "Preserve the ingredient's exact original wording in rawText even when you " +
+                "also identify amount/unit/name."
         })
         do {
             let result = try await session.respond(to: text, generating: CapturedRecipeSchema.self)

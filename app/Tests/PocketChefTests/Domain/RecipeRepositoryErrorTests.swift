@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 final class RecipeRepositoryErrorTests: XCTestCase {
     func testRecipeNotFoundHasANonEmptyLocalizedDescription() {
@@ -19,7 +19,7 @@ final class RecipeRepositoryErrorTests: XCTestCase {
             "es": "No se pudo encontrar esta receta. Puede que ya se haya eliminado.",
             "fr": "Cette recette est introuvable. Elle a peut-être déjà été supprimée.",
             "de": "Dieses Rezept konnte nicht gefunden werden. Es wurde möglicherweise bereits gelöscht.",
-            "nl": "Dit recept kon niet worden gevonden. Mogelijk is het al verwijderd."
+            "nl": "Dit recept kon niet worden gevonden. Mogelijk is het al verwijderd.",
         ]
 
         for (languageCode, translated) in translations {

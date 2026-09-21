@@ -27,18 +27,18 @@ struct FlowLayout: Layout {
     /// SwiftUI layout) this is directly unit-testable.
     static func positions(for sizes: [CGSize], maxWidth: CGFloat, spacing: CGFloat) -> [CGPoint] {
         var result: [CGPoint] = []
-        var x: CGFloat = 0
-        var y: CGFloat = 0
+        var xPos: CGFloat = 0
+        var yPos: CGFloat = 0
         var rowHeight: CGFloat = 0
 
         for size in sizes {
-            if x > 0, x + size.width > maxWidth {
-                x = 0
-                y += rowHeight + spacing
+            if xPos > 0, xPos + size.width > maxWidth {
+                xPos = 0
+                yPos += rowHeight + spacing
                 rowHeight = 0
             }
-            result.append(CGPoint(x: x, y: y))
-            x += size.width + spacing
+            result.append(CGPoint(x: xPos, y: yPos))
+            xPos += size.width + spacing
             rowHeight = max(rowHeight, size.height)
         }
         return result

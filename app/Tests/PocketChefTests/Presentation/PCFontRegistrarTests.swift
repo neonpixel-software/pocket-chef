@@ -1,6 +1,6 @@
-import XCTest
 import CoreText
 @testable import PocketChef
+import XCTest
 
 final class PCFontRegistrarTests: XCTestCase {
     func testRegisterCustomFontsMakesEdoSZAvailable() {

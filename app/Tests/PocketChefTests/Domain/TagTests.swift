@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 final class TagTests: XCTestCase {
     func testLocalizedDisplayNameReturnsSomeNonEmptyStringForEveryPreset() {
@@ -36,7 +36,7 @@ final class TagTests: XCTestCase {
             "Lunch": ["es": "Almuerzo", "fr": "Déjeuner", "de": "Mittagessen", "nl": "Lunch"],
             "Dinner": ["es": "Cena", "fr": "Dîner", "de": "Abendessen", "nl": "Diner"],
             "Dessert": ["es": "Postre", "fr": "Dessert", "de": "Nachtisch", "nl": "Toetje"],
-            "Snack": ["es": "Merienda", "fr": "Collation", "de": "Snack", "nl": "Snack"]
+            "Snack": ["es": "Merienda", "fr": "Collation", "de": "Snack", "nl": "Snack"],
         ]
 
         for (name, translations) in expected {

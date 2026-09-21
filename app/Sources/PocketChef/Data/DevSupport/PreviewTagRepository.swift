@@ -6,7 +6,7 @@ struct PreviewTagRepository: TagRepository {
     func fetchAll() throws -> [Tag] {
         [
             Tag(id: UUID(), name: "Breakfast", isPreset: true),
-            Tag(id: UUID(), name: "Dinner", isPreset: true)
+            Tag(id: UUID(), name: "Dinner", isPreset: true),
         ]
     }
 

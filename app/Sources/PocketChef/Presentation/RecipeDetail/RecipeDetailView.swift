@@ -127,11 +127,10 @@ struct RecipeDetailView: View {
         .tint(PCColor.pink)
     }
 
-    @ViewBuilder
-    private func section<Content: View>(
+    private func section(
         title: String,
         accent: Color,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: () -> some View
     ) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 8) {

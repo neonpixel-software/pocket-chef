@@ -1,19 +1,19 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private final class FakeRecipeRepository: RecipeRepository {
     var updateResult: Result<Void, Error> = .success(())
     private(set) var updatedRecipes: [Recipe] = []
 
     func fetchAll() throws -> [Recipe] { [] }
-    func create(_ recipe: Recipe) throws {}
+    func create(_: Recipe) throws {}
 
     func update(_ recipe: Recipe) throws {
         updatedRecipes.append(recipe)
         try updateResult.get()
     }
 
-    func delete(id: UUID) throws {}
+    func delete(id _: UUID) throws {}
 }
 
 private struct RepositoryFailure: Error, Equatable {}

@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 final class CapturedRecipeSchemaTests: XCTestCase {
     func testToDomainMapsFullyStructuredIngredient() {

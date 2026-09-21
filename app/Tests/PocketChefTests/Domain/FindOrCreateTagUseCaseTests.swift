@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private final class FakeTagRepository: TagRepository {
     var findOrCreateResult: Result<Tag, Error> = .success(Tag(id: UUID(), name: "", isPreset: false))

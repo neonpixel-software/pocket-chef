@@ -112,11 +112,10 @@ struct RecipeFormView: View {
             .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 14))
     }
 
-    @ViewBuilder
-    private func formSection<Content: View>(
+    private func formSection(
         title: String,
         accent: Color,
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: () -> some View
     ) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 8) {

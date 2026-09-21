@@ -36,7 +36,7 @@ struct IngredientLineDraft: Identifiable, Equatable {
         originalRawText = ingredientLine.rawText
     }
 
-    // Avoids "2.0" round-tripping into the field for a whole-number amount typed as "2".
+    /// Avoids "2.0" round-tripping into the field for a whole-number amount typed as "2".
     private static func formatAmount(_ amount: Double) -> String {
         amount.truncatingRemainder(dividingBy: 1) == 0
             ? String(Int(amount))
@@ -93,7 +93,7 @@ final class RecipeFormViewModel {
             ingredients = []
             steps = []
             initialTags = []
-        case .edit(let recipe), .capture(let recipe):
+        case let .edit(recipe), let .capture(recipe):
             title = recipe.title
             ingredients = recipe.ingredients.map { IngredientLineDraft(ingredientLine: $0) }
             steps = recipe.steps.map { StepDraft(text: $0) }
@@ -254,7 +254,7 @@ final class RecipeFormViewModel {
                 source: .typed,
                 tags: selectedTags
             )
-        case .capture(let original):
+        case let .capture(original):
             return Recipe(
                 id: UUID(), // fresh id: this is a new record, not an update to original
                 title: trimmedTitle,
@@ -263,7 +263,7 @@ final class RecipeFormViewModel {
                 source: original.source,
                 tags: selectedTags
             )
-        case .edit(let original):
+        case let .edit(original):
             return Recipe(
                 id: original.id,
                 title: trimmedTitle,

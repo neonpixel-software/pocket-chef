@@ -1,11 +1,11 @@
-import XCTest
-import ViewInspector
 @testable import PocketChef
+import ViewInspector
+import XCTest
 
 private struct FakeCaptureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase {
     var result: Result<Recipe, Error>
 
-    func execute(urlString: String) async throws -> Recipe {
+    func execute(urlString _: String) async throws -> Recipe {
         try result.get()
     }
 }
