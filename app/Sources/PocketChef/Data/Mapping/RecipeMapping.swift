@@ -22,7 +22,7 @@ extension Recipe {
         case .typed:
             isTyped = true
             url = nil
-        case .url(let sourceURL):
+        case let .url(sourceURL):
             isTyped = false
             url = sourceURL
         }

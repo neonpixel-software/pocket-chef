@@ -1,0 +1,47 @@
+# Style contract for the Pocket Chef density API.
+#
+# Enforced in CI via `dotnet format --verify-no-changes` (see
+# .github/workflows/ci.yml, build-api job). Run `dotnet format` locally to
+# apply any required changes.
+#
+# Severity convention: rules at `warning`/`error` are applied and verified
+# by `dotnet format`; rules at `suggestion` are editor hints only and never
+# block a build.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{cs,csx}]
+
+# Whitespace — matches the existing codebase (K&R braces, one statement per
+# line, blank line between members of a block-scoped type).
+csharp_new_line_before_opening_brace = never
+csharp_new_line_before_members_in_block_scoped_type = true
+csharp_indent_labels = one_level_less
+
+# Local variables — the codebase writes `var` consistently.
+csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_for_built_in_types = true:warning
+csharp_style_var_elsewhere = true:suggestion
+
+# Members always carry an explicit accessibility modifier.
+dotnet_style_require_accessibility_modifiers = always:warning
+
+# Unused usings are removed.
+dotnet_diagnostic.IDE0005.severity = warning
+
+# Expression-bodied members — preferred where they fit on one line, but the
+# codebase deliberately keeps multi-line statement bodies where they read
+# better, so this is a suggestion rather than an enforced rule.
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+csharp_style_expression_bodied_indexers = when_on_single_line:suggestion
+csharp_style_expression_bodied_operators = when_on_single_line:suggestion
+csharp_style_expression_bodied_lambdas = when_on_single_line:suggestion

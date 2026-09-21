@@ -1,6 +1,6 @@
-import XCTest
-import SwiftData
 @testable import PocketChef
+import SwiftData
+import XCTest
 
 /// Regression test for the CloudKit schema-compatibility rework (issue #48):
 /// unique attributes, non-optional attributes without defaults, and relationships
@@ -15,7 +15,7 @@ final class CloudKitSchemaCompatibilityTests: XCTestCase {
             RecipeModel.self,
             IngredientLineModel.self,
             TagModel.self,
-            DensityEntryModel.self
+            DensityEntryModel.self,
         ])
         let configuration = ModelConfiguration(
             isStoredInMemoryOnly: true,

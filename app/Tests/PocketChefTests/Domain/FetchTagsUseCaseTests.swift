@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private struct FakeTagRepository: TagRepository {
     var fetchAllResult: Result<[Tag], Error>
