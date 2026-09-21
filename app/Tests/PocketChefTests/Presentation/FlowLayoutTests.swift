@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 final class FlowLayoutTests: XCTestCase {
     func testPositionsForEmptyInputIsEmpty() {
@@ -33,7 +33,7 @@ final class FlowLayoutTests: XCTestCase {
         let sizes = [
             CGSize(width: 30, height: 40), // tall
             CGSize(width: 20, height: 20), // same row (30+8+20=58 <= 70), shorter
-            CGSize(width: 60, height: 20) // wraps — row 1's height should be based on the tall item
+            CGSize(width: 60, height: 20), // wraps — row 1's height should be based on the tall item
         ]
 
         let positions = FlowLayout.positions(for: sizes, maxWidth: 70, spacing: 8)

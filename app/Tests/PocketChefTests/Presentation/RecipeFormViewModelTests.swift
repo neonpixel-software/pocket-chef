@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private final class FakeCreateRecipeUseCase: CreateRecipeUseCase {
     var result: Result<Void, Error> = .success(())

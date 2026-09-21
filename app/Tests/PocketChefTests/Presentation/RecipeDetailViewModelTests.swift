@@ -1,12 +1,12 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private struct NoOpCreateRecipeUseCase: CreateRecipeUseCase {
-    func execute(_ recipe: Recipe) throws {}
+    func execute(_: Recipe) throws {}
 }
 
 private struct NoOpUpdateRecipeUseCase: UpdateRecipeUseCase {
-    func execute(_ recipe: Recipe) throws {}
+    func execute(_: Recipe) throws {}
 }
 
 private struct FakeDeleteRecipeUseCase: DeleteRecipeUseCase {

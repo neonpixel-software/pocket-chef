@@ -1,0 +1,31 @@
+# Pocket Chef Swift formatting contract.
+#
+# Enforced in CI via `swiftformat Sources Tests --lint` (see
+# .github/workflows/ci.yml, build job). Run `swiftformat` from app/ to apply
+# any required changes locally.
+#
+# Deviations from the SwiftFormat defaults below exist so the formatter
+# preserves the codebase's existing conventions instead of re-styling it;
+# everything else (trailing commas, import sorting, `case let` patterns,
+# opaque `some View` parameters, unused-argument wildcards, XCTUnwrap in
+# tests, ...) runs at the tool's defaults.
+--swiftversion 6
+# Matches SWIFT_VERSION in project.yml — some rules (opaque parameters,
+# redundant @ViewBuilder) only activate for the correct language version.
+
+# Apple style: #if/#elseif/#endif bodies are not indented (codebase convention).
+--ifdef no-indent
+
+# Multi-line guards/ifs keep `else {` on the same line (codebase convention);
+# the default "auto" would move it to the next line for multi-line conditions.
+--guard-else same-line
+
+# ...and the same for the opening brace of multi-line statements.
+--disable wrapMultilineStatementBraces
+
+# Concise single-line bodies stay single-line, e.g. `func isAvailable() -> Bool { true }`
+# and `var recipe: Recipe { viewModel.recipe }` (codebase convention).
+--disable wrapFunctionBodies,wrapIfStatementBodies,wrapPropertyBodies
+
+# Range operators stay snug, e.g. `.lineLimit(1...6)` (codebase convention).
+--ranges no-space

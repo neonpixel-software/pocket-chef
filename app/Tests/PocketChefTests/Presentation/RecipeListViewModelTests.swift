@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private struct FakeFetchRecipesUseCase: FetchRecipesUseCase {
     var result: Result<[Recipe], Error>
@@ -10,17 +10,17 @@ private struct FakeFetchRecipesUseCase: FetchRecipesUseCase {
 }
 
 private struct NoOpCreateRecipeUseCase: CreateRecipeUseCase {
-    func execute(_ recipe: Recipe) throws {}
+    func execute(_: Recipe) throws {}
 }
 
 private struct NoOpUpdateRecipeUseCase: UpdateRecipeUseCase {
-    func execute(_ recipe: Recipe) throws {}
+    func execute(_: Recipe) throws {}
 }
 
 private struct FakeDeleteRecipeUseCase: DeleteRecipeUseCase {
     var result: Result<Void, Error> = .success(())
 
-    func execute(id: UUID) throws {
+    func execute(id _: UUID) throws {
         try result.get()
     }
 }
@@ -40,7 +40,7 @@ private struct NoOpFindOrCreateTagUseCase: FindOrCreateTagUseCase {
 }
 
 private struct NoOpCaptureRecipeUseCase: CaptureRecipeUseCase {
-    func execute(text: String) async throws -> Recipe {
+    func execute(text _: String) async throws -> Recipe {
         Recipe(id: UUID(), title: "", ingredients: [], steps: [], source: .typed, tags: [])
     }
 }
@@ -51,7 +51,7 @@ private struct FakeCheckCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseC
 }
 
 private struct NoOpCaptureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase {
-    func execute(urlString: String) async throws -> Recipe {
+    func execute(urlString _: String) async throws -> Recipe {
         Recipe(id: UUID(), title: "", ingredients: [], steps: [], source: .typed, tags: [])
     }
 }

@@ -1,0 +1,41 @@
+# Pocket Chef SwiftLint contract.
+#
+# Enforced in CI via `swiftlint Sources Tests --strict` (see
+# .github/workflows/ci.yml, build job). --strict promotes warnings to
+# failures, so this file is the complete lint policy: anything not
+# mentioned here runs at SwiftLint defaults. Run `swiftlint` from app/
+# locally to check.
+#
+# Every deviation from a default below exists so the linter agrees with a
+# convention the codebase already uses (and, where noted, that
+# app/.swiftformat already enforces) instead of re-flagging existing style.
+
+trailing_comma:
+  # app/.swiftformat's trailingCommas rule (default) *inserts* trailing
+  # commas in multi-line collections, while SwiftLint's default mode
+  # forbids them. Requiring them here so both tools enforce the same
+  # convention — otherwise whichever tool runs last always fails.
+  mandatory_comma: true
+
+line_length:
+  # The codebase allows long lines (current max ~160: SwiftUI
+  # trailing-closure chains and string literals), and SwiftFormat never
+  # wraps lines. The default 120 would flag ~47 existing lines; 200 keeps
+  # the signal for genuinely unreadable lines only.
+  warning: 200
+
+type_body_length:
+  # Code-smell guard, calibrated to the codebase's current max (~315: the
+  # form view-model test class) rather than the default 250.
+  warning: 400
+
+file_length:
+  # Code-smell guard, calibrated to the codebase's current max (~460: the
+  # form view-model test file) rather than the default 400.
+  warning: 500
+
+disabled_rules:
+  # SwiftUI idiom: @ViewBuilder content closures are passed trailing even
+  # when another closure argument is labeled, e.g.
+  # .sheet(isPresented:, onDismiss: { ... }) { ... }.
+  - multiple_closures_with_trailing_closure
