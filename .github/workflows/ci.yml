@@ -79,6 +79,9 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore --configuration Release
+      - name: Verify formatting
+        # Enforces the style contract in api/.editorconfig; fails without changing anything.
+        run: dotnet format --verify-no-changes
       - name: Test
         # Testcontainers.PostgreSql needs a Docker-compatible daemon — ubuntu-latest runners
         # have Docker preinstalled, so this works unmodified (local dev here uses Podman
