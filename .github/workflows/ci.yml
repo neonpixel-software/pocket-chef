@@ -44,7 +44,7 @@ jobs:
         # can change rule defaults and re-flag code the contract already covers. (The
         # Homebrew formula is unpinned, so install from the GitHub release instead.)
         run: |
-          curl -sL https://github.com/nicklockwood/SwiftFormat/releases/download/0.63.0/swiftformat.zip -o swiftformat.zip
+          curl -fsSL --proto '=https' --tlsv1.2 https://github.com/nicklockwood/SwiftFormat/releases/download/0.63.0/swiftformat.zip -o swiftformat.zip
           unzip -o swiftformat.zip
           ./swiftformat Sources Tests --lint
       - name: Verify lint
@@ -53,7 +53,7 @@ jobs:
         # Pinned to the version the config was validated against (the Homebrew
         # formula is unpinned, so install from the GitHub release instead).
         run: |
-          curl -sL https://github.com/realm/SwiftLint/releases/download/0.65.1/portable_swiftlint.zip -o swiftlint.zip
+          curl -fsSL --proto '=https' --tlsv1.2 https://github.com/realm/SwiftLint/releases/download/0.65.1/portable_swiftlint.zip -o swiftlint.zip
           unzip -o swiftlint.zip
           ./swiftlint Sources Tests --strict
       - name: Build & test iOS
