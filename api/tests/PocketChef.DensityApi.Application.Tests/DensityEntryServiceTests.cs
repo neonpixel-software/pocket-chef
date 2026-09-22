@@ -82,6 +82,19 @@ public class DensityEntryServiceTests
         Assert.Equal(120, result.GramsPerCup);
     }
 
+    [Fact]
+    public async Task UpsertAsync_NullIngredientName_ThrowsArgument()
+    {
+        // A JSON null name binds fine to the non-nullable string parameter, so the
+        // service is the first place that sees it. An unguarded Canonicalize would then
+        // throw a raw NullReferenceException — a 500 where the constructor's
+        // IsNullOrWhiteSpace check used to produce a clean 400.
+        var repository = new FakeDensityEntryRepository();
+        var service = new DensityEntryService(repository);
+
+        await Assert.ThrowsAsync<ArgumentException>(() => service.UpsertAsync(null!, 200, CancellationToken.None));
+    }
+
     /// Simulates the database's handling of names rather than the service's expectations:
     /// FindByNameAsync matches the way the citext column does (case folds, but whitespace
     /// and Unicode canonical form are significant), and UpsertAsync enforces the way the
@@ -106,15 +119,19 @@ public class DensityEntryServiceTests
 
         public Task<DensityEntry> UpsertAsync(DensityEntry entry, CancellationToken cancellationToken)
         {
+            // Postgres's unique citext index fires on INSERT and UPDATE alike: an update
+            // that would end up holding a name another row already has (case-insensitive)
+            // is rejected, not just a duplicate insert.
+            var collides = _entries.Any(existing =>
+                existing.Id != entry.Id && CitextEquals(existing.IngredientName, entry.IngredientName));
+            if (collides)
+            {
+                throw new DensityEntryConflictException(entry.IngredientName);
+            }
+
             var index = _entries.FindIndex(existing => existing.Id == entry.Id);
             if (index is -1)
             {
-                // The unique citext index: two rows cannot hold the same (case-insensitive) name.
-                if (_entries.Any(existing => CitextEquals(existing.IngredientName, entry.IngredientName)))
-                {
-                    throw new DensityEntryConflictException(entry.IngredientName);
-                }
-
                 _entries.Add(entry);
             }
             else
@@ -127,8 +144,10 @@ public class DensityEntryServiceTests
         }
 
         // citext folds case but treats whitespace and Unicode canonical form as significant.
-        // OrdinalIgnoreCase approximates the case folding; both edge cases above (trailing
-        // space, decomposed accent) compare unequal under it, as they do in Postgres.
+        // OrdinalIgnoreCase approximates the case folding — Postgres's actual folding is
+        // locale-dependent, so non-ASCII case pairs could diverge (none of this test's
+        // names exercise that); the properties under test, whitespace and canonical form,
+        // compare unequal under it exactly as they do in Postgres.
         private static bool CitextEquals(string storedName, string candidate)
             => string.Equals(storedName, candidate, StringComparison.OrdinalIgnoreCase);
     }
