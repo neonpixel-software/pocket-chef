@@ -198,3 +198,12 @@ dotnet ef database update \
   --startup-project src/PocketChef.DensityApi.Api \
   --connection "<production connection string>"
 ```
+
+**Names in the table must stay canonical** (NFC + trimmed — enforced by the
+`DensityEntry` constructor, issue #55). The upsert lookup is byte-exact
+except for case, so a non-canonical row (a hand-edit, or a row written by
+pre-fix code) can never be found by a later upsert — re-POSTing the
+ingredient would insert a duplicate, not merge. If you ever spot such a
+row, normalize it in place (or delete it); no backfill exists because the
+API ships unseeded, and the only paths that bypass the constructor are
+manual SQL and that pre-fix window.

@@ -33,6 +33,15 @@ public class DensityEntryTests
     }
 
     [Fact]
+    public void Constructor_NormalizesIngredientNameToNfc()
+    {
+        // "café" spelled as "e" + combining acute accent, with padding around it.
+        var entry = new DensityEntry(Guid.NewGuid(), "  cafe\u0301  ", 120, SomeLastModifiedUtc);
+
+        Assert.Equal("café", entry.IngredientName);
+    }
+
+    [Fact]
     public void Constructor_SetsAllProperties()
     {
         var id = Guid.NewGuid();

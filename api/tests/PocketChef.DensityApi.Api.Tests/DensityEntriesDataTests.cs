@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -114,6 +115,31 @@ public class DensityEntriesDataTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Post_WithValidWriteKey_WhitespacePaddedName_UpdatesInPlaceInsteadOfConflicting()
+    {
+        // Issue #55: "Flour " differs from the seeded "Flour" only in trailing whitespace,
+        // which the citext index treats as significant — before the service canonicalized
+        // the name, this 409'd instead of merging.
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
+
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Flour ", 130));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<DensityEntryResponse>();
+        Assert.Equal("Flour", body!.IngredientName);
+        Assert.Equal(130, body.GramsPerCup);
+
+        var options = new DbContextOptionsBuilder<DensityApiDbContext>()
+            .UseNpgsql(_container.GetConnectionString())
+            .Options;
+        await using var context = new DensityApiDbContext(options);
+        var entry = Assert.Single(await context.DensityEntries.ToListAsync());
+        Assert.Equal("Flour", entry.IngredientName);
+        Assert.Equal(130, entry.GramsPerCup);
+    }
+
+    [Fact]
     public async Task Post_WithValidWriteKey_BlankIngredientName_ReturnsBadRequest()
     {
         var client = _factory.CreateClient();
@@ -122,6 +148,26 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("   ", 200));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_WithValidWriteKey_NullOrMissingIngredientName_ReturnsBadRequest()
+    {
+        // STJ binds a JSON null (or a missing field) to the non-nullable string
+        // parameter without complaint, so the service is the first place that can
+        // see the null — before the guard added for the review, that was an uncaught
+        // NRE: a 500 instead of a 400. Raw JSON rather than a typed body: the payload
+        // is the thing under test.
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
+
+        var explicitNull = new StringContent("""{"ingredientName": null, "gramsPerCup": 200}""", Encoding.UTF8, "application/json");
+        var nullResponse = await client.PostAsync("/density-entries", explicitNull);
+        Assert.Equal(HttpStatusCode.BadRequest, nullResponse.StatusCode);
+
+        var missing = new StringContent("""{"gramsPerCup": 200}""", Encoding.UTF8, "application/json");
+        var missingResponse = await client.PostAsync("/density-entries", missing);
+        Assert.Equal(HttpStatusCode.BadRequest, missingResponse.StatusCode);
     }
 
     [Fact]
