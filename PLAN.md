@@ -174,6 +174,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 ### Phase 10: Client density integration
 - [ ] **10.1 Local density cache** — client fetches entries from the read endpoint and caches them on-device (SwiftData or a lightweight store).
   Acceptance: after one fetch, density lookups work with network off.
+  Note: matching recipe ingredient names against the cache must apply the same normalization as the API's `IngredientNames.Canonicalize` (NFC + trim, `api/src/PocketChef.DensityApi.Domain/`) — the database's citext index only folds case, so whitespace and Unicode canonical form are significant in name matching (issue #55).
 - [ ] **10.2 Periodic + manual refresh** — background periodic check for new/changed entries, plus a manual "refresh now" action in Settings.
   Acceptance: adding a new entry via the write API and triggering manual refresh brings it into the app's cache without reinstalling.
   Note: `DensityEntryResponse` already includes `lastModifiedUtc` on every entry (added ahead of this phase, after review flagged that adding it later would mean a schema migration plus an API contract change at the same time a client already depends on the shape). "New/changed" can be detected by diffing against the client's cached `lastModifiedUtc` per ingredient without needing a dedicated `?since=` endpoint — revisit only if the full-table `GET` stops being cheap enough at real seeded-data scale.
