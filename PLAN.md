@@ -166,6 +166,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 ### Phase 9: Seed & deploy
 - [ ] **9.1 Seed data import** — one-off script loading existing public ingredient-density data into the database.
   Acceptance: common ingredients (flour, sugar, butter, etc.) return sensible density values from the read endpoint.
+  Note: seed rows must go through the `DensityEntry` constructor (or canonicalize names to NFC + trim) — the citext index is byte-exact except for case, so a non-canonical seed row (padded, or a decomposed Unicode accent) could never be merged by a later upsert; it would 409 (issue #55).
 - [ ] **9.2 Deploy to Ubuntu VPS** — API running as a service on the existing 26.04 VPS, reachable over HTTPS.
   Acceptance: read endpoint reachable from outside the VPS over HTTPS with the read key; write endpoints not reachable without the write key.
   Note: TLS termination (via the VPS's existing nginx + certbot), production key storage, Postgres backups, and process supervision are documented in `api/docs/deploy.md` (issue #47). A fixed-window rate limiter on the read endpoint (60 req/min, since the read key ships inside the app binary and is extractable) is already implemented and covered by `DensityEntriesRateLimitTests`. Still open: actually running this runbook against the real VPS — needs whoever has access to it.
