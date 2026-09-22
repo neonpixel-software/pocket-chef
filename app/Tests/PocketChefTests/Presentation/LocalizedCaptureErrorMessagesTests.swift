@@ -19,6 +19,18 @@ final class LocalizedCaptureErrorMessagesTests: XCTestCase {
             "de": "Diese Seite konnte nicht geladen werden. Überprüfe den Link und versuche es erneut.",
             "nl": "Die pagina kon niet worden geladen. Controleer de link en probeer het opnieuw.",
         ],
+        "That page is too large to read. Try a link to just the recipe.": [
+            "es": "Esa página es demasiado grande para leerla. Prueba con un enlace solo a la receta.",
+            "fr": "Cette page est trop volumineuse pour être lue. Essayez un lien vers la recette seule.",
+            "de": "Diese Seite ist zu groß zum Lesen. Versuche einen Link nur zum Rezept.",
+            "nl": "Die pagina is te groot om te lezen. Probeer een link naar alleen het recept.",
+        ],
+        "That site doesn't use a secure connection (https), so it can't be opened.": [
+            "es": "Ese sitio no usa una conexión segura (https), por lo que no se puede abrir.",
+            "fr": "Ce site n'utilise pas de connexion sécurisée (https) et ne peut donc pas être ouvert.",
+            "de": "Diese Website verwendet keine sichere Verbindung (https) und kann daher nicht geöffnet werden.",
+            "nl": "Die site gebruikt geen beveiligde verbinding (https) en kan daarom niet worden geopend.",
+        ],
         "Couldn't find a recipe on that page. Check it over and try again.": [
             "es": "No se encontró ninguna receta en esa página. Revísala e inténtalo de nuevo.",
             "fr": "Aucune recette trouvée sur cette page. Vérifiez-la et réessayez.",
