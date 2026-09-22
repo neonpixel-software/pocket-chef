@@ -114,6 +114,31 @@ public class DensityEntriesDataTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Post_WithValidWriteKey_WhitespacePaddedName_UpdatesInPlaceInsteadOfConflicting()
+    {
+        // Issue #55: "Flour " differs from the seeded "Flour" only in trailing whitespace,
+        // which the citext index treats as significant — before the service canonicalized
+        // the name, this 409'd instead of merging.
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
+
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Flour ", 130));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<DensityEntryResponse>();
+        Assert.Equal("Flour", body!.IngredientName);
+        Assert.Equal(130, body.GramsPerCup);
+
+        var options = new DbContextOptionsBuilder<DensityApiDbContext>()
+            .UseNpgsql(_container.GetConnectionString())
+            .Options;
+        await using var context = new DensityApiDbContext(options);
+        var entry = Assert.Single(await context.DensityEntries.ToListAsync());
+        Assert.Equal("Flour", entry.IngredientName);
+        Assert.Equal(130, entry.GramsPerCup);
+    }
+
+    [Fact]
     public async Task Post_WithValidWriteKey_BlankIngredientName_ReturnsBadRequest()
     {
         var client = _factory.CreateClient();
