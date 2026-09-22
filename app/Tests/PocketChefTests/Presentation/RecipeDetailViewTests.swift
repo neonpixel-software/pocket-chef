@@ -1,13 +1,13 @@
-import XCTest
-import ViewInspector
 @testable import PocketChef
+import ViewInspector
+import XCTest
 
 private struct NoOpCreateRecipeUseCase: CreateRecipeUseCase {
-    func execute(_ recipe: Recipe) throws {}
+    func execute(_: Recipe) throws {}
 }
 
 private struct NoOpUpdateRecipeUseCase: UpdateRecipeUseCase {
-    func execute(_ recipe: Recipe) throws {}
+    func execute(_: Recipe) throws {}
 }
 
 private final class RecordingDeleteRecipeUseCase: DeleteRecipeUseCase {

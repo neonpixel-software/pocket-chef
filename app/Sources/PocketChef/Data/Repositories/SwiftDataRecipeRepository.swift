@@ -33,7 +33,7 @@ final class SwiftDataRecipeRepository: RecipeRepository {
         case .typed:
             model.isTypedSource = true
             model.sourceURL = nil
-        case .url(let url):
+        case let .url(url):
             model.isTypedSource = false
             model.sourceURL = url
         }

@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace PocketChef.DensityApi.Api.RateLimiting;
 

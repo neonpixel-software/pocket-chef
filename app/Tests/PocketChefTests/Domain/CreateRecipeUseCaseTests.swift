@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private final class FakeRecipeRepository: RecipeRepository {
     var createResult: Result<Void, Error> = .success(())
@@ -12,8 +12,8 @@ private final class FakeRecipeRepository: RecipeRepository {
         try createResult.get()
     }
 
-    func update(_ recipe: Recipe) throws {}
-    func delete(id: UUID) throws {}
+    func update(_: Recipe) throws {}
+    func delete(id _: UUID) throws {}
 }
 
 private struct RepositoryFailure: Error, Equatable {}

@@ -1,6 +1,6 @@
-import XCTest
-import SwiftData
 @testable import PocketChef
+import SwiftData
+import XCTest
 
 final class SwiftDataRecipeRepositoryTests: XCTestCase {
     private func makeInMemoryContext() throws -> ModelContext {
@@ -8,7 +8,7 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
             RecipeModel.self,
             IngredientLineModel.self,
             TagModel.self,
-            DensityEntryModel.self
+            DensityEntryModel.self,
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: schema, configurations: [configuration])

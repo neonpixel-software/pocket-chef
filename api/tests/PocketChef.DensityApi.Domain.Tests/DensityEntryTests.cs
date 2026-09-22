@@ -1,5 +1,3 @@
-using PocketChef.DensityApi.Domain;
-
 namespace PocketChef.DensityApi.Domain.Tests;
 
 public class DensityEntryTests

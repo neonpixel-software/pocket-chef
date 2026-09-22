@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private struct FakeRecipeCaptureService: RecipeCaptureService {
     var isAvailableResult = true
@@ -7,7 +7,7 @@ private struct FakeRecipeCaptureService: RecipeCaptureService {
 
     func isAvailable() -> Bool { isAvailableResult }
 
-    func captureRecipe(from text: String) async throws -> Recipe {
+    func captureRecipe(from _: String) async throws -> Recipe {
         try captureResult.get()
     }
 }

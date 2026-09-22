@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 /// Verifies the String Catalog entries for the 3 capture-failure messages that
 /// RecipeCaptureViewModel/RecipeURLCaptureViewModel assign via String(localized:) — reading the
@@ -11,13 +11,13 @@ final class LocalizedCaptureErrorMessagesTests: XCTestCase {
             "es": "No se pudo extraer una receta de ese texto. Revísalo e inténtalo de nuevo.",
             "fr": "Impossible d'extraire une recette de ce texte. Vérifiez-le et réessayez.",
             "de": "Aus diesem Text konnte kein Rezept extrahiert werden. Überprüfe ihn und versuche es erneut.",
-            "nl": "Er kon geen recept uit deze tekst worden gehaald. Controleer het en probeer het opnieuw."
+            "nl": "Er kon geen recept uit deze tekst worden gehaald. Controleer het en probeer het opnieuw.",
         ],
         "Couldn't load that page. Check the link and try again.": [
             "es": "No se pudo cargar esa página. Comprueba el enlace e inténtalo de nuevo.",
             "fr": "Impossible de charger cette page. Vérifiez le lien et réessayez.",
             "de": "Diese Seite konnte nicht geladen werden. Überprüfe den Link und versuche es erneut.",
-            "nl": "Die pagina kon niet worden geladen. Controleer de link en probeer het opnieuw."
+            "nl": "Die pagina kon niet worden geladen. Controleer de link en probeer het opnieuw.",
         ],
         "That page is too large to read. Try a link to just the recipe.": [
             "es": "Esa página es demasiado grande para leerla. Prueba con un enlace solo a la receta.",
@@ -35,8 +35,8 @@ final class LocalizedCaptureErrorMessagesTests: XCTestCase {
             "es": "No se encontró ninguna receta en esa página. Revísala e inténtalo de nuevo.",
             "fr": "Aucune recette trouvée sur cette page. Vérifiez-la et réessayez.",
             "de": "Auf dieser Seite wurde kein Rezept gefunden. Überprüfe sie und versuche es erneut.",
-            "nl": "Er is geen recept gevonden op die pagina. Controleer het en probeer het opnieuw."
-        ]
+            "nl": "Er is geen recept gevonden op die pagina. Controleer het en probeer het opnieuw.",
+        ],
     ]
 
     func testEachCaptureErrorMessageTranslatesPerLocale() {

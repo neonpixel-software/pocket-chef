@@ -1,5 +1,5 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private final class FakeWebPageFetcher: WebPageFetcher, @unchecked Sendable {
     var result: Result<String, Error>
@@ -18,7 +18,7 @@ private final class FakeWebPageFetcher: WebPageFetcher, @unchecked Sendable {
 private struct FakeCaptureRecipeUseCase: CaptureRecipeUseCase {
     var result: Result<Recipe, Error>
 
-    func execute(text: String) async throws -> Recipe {
+    func execute(text _: String) async throws -> Recipe {
         try result.get()
     }
 }
@@ -104,7 +104,7 @@ final class CaptureRecipeFromURLUseCaseTests: XCTestCase {
 
         XCTAssertEqual(fetcher.requestedURL, URL(string: "https://example.com/recipe"))
         XCTAssertEqual(result.title, capturedRecipe.title)
-        XCTAssertEqual(result.source, .url(URL(string: "https://example.com/recipe")!))
+        XCTAssertEqual(result.source, try .url(XCTUnwrap(URL(string: "https://example.com/recipe"))))
     }
 
     private func makeRecipe(title: String = "Pancakes", source: RecipeSource = .typed) -> Recipe {

@@ -18,7 +18,7 @@ enum HTMLPlainTextConverter {
             data: data,
             options: [
                 .documentType: NSAttributedString.DocumentType.html,
-                .characterEncoding: String.Encoding.utf8.rawValue
+                .characterEncoding: String.Encoding.utf8.rawValue,
             ],
             documentAttributes: nil
         ) else { return nil }

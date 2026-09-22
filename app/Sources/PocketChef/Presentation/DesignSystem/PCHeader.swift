@@ -17,15 +17,15 @@ struct PCHeader: View {
         ZStack(alignment: .bottomLeading) {
             PCColor.pink
             Canvas { context, size in
-                var x: CGFloat = 0
-                while x < size.width {
-                    var y: CGFloat = 0
-                    while y < size.height {
-                        let dot = Path(ellipseIn: CGRect(x: x, y: y, width: Self.dotDiameter, height: Self.dotDiameter))
+                var xPos: CGFloat = 0
+                while xPos < size.width {
+                    var yPos: CGFloat = 0
+                    while yPos < size.height {
+                        let dot = Path(ellipseIn: CGRect(x: xPos, y: yPos, width: Self.dotDiameter, height: Self.dotDiameter))
                         context.fill(dot, with: .color(.white.opacity(Self.dotOpacity)))
-                        y += Self.dotSpacing
+                        yPos += Self.dotSpacing
                     }
-                    x += Self.dotSpacing
+                    xPos += Self.dotSpacing
                 }
             }
             Text(title)

@@ -1,13 +1,13 @@
-import XCTest
 @testable import PocketChef
+import XCTest
 
 private final class FakeRecipeRepository: RecipeRepository {
     var deleteResult: Result<Void, Error> = .success(())
     private(set) var deletedIDs: [UUID] = []
 
     func fetchAll() throws -> [Recipe] { [] }
-    func create(_ recipe: Recipe) throws {}
-    func update(_ recipe: Recipe) throws {}
+    func create(_: Recipe) throws {}
+    func update(_: Recipe) throws {}
 
     func delete(id: UUID) throws {
         deletedIDs.append(id)
