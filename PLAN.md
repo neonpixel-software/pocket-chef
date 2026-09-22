@@ -12,6 +12,14 @@ Recipe capture (typed text and URL extraction) runs entirely on-device via Apple
 
 A separate, purpose-built .NET API (hosted on an existing Ubuntu 26.04 VPS) does exactly one job: serve ingredient density data (grams per cup) for unit conversion. It is not involved in recipe storage, sync, or capture — fully decoupled from the client app.
 
+## Platform & deployment target
+
+`app/project.yml` pins a 26.0 minimum for both iOS and macOS. This is a deliberate product-scope decision, not an oversight (issue #53): Apple Intelligence — the mechanism behind both capture paths (Phase 5, Phase 6) — requires iOS 26, so the floor is necessary for the app's core capture experience to exist at all. The app ships AI-first and accepts excluding the entire pre-iOS-26 installed base as a trade-off, rather than lowering the floor and gating every AI-dependent code path behind availability checks to give older OSes a non-AI story.
+
+The "no Apple Intelligence available → blank form" fallback (Phase 5.2) is not an older-OS compatibility path — every supported device already runs iOS 26+. It's for iOS 26 devices whose hardware doesn't meet Apple Intelligence's requirements (e.g. older chips that received iOS 26 but not Apple Intelligence). Manual entry, tagging, sync, and density conversion work identically there; only the AI-assisted capture step is skipped.
+
+Revisit only if pre-26 demand turns out to be significant enough to justify the added complexity of an older-OS, non-AI code path.
+
 ## Architecture & coding guidelines
 
 Priority for this project: maintainable, testable, scalable over fastest-to-ship. Clean Architecture on both the client and the API, targeting **90%+ test coverage** on both projects.
