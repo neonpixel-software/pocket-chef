@@ -12,8 +12,16 @@ namespace PocketChef.DensityApi.Domain;
 /// and the caller gets a 409 conflict for an entry that already exists (issue #55).
 /// Every path that puts a name into a DensityEntry (the upsert service, seed data)
 /// must pass it through <see cref="Canonicalize"/> so stored rows are always canonical.
+/// A null or whitespace-only name throws <see cref="ArgumentException"/>.
 public static class IngredientNames
 {
     public static string Canonicalize(string ingredientName)
-        => ingredientName.Normalize(NormalizationForm.FormC).Trim();
+    {
+        // Guard before normalizing: in .NET, Normalize on a null string throws a raw
+        // NullReferenceException, not an ArgumentException. The write endpoint only
+        // translates ArgumentException to 400, so without this a JSON null name (which
+        // STJ happily binds to the non-nullable string parameter) would surface as a 500.
+        ArgumentException.ThrowIfNullOrWhiteSpace(ingredientName);
+        return ingredientName.Normalize(NormalizationForm.FormC).Trim();
+    }
 }

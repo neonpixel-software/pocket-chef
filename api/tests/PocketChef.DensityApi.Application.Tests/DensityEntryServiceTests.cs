@@ -92,7 +92,7 @@ public class DensityEntryServiceTests
         var repository = new FakeDensityEntryRepository();
         var service = new DensityEntryService(repository);
 
-        await Assert.ThrowsAsync<ArgumentException>(() => service.UpsertAsync(null!, 200, CancellationToken.None));
+        await Assert.ThrowsAnyAsync<ArgumentException>(() => service.UpsertAsync(null!, 200, CancellationToken.None));
     }
 
     /// Simulates the database's handling of names rather than the service's expectations:
