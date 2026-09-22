@@ -8,4 +8,6 @@ enum WebPageFetchError: Error {
     case invalidURL
     case requestFailed(underlying: Error)
     case emptyContent
+    case tooLarge
+    case insecureConnection
 }
