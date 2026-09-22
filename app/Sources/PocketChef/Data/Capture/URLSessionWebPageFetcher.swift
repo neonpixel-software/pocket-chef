@@ -1,8 +1,8 @@
 import Foundation
 
 /// Not unit tested: a real network round trip isn't exercised in CI or this environment,
-/// matching how FoundationModelsRecipeCaptureService's real AI call is treated. The size cap,
-/// decoding, and plain-text conversion this delegates to (WebPageTextDecoding,
+/// matching how FoundationModelsRecipeCaptureService's real AI call is treated. The size cap
+/// enforcement, decoding, and plain-text conversion this delegates to (WebPageTextDecoding,
 /// HTMLPlainTextConverter) are tested independently.
 final class URLSessionWebPageFetcher: WebPageFetcher {
     func fetchPlainText(from url: URL) async throws -> String {
@@ -15,11 +15,9 @@ final class URLSessionWebPageFetcher: WebPageFetcher {
                 throw WebPageFetchError.tooLarge
             }
             var buffer = Data()
+            buffer.reserveCapacity(WebPageTextDecoding.maxDownloadBytes)
             for try await byte in bytes {
-                buffer.append(byte)
-                if buffer.count > WebPageTextDecoding.maxDownloadBytes {
-                    throw WebPageFetchError.tooLarge
-                }
+                try WebPageTextDecoding.append(byte, to: &buffer)
             }
             data = buffer
         } catch let error as WebPageFetchError {

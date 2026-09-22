@@ -37,6 +37,14 @@ final class WebPageTextDecodingTests: XCTestCase {
         XCTAssertEqual(WebPageTextDecoding.decode(data, declaredEncodingName: "not-a-charset"), "Pancakes")
     }
 
+    func testDecodeMapsDeclaredISO88591ToWindows1252ForSmartQuotes() throws {
+        // U+2019 encodes to byte 0x92 in CP1252 — a C1 control character in Latin-1, which maps
+        // every byte and would otherwise win outright since it's tried before windows-1252.
+        let data = try XCTUnwrap("Grandma’s Pancakes".data(using: .windowsCP1252))
+
+        XCTAssertEqual(WebPageTextDecoding.decode(data, declaredEncodingName: "iso-8859-1"), "Grandma’s Pancakes")
+    }
+
     func testTruncatedLeavesShortTextAlone() {
         XCTAssertEqual(WebPageTextDecoding.truncated("Pancakes"), "Pancakes")
     }
@@ -45,5 +53,28 @@ final class WebPageTextDecodingTests: XCTestCase {
         let long = String(repeating: "a", count: WebPageTextDecoding.maxPlainTextCharacters + 500)
 
         XCTAssertEqual(WebPageTextDecoding.truncated(long).count, WebPageTextDecoding.maxPlainTextCharacters)
+    }
+
+    func testAppendAllowsBytesUpToTheCap() throws {
+        var buffer = Data()
+
+        for byte in repeatElement(UInt8(ascii: "a"), count: WebPageTextDecoding.maxDownloadBytes) {
+            try WebPageTextDecoding.append(byte, to: &buffer)
+        }
+
+        XCTAssertEqual(buffer.count, WebPageTextDecoding.maxDownloadBytes)
+    }
+
+    func testAppendThrowsTooLargeOnceCapIsExceeded() {
+        var buffer = Data(repeating: UInt8(ascii: "a"), count: WebPageTextDecoding.maxDownloadBytes)
+
+        do {
+            try WebPageTextDecoding.append(UInt8(ascii: "a"), to: &buffer)
+            XCTFail("Expected WebPageFetchError.tooLarge")
+        } catch WebPageFetchError.tooLarge {
+            // Expected.
+        } catch {
+            XCTFail("Expected WebPageFetchError.tooLarge, got \(error)")
+        }
     }
 }

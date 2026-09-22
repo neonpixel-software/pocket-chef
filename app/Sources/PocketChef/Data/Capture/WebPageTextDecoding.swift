@@ -38,10 +38,23 @@ enum WebPageTextDecoding {
         String(text.prefix(maxPlainTextCharacters))
     }
 
+    /// Appends a downloaded byte to `buffer`, throwing once the size cap is exceeded. Split out
+    /// so the streaming fetcher's cap enforcement — not just the `maxDownloadBytes` threshold —
+    /// is covered by a unit test rather than only the untested network path.
+    static func append(_ byte: UInt8, to buffer: inout Data) throws {
+        buffer.append(byte)
+        if buffer.count > maxDownloadBytes {
+            throw WebPageFetchError.tooLarge
+        }
+    }
+
     private static func encoding(forName name: String) -> String.Encoding? {
         let cfEncoding = CFStringConvertIANACharSetNameToEncoding(name as CFString)
         guard cfEncoding != kCFStringEncodingInvalidId else { return nil }
-        return String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(cfEncoding))
+        let encoding = String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(cfEncoding))
+        // HTML5: iso-8859-1 is an alias for windows-1252 (Latin-1 leaves 0x80–0x9F as C1 controls;
+        // browsers decode as CP1252). CP1252 agrees with Latin-1 everywhere else, so this is safe.
+        return encoding == .isoLatin1 ? .windowsCP1252 : encoding
     }
 
     private static func sniffMetaCharset(in data: Data) -> String.Encoding? {
