@@ -9,7 +9,7 @@ enum WebPageTextDecoding {
 
     /// Cap on the converted plain text handed to the model, whose context window is far
     /// smaller than the download cap allows for.
-    static let maxPlainTextCharacters = 12_000
+    static let maxPlainTextCharacters = 12000
 
     /// Decodes using, in order: the charset the server declared, a `<meta charset>` in the
     /// first KB, UTF-8, then windows-1252 and ISO-8859-1 for legacy pages. ISO-8859-1 maps
