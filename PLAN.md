@@ -153,7 +153,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 **Checkpoint:** app fully navigable in English, Spanish, French, German, and Dutch; mechanism verified manually, translation quality flagged for human review before ship.
 
 ### Phase 8: Density API (.NET)
-- [x] **8.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams-per-cup), basic persistence. PostgreSQL chosen (via Docker/Podman), not SQLite.
+- [x] **8.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams-per-cup), basic persistence. PostgreSQL chosen (via Podman), not SQLite.
   Acceptance: API runs locally, entries can be created/read directly against the database. Verified end-to-end: real migration applied to a locally running Postgres (via Podman), entry inserted and read back via `psql`, the `/health` endpoint responds, and the Dockerfile image builds and runs correctly against the same Postgres.
   `nuget` ecosystem entry added to `.github/dependabot.yml`.
 - [x] **8.2 Read endpoint + low-privilege key** — public-ish read endpoint gated by a read-only API key.

@@ -27,6 +27,17 @@ dotnet run --project src/PocketChef.DensityApi.Api
 dotnet test
 ```
 
-`Infrastructure.Tests` uses `Testcontainers.PostgreSql` — spins up a real,
-throwaway Postgres container per test class and runs actual EF Core
-migrations against it. Needs a running Podman (or Docker) machine.
+The `Infrastructure.Tests` and `Api.Tests` data tests use
+`Testcontainers.PostgreSql` — a real, throwaway Postgres container per
+test method, with the actual EF Core migrations run against it.
+Testcontainers talks to the Docker Engine API over the standard
+`/var/run/docker.sock` path: `podman machine` forwards the in-machine API
+socket to `~/.local/share/containers/podman/machine/podman.sock`, and the
+`podman-mac-helper` system service (one-time `sudo podman-mac-helper
+install`) keeps the `/var/run/docker.sock` link pointed at it. The only
+prerequisite after that is a running Podman machine (`podman machine
+start` again after a reboot). If the helper is missing or
+`/var/run/docker.sock` is in use by another runtime, `podman machine
+start` prints a `DOCKER_HOST` export for the machine socket — run it for
+the test session, or install the helper.
+The first run pulls `postgres:17` into the machine.
