@@ -7,10 +7,8 @@ public static class ServiceCollectionExtensions
         var options = configuration.GetSection(ApiKeyOptions.SectionName).Get<ApiKeyOptions>()
             ?? throw new InvalidOperationException($"Missing '{ApiKeyOptions.SectionName}' configuration.");
 
-        // Binding doesn't enforce `required`, so a partially-present section (e.g. only
-        // ApiKeys__ReadApiKey set) binds with the other key null. Left unchecked, that
-        // passes startup and then 500s on every request once ApiKeyAuthorizer compares
-        // against the null key — fail here instead, as a clear deploy error.
+        // Binding doesn't enforce `required`: a partial section binds with the other key
+        // null, which passes startup but 500s every request in ApiKeyAuthorizer. Fail fast.
         EnsureConfigured(options.ReadApiKey, nameof(ApiKeyOptions.ReadApiKey));
         EnsureConfigured(options.WriteApiKey, nameof(ApiKeyOptions.WriteApiKey));
 
@@ -23,7 +21,7 @@ public static class ServiceCollectionExtensions
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new InvalidOperationException($"Missing '{ApiKeyOptions.SectionName}:{keyName}' configuration.");
+            throw new InvalidOperationException($"Missing or blank '{ApiKeyOptions.SectionName}:{keyName}' configuration.");
         }
     }
 }

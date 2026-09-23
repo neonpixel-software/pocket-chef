@@ -53,7 +53,8 @@ public class ApiKeyAuthenticationRegistrationTests
             () => new ServiceCollection().AddApiKeyAuthentication(
                 BuildConfiguration(("ReadApiKey", "r"), ("WriteApiKey", blankValue))));
 
-        Assert.Contains($"{ApiKeyOptions.SectionName}:WriteApiKey", exception.Message);
+        // "blank", not just "Missing": the variable exists, so don't send someone hunting for it.
+        Assert.Contains($"blank '{ApiKeyOptions.SectionName}:WriteApiKey'", exception.Message);
     }
 
     private static IConfiguration BuildConfiguration(params (string Key, string Value)[] apiKeys) =>
