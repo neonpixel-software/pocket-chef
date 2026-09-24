@@ -215,6 +215,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 | Density data coverage gaps | Low — explicitly handled by the fallback note (Phase 11.2) rather than silent wrong answers | None needed beyond the fallback already designed |
 | Density Postgres data loss on the VPS (disk failure, accidental drop) | Low — the density table is small, hand-curated data, not user data; re-seeding from Phase 9.1's source is a viable fallback | Nightly `pg_dump` backup documented in `api/docs/deploy.md` (issue #47) |
 | VPS/API becomes a single point of failure for conversion | Low — client caches locally, so downtime only blocks *new* density data, not existing conversions | Local cache (Phase 10.1) already covers this |
+| No telemetry by design — failures are invisible until users report them | Medium — no field signal for Apple Intelligence extraction failure rates (Phases 5.1 / 6.1), density API outages or misbehavior as real users see them, or CloudKit sync failures (Phase 4); user complaints are the only feedback channel | Accepted trade-off to keep the app completely anonymous. Compensate with manual/semi-automated on-device verification before each release (Phase 12.4 runbook) and accept a slow feedback loop. If that loop proves too slow, revisiting the anonymity promise is a product decision, not a technical one |
 
 ## Open items / not yet decided
 
