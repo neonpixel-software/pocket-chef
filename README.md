@@ -15,12 +15,10 @@ A NeonPixel app for macOS, iPadOS, and iOS. Gather recipes with zero friction: t
 - **Zero-friction capture** — two clearly presented options on the add-recipe screen: *Type it* (free text) or *Paste a link* (URL). Apple Intelligence structures or extracts the recipe entirely on-device — no server round-trip. Devices without Apple Intelligence fall back straight to a blank structured form.
 - **Review before save** — every capture path lands on an editable review screen. Nothing saves unreviewed.
 - **Tags** — preset tags (breakfast, lunch, dinner, dessert, snack) plus unlimited custom tags, multiple per recipe, with tag filtering on the list.
-- **Unit conversion** — a volume/weight toggle on every recipe converts ingredients using ingredient density data (grams per cup) fetched from the density API. Ingredients without a known density show their original measurement plus a "conversion not available" note — no guessing.
-- **Local or iCloud** — a single settings toggle. The default is local; opting into iCloud migrates your recipes to CloudKit sync without a second code path.
 
 ## Privacy
 
-Pocket Chef collects **no** user data, shows **no** ads, and is completely anonymous. Recipe capture runs on-device via Apple Intelligence; the only other network activity is the optional density-data API. The App Store privacy declaration is "data not collected".
+Pocket Chef collects **no** user data, shows **no** ads, and is completely anonymous. Recipe capture runs on-device via Apple Intelligence — a pasted URL is fetched directly from its source site, never proxied through our servers — and the only other planned network activity is the density-data API. The App Store privacy declaration will be "data not collected".
 
 ## Repository layout
 
@@ -36,7 +34,7 @@ The API does exactly one job — serve ingredient density data for unit conversi
 
 ### Swift app (`app/`)
 
-The Xcode project is generated from [`project.yml`](app/project.yml) with [XcodeGen](https://github.com/yonaskolb/XcodeGen):
+The Xcode project is generated from [`project.yml`](app/project.yml) with [XcodeGen](https://github.com/yonaskolb/XcodeGen), from the `app/` directory:
 
 ```sh
 xcodegen generate
@@ -46,30 +44,32 @@ Then open `app/PocketChef.xcodeproj` and use the `PocketChef-iOS` / `PocketChef-
 
 ### Density API (`api/`)
 
-Local development uses [Podman](https://podman.io) for the PostgreSQL container:
+Local development uses [Podman](https://podman.io) for the PostgreSQL container. From the `api/` directory:
 
 ```sh
 podman compose up -d        # starts Postgres on localhost:5433
-dotnet ef database update   # apply migrations
-dotnet run                  # run the API
+dotnet ef database update \
+  --project src/PocketChef.DensityApi.Infrastructure \
+  --startup-project src/PocketChef.DensityApi.Api
+dotnet run --project src/PocketChef.DensityApi.Api
 dotnet test                 # unit + Testcontainers-backed integration tests
 ```
 
-See [`api/README.md`](api/README.md) for full details, and [`api/docs/deploy.md`](api/docs/deploy.md) for the production deployment runbook (TLS, key storage, backups, rate limiting, process supervision).
+See [`api/README.md`](api/README.md) for full details (one-time `dotnet-ef` install, the Testcontainers/Podman socket setup), and [`api/docs/deploy.md`](api/docs/deploy.md) for the production deployment runbook (TLS, key storage, backups, rate limiting, process supervision) — documented, but not yet executed against the real VPS.
 
 ## Documentation
 
 - [`PLAN.md`](PLAN.md) — architecture, data model, and the phase-by-phase plan with current status
 - [`app/docs/plans/`](app/docs/plans/) — Swift app design docs (entry form, tagging, capture, localization)
 - [`api/docs/plans/`](api/docs/plans/) — density API design docs
-- [`api/docs/deploy.md`](api/docs/deploy.md) — operational deployment runbook
+- [`api/docs/deploy.md`](api/docs/deploy.md) — operational deployment runbook (documented, not yet executed against the real VPS — Phase 9.2)
 
-Development proceeds in vertical slices (see `PLAN.md`); the project is not yet at its full v1 feature set — iCloud sync, on-device AI verification, production deployment, and the client's density cache are still in the roadmap.
+Development proceeds in vertical slices (see `PLAN.md`); the project is not yet at its full v1 feature set. Still on the roadmap: the settings screen with the local/iCloud sync toggle (Phase 4), verification of the on-device AI capture on real devices (Phases 5.1/6.1/7.3), the production deployment of the density API (Phase 9.2), the client's density cache (Phase 10), and unit conversion — the volume/weight toggle on each recipe (Phase 11).
 
 ## CI & quality
 
-GitHub Actions runs on every push/PR: Swift build + test + coverage (iOS and macOS), .NET build + test, linting (SwiftLint/SwiftFormat, `dotnet format`), and a SonarCloud analysis with quality gate for the whole repo (the badges above). The project targets 90%+ test coverage on both sides.
+GitHub Actions runs on every PR targeting `main` and every push to `main`: Swift build + test + coverage (iOS and macOS), .NET build + test, linting (SwiftLint/SwiftFormat, `dotnet format`), and a SonarCloud analysis with quality gate for the whole repo (the badges above). The project targets 90%+ test coverage on both sides.
 
 ## License
 
-MIT — one [`LICENSE`](LICENSE) at the repo root covering the whole repository (`app/` + `api/`). See the [Licensing section of PLAN.md](PLAN.md) for the reasoning behind the choice.
+MIT — one [`LICENSE`](LICENSE) at the repo root covering the whole repository (`app/` + `api/`). See the [Licensing section of PLAN.md](PLAN.md#licensing) for the reasoning behind the choice.
