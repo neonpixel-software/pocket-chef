@@ -27,7 +27,7 @@ public sealed class DensityEntryConfiguration : IEntityTypeConfiguration<Density
             .IsUnique()
             .HasDatabaseName(IngredientNameUniqueIndexName);
 
-        builder.Property(entry => entry.GramsPerCup)
+        builder.Property(entry => entry.GramsPerMilliliter)
             .IsRequired();
 
         builder.Property(entry => entry.LastModifiedUtc)
