@@ -24,7 +24,7 @@ dotnet run --project src/PocketChef.DensityApi.Api
 ## Data source
 
 Seed density values come from [USDA FoodData Central](https://fdc.nal.usda.gov/)
-(SR Legacy, "1 cup" portion weights), which is public domain under
+(SR Legacy, "1 cup" portion weights, converted to g/ml), which is public domain under
 [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Each seed entry
 cites its FDC ID. Don't add values copied from sources whose license doesn't
 permit redistribution in this GPL-3.0 repo (see PLAN.md Phase 9.1).
