@@ -21,21 +21,17 @@ dotnet run --project src/PocketChef.DensityApi.Api
 
 `GET /health` confirms the host is up.
 
-## Seed data
+## Data source
 
-The initial density entries (Phase 9.1) are derived from
-[USDA FoodData Central](https://fdc.nal.usda.gov) household-measure portion
-weights, converted to grams per millilitre. FoodData Central data is in the
-public domain and published under
-[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/), so it can
-ship in this MIT-licensed repo. Each seed row records its FDC ID, food
-description, and the portion it was converted from.
+Seed density values come from [USDA FoodData Central](https://fdc.nal.usda.gov/)
+(SR Legacy household-measure portion weights — the cup/tbsp unit is in the
+`food_portion.modifier` column — converted to g/ml), which is public domain under
+[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Each seed entry
+cites its FDC ID. Don't add values copied from sources whose license doesn't
+permit redistribution in this MIT-licensed repo (see PLAN.md Phase 9.1).
 
 > U.S. Department of Agriculture, Agricultural Research Service.
 > FoodData Central. fdc.nal.usda.gov.
-
-Don't add seed rows from sources without an open license (brand weight
-charts, scraped cooking sites) — see PLAN.md Phase 9.1.
 
 ## Testing
 
