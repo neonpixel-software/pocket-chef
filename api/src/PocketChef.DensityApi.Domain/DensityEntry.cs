@@ -20,7 +20,7 @@ public sealed class DensityEntry
         }
 
         Id = id;
-        IngredientName = ingredientName.Trim();
+        IngredientName = IngredientNames.Canonicalize(ingredientName);
         GramsPerCup = gramsPerCup;
         LastModifiedUtc = lastModifiedUtc;
     }

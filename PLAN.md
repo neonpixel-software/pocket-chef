@@ -12,6 +12,14 @@ Recipe capture (typed text and URL extraction) runs entirely on-device via Apple
 
 A separate, purpose-built .NET API (hosted on an existing Ubuntu 26.04 VPS) does exactly one job: serve ingredient density data (grams per cup) for unit conversion. It is not involved in recipe storage, sync, or capture — fully decoupled from the client app.
 
+## Platform & deployment target
+
+`app/project.yml` pins a 26.0 minimum for both iOS and macOS. This is a deliberate product-scope decision, not an oversight (issue #53): Apple Intelligence — the mechanism behind both capture paths (Phase 5, Phase 6) — requires iOS 26, so the floor is necessary for the app's core capture experience to exist at all. The app ships AI-first and accepts excluding the entire pre-iOS-26 installed base as a trade-off, rather than lowering the floor and gating every AI-dependent code path behind availability checks to give older OSes a non-AI story.
+
+The "no Apple Intelligence available → blank form" fallback (Phase 5.2) is not an older-OS compatibility path — every supported device already runs iOS 26+. It's for iOS 26 devices whose hardware doesn't meet Apple Intelligence's requirements (e.g. older chips that received iOS 26 but not Apple Intelligence). Manual entry, tagging, sync, and density conversion work identically there; only the AI-assisted capture step is skipped.
+
+Revisit only if pre-26 demand turns out to be significant enough to justify the added complexity of an older-OS, non-AI code path.
+
 ## Architecture & coding guidelines
 
 Priority for this project: maintainable, testable, scalable over fastest-to-ship. Clean Architecture on both the client and the API, targeting **90%+ test coverage** on both projects.
@@ -128,6 +136,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 - [ ] **6.1 "Paste a link" entry point** — fetch page content, hand to Apple Intelligence to extract just the recipe, land on the same review screen pre-filled.
   Acceptance: pasting a real recipe URL produces a correctly structured, editable result with ads/backstory/comments excluded.
   All code/tests/UI built and passing; left unchecked because the actual on-device AI extraction quality hasn't been verified — no development machine here has Apple Intelligence enabled. Check off once verified on a real device (same constraint as 5.1).
+  Also verify the fetch-layer limits (#49) on device — deferred until all phases are done, then test together with the rest of the real-device checks: a very large page (>2 MB) shows the "too large" message; a windows-1252 page (e.g. an old recipe blog) decodes with accents intact; a plain-HTTP-only site shows the "secure connection" message. Plain text is truncated to 12,000 characters before the model call.
 - [x] **6.2 Add-recipe screen shows both options clearly** — "Type it" / "Paste a link" presented side by side, not hidden.
   Acceptance: both entry points are visible without extra taps from the main add-recipe screen.
 
@@ -144,7 +153,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 **Checkpoint:** app fully navigable in English, Spanish, French, German, and Dutch; mechanism verified manually, translation quality flagged for human review before ship.
 
 ### Phase 8: Density API (.NET)
-- [x] **8.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams-per-cup), basic persistence. PostgreSQL chosen (via Docker/Podman), not SQLite.
+- [x] **8.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams-per-cup), basic persistence. PostgreSQL chosen (via Podman), not SQLite.
   Acceptance: API runs locally, entries can be created/read directly against the database. Verified end-to-end: real migration applied to a locally running Postgres (via Podman), entry inserted and read back via `psql`, the `/health` endpoint responds, and the Dockerfile image builds and runs correctly against the same Postgres.
   `nuget` ecosystem entry added to `.github/dependabot.yml`.
 - [x] **8.2 Read endpoint + low-privilege key** — public-ish read endpoint gated by a read-only API key.
@@ -157,6 +166,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 ### Phase 9: Seed & deploy
 - [ ] **9.1 Seed data import** — one-off script loading existing public ingredient-density data into the database.
   Acceptance: common ingredients (flour, sugar, butter, etc.) return sensible density values from the read endpoint.
+  Note: seed rows must go through the `DensityEntry` constructor (or canonicalize names to NFC + trim) — the citext index is byte-exact except for case, so a non-canonical seed row (padded, or a decomposed Unicode accent) could never be merged by a later upsert; it would 409 (issue #55).
 - [ ] **9.2 Deploy to Ubuntu VPS** — API running as a service on the existing 26.04 VPS, reachable over HTTPS.
   Acceptance: read endpoint reachable from outside the VPS over HTTPS with the read key; write endpoints not reachable without the write key.
   Note: TLS termination (via the VPS's existing nginx + certbot), production key storage, Postgres backups, and process supervision are documented in `api/docs/deploy.md` (issue #47). A fixed-window rate limiter on the read endpoint (60 req/min, since the read key ships inside the app binary and is extractable) is already implemented and covered by `DensityEntriesRateLimitTests`. Still open: actually running this runbook against the real VPS — needs whoever has access to it.
@@ -166,6 +176,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 ### Phase 10: Client density integration
 - [ ] **10.1 Local density cache** — client fetches entries from the read endpoint and caches them on-device (SwiftData or a lightweight store).
   Acceptance: after one fetch, density lookups work with network off.
+  Note: matching recipe ingredient names against the cache must apply the same normalization as the API's `IngredientNames.Canonicalize` (NFC + trim, `api/src/PocketChef.DensityApi.Domain/`) — the database's citext index only folds case, so whitespace and Unicode canonical form are significant in name matching (issue #55).
 - [ ] **10.2 Periodic + manual refresh** — background periodic check for new/changed entries, plus a manual "refresh now" action in Settings.
   Acceptance: adding a new entry via the write API and triggering manual refresh brings it into the app's cache without reinstalling.
   Note: `DensityEntryResponse` already includes `lastModifiedUtc` on every entry (added ahead of this phase, after review flagged that adding it later would mean a schema migration plus an API contract change at the same time a client already depends on the shape). "New/changed" can be detected by diffing against the client's cached `lastModifiedUtc` per ingredient without needing a dedicated `?since=` endpoint — revisit only if the full-table `GET` stops being cheap enough at real seeded-data scale.

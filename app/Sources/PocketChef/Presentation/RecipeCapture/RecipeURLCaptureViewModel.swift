@@ -31,7 +31,11 @@ final class RecipeURLCaptureViewModel {
             return recipe
         } catch {
             print("Recipe URL capture failed: \(error)")
-            if error is WebPageFetchError {
+            if case WebPageFetchError.tooLarge = error {
+                errorMessage = String(localized: "That page is too large to read. Try a link to just the recipe.")
+            } else if case WebPageFetchError.insecureConnection = error {
+                errorMessage = String(localized: "That site doesn't use a secure connection (https), so it can't be opened.")
+            } else if error is WebPageFetchError {
                 errorMessage = String(localized: "Couldn't load that page. Check the link and try again.")
             } else {
                 errorMessage = String(localized: "Couldn't find a recipe on that page. Check it over and try again.")
