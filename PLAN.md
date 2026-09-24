@@ -72,7 +72,7 @@ Hosted on Nick's existing Ubuntu 26.04 VPS. Two access tiers:
 - **Read** — low-privilege API key baked into the app, used for fetching/refreshing density entries.
 - **Write** — higher-privilege API key held by Nick, used to add/edit entries. No admin UI needed yet; a script is enough for now.
 
-Seeded once from existing public ingredient-density data, then curated by hand over time through the authenticated write endpoints.
+Seeded once from public-domain USDA FoodData Central portion weights (see Phase 9.1), then curated by hand over time through the authenticated write endpoints.
 
 **Refresh cadence:** the app checks for new/changed density entries periodically in the background, and also lets the user trigger a manual refresh. Either way, results are cached locally so conversion keeps working offline.
 
@@ -165,7 +165,9 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 
 ### Phase 9: Seed & deploy
 - [ ] **9.1 Seed data import** — one-off script loading existing public ingredient-density data into the database.
-  Acceptance: common ingredients (flour, sugar, butter, etc.) return sensible density values from the read endpoint.
+  Acceptance: common ingredients (flour, sugar, butter, etc.) return sensible density values from the read endpoint; every seed entry records its source (see below).
+  Source: [USDA FoodData Central](https://fdc.nal.usda.gov/), SR Legacy dataset — its household portions give the gram weight of a known volume (one US cup, 236.5882365 ml), which the seed script divides down to grams per millilitre (PR #70). The unit lives in `food_portion.modifier`, not in `measure_unit_id` (always 9999 "undetermined" for SR Legacy) or `portion_description` (always empty): 1,691 of the 14,449 SR Legacy portion rows are exactly `amount=1, modifier="cup"` — e.g. "Wheat flour, white, all-purpose, enriched, bleached" 125 g, "Sugars, granulated" 200 g, "Butter, salted" 227 g, "Honey" 339 g, "Cocoa, dry powder, unsweetened" 86 g (checked against FDC's 2018-04 SR Legacy CSV). Flour is filed under "Wheat flour, …", not "Flour, …". Many staples carry qualified cup rows instead (`cup packed`/`cup unpacked` for brown sugar, `cup sifted`/`cup unsifted` for powdered sugar, `cup, crumbs` under white bread), so the script picks each ingredient's row explicitly rather than matching "cup" as a substring; ingredients with no cup row fall back to `tbsp`/`tsp` rows or are left for manual curation. FDC data is public domain, published under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/), so it can ship in this public MIT-licensed repo. Do not seed from cooking sites' weight charts (e.g. King Arthur) or the FAO/INFOODS density database: the former are all-rights-reserved, the latter restricts commercial reuse (issue #50).
+  Provenance: each seed row in the script carries its FDC ID and the portion it came from (e.g. `// FDC <id>, 1 cup = 125 g`), so any value can be re-checked against the source. No `sourceUrl` column — nothing reads it yet; add one only if curation needs it later.
   Note: seed rows must go through the `DensityEntry` constructor (or canonicalize names to NFC + trim) — the citext index is byte-exact except for case, so a non-canonical seed row (padded, or a decomposed Unicode accent) could never be merged by a later upsert; it would 409 (issue #55).
 - [ ] **9.2 Deploy to Ubuntu VPS** — API running as a service on the existing 26.04 VPS, reachable over HTTPS.
   Acceptance: read endpoint reachable from outside the VPS over HTTPS with the read key; write endpoints not reachable without the write key.
