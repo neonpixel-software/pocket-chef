@@ -9,7 +9,7 @@ public class DensityEntryTests
     [InlineData("   ")]
     public void Constructor_ThrowsForBlankIngredientName(string blankName)
     {
-        var exception = Assert.Throws<ArgumentException>(() => new DensityEntry(Guid.NewGuid(), blankName, 120, SomeLastModifiedUtc));
+        var exception = Assert.Throws<ArgumentException>(() => new DensityEntry(Guid.NewGuid(), blankName, 0.53, SomeLastModifiedUtc));
 
         Assert.Equal("ingredientName", exception.ParamName);
     }
@@ -17,17 +17,17 @@ public class DensityEntryTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void Constructor_ThrowsForNonPositiveGramsPerCup(double invalidGrams)
+    public void Constructor_ThrowsForNonPositiveGramsPerMilliliter(double invalidGrams)
     {
         var exception = Assert.Throws<ArgumentException>(() => new DensityEntry(Guid.NewGuid(), "Flour", invalidGrams, SomeLastModifiedUtc));
 
-        Assert.Equal("gramsPerCup", exception.ParamName);
+        Assert.Equal("gramsPerMilliliter", exception.ParamName);
     }
 
     [Fact]
     public void Constructor_TrimsIngredientName()
     {
-        var entry = new DensityEntry(Guid.NewGuid(), "  Flour  ", 120, SomeLastModifiedUtc);
+        var entry = new DensityEntry(Guid.NewGuid(), "  Flour  ", 0.53, SomeLastModifiedUtc);
 
         Assert.Equal("Flour", entry.IngredientName);
     }
@@ -36,7 +36,7 @@ public class DensityEntryTests
     public void Constructor_NormalizesIngredientNameToNfc()
     {
         // "café" spelled as "e" + combining acute accent, with padding around it.
-        var entry = new DensityEntry(Guid.NewGuid(), "  cafe\u0301  ", 120, SomeLastModifiedUtc);
+        var entry = new DensityEntry(Guid.NewGuid(), "  cafe\u0301  ", 0.53, SomeLastModifiedUtc);
 
         Assert.Equal("café", entry.IngredientName);
     }
@@ -46,11 +46,11 @@ public class DensityEntryTests
     {
         var id = Guid.NewGuid();
 
-        var entry = new DensityEntry(id, "Sugar", 200, SomeLastModifiedUtc);
+        var entry = new DensityEntry(id, "Sugar", 0.85, SomeLastModifiedUtc);
 
         Assert.Equal(id, entry.Id);
         Assert.Equal("Sugar", entry.IngredientName);
-        Assert.Equal(200, entry.GramsPerCup);
+        Assert.Equal(0.85, entry.GramsPerMilliliter);
         Assert.Equal(SomeLastModifiedUtc, entry.LastModifiedUtc);
     }
 }

@@ -36,21 +36,21 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
     public async Task UpsertAsync_InsertsANewEntry()
     {
         var repository = new DensityEntryRepository(_context);
-        var entry = new DensityEntry(Guid.NewGuid(), "Flour", 120, SomeLastModifiedUtc);
+        var entry = new DensityEntry(Guid.NewGuid(), "Flour", 0.53, SomeLastModifiedUtc);
 
         await repository.UpsertAsync(entry, CancellationToken.None);
 
         var all = await repository.GetAllAsync(CancellationToken.None);
         Assert.Single(all);
         Assert.Equal("Flour", all[0].IngredientName);
-        Assert.Equal(120, all[0].GramsPerCup);
+        Assert.Equal(0.53, all[0].GramsPerMilliliter);
     }
 
     [Fact]
     public async Task UpsertAsync_PersistsLastModifiedUtcAndReadsItBackAsTheSameInstant()
     {
         var repository = new DensityEntryRepository(_context);
-        var entry = new DensityEntry(Guid.NewGuid(), "Cinnamon", 100, SomeLastModifiedUtc);
+        var entry = new DensityEntry(Guid.NewGuid(), "Cinnamon", 0.56, SomeLastModifiedUtc);
 
         await repository.UpsertAsync(entry, CancellationToken.None);
 
@@ -65,16 +65,16 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
     public async Task UpsertAsync_UpdatesAnExistingEntryInPlaceRatherThanDuplicating()
     {
         var repository = new DensityEntryRepository(_context);
-        var original = new DensityEntry(Guid.NewGuid(), "Sugar", 190, SomeLastModifiedUtc);
+        var original = new DensityEntry(Guid.NewGuid(), "Sugar", 0.80, SomeLastModifiedUtc);
         await repository.UpsertAsync(original, CancellationToken.None);
 
         var newerLastModifiedUtc = SomeLastModifiedUtc.AddMinutes(5);
-        var updated = new DensityEntry(original.Id, "Sugar", 200, newerLastModifiedUtc);
+        var updated = new DensityEntry(original.Id, "Sugar", 0.85, newerLastModifiedUtc);
         await repository.UpsertAsync(updated, CancellationToken.None);
 
         var all = await repository.GetAllAsync(CancellationToken.None);
         var stored = Assert.Single(all);
-        Assert.Equal(200, stored.GramsPerCup);
+        Assert.Equal(0.85, stored.GramsPerMilliliter);
         Assert.Equal(newerLastModifiedUtc.ToUniversalTime(), stored.LastModifiedUtc.ToUniversalTime());
     }
 
@@ -82,7 +82,7 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
     public async Task FindByNameAsync_IsCaseInsensitive()
     {
         var repository = new DensityEntryRepository(_context);
-        await repository.UpsertAsync(new DensityEntry(Guid.NewGuid(), "Butter", 227, SomeLastModifiedUtc), CancellationToken.None);
+        await repository.UpsertAsync(new DensityEntry(Guid.NewGuid(), "Butter", 0.96, SomeLastModifiedUtc), CancellationToken.None);
 
         var found = await repository.FindByNameAsync("BUTTER", CancellationToken.None);
 
@@ -104,14 +104,14 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
     public async Task IngredientName_UniqueConstraintIsEnforcedAtTheDatabaseLevel()
     {
         var repository = new DensityEntryRepository(_context);
-        await repository.UpsertAsync(new DensityEntry(Guid.NewGuid(), "Honey", 340, SomeLastModifiedUtc), CancellationToken.None);
+        await repository.UpsertAsync(new DensityEntry(Guid.NewGuid(), "Honey", 1.42, SomeLastModifiedUtc), CancellationToken.None);
 
         // A second, distinct entry with the same (case-insensitive) name bypasses the
         // Application-layer upsert logic entirely, to prove the database itself — not just
         // the service — refuses the duplicate. The repository translates the raw
         // DbUpdateException into DensityEntryConflictException so callers above it never need
         // to know this is backed by Postgres.
-        var duplicate = new DensityEntry(Guid.NewGuid(), "HONEY", 300, SomeLastModifiedUtc);
+        var duplicate = new DensityEntry(Guid.NewGuid(), "HONEY", 1.40, SomeLastModifiedUtc);
 
         await Assert.ThrowsAsync<DensityEntryConflictException>(async () =>
         {
@@ -139,8 +139,8 @@ public class DensityEntryRepositoryTests : IAsyncLifetime
         var repositoryA = new DensityEntryRepository(contextA);
         var repositoryB = new DensityEntryRepository(contextB);
 
-        var entryA = new DensityEntry(Guid.NewGuid(), "Cocoa", 90, SomeLastModifiedUtc);
-        var entryB = new DensityEntry(Guid.NewGuid(), "COCOA", 95, SomeLastModifiedUtc);
+        var entryA = new DensityEntry(Guid.NewGuid(), "Cocoa", 0.38, SomeLastModifiedUtc);
+        var entryB = new DensityEntry(Guid.NewGuid(), "COCOA", 0.40, SomeLastModifiedUtc);
 
         var outcomes = await Task.WhenAll(
             UpsertAndReportOutcome(repositoryA, entryA),

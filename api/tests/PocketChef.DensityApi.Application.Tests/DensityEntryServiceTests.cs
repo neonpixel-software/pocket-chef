@@ -9,7 +9,7 @@ public class DensityEntryServiceTests
     [Fact]
     public async Task GetAllAsync_ReturnsWhateverTheRepositoryReturns()
     {
-        var entries = new[] { new DensityEntry(Guid.NewGuid(), "Flour", 120, SomeLastModifiedUtc) };
+        var entries = new[] { new DensityEntry(Guid.NewGuid(), "Flour", 0.53, SomeLastModifiedUtc) };
         var repository = new FakeDensityEntryRepository(entries);
         var service = new DensityEntryService(repository);
 
@@ -25,10 +25,10 @@ public class DensityEntryServiceTests
         var service = new DensityEntryService(repository);
         var before = DateTimeOffset.UtcNow;
 
-        var result = await service.UpsertAsync("Sugar", 200, CancellationToken.None);
+        var result = await service.UpsertAsync("Sugar", 0.85, CancellationToken.None);
 
         Assert.Equal("Sugar", result.IngredientName);
-        Assert.Equal(200, result.GramsPerCup);
+        Assert.Equal(0.85, result.GramsPerMilliliter);
         Assert.InRange(result.LastModifiedUtc, before, DateTimeOffset.UtcNow);
         Assert.NotNull(repository.LastUpsertedEntry);
         Assert.Equal(result.Id, repository.LastUpsertedEntry!.Id);
@@ -37,14 +37,14 @@ public class DensityEntryServiceTests
     [Fact]
     public async Task UpsertAsync_ReusesTheExistingIdWhenAnEntryAlreadyExistsForThatName()
     {
-        var existing = new DensityEntry(Guid.NewGuid(), "Sugar", 190, SomeLastModifiedUtc);
+        var existing = new DensityEntry(Guid.NewGuid(), "Sugar", 0.80, SomeLastModifiedUtc);
         var repository = new FakeDensityEntryRepository(existing);
         var service = new DensityEntryService(repository);
 
-        var result = await service.UpsertAsync("Sugar", 200, CancellationToken.None);
+        var result = await service.UpsertAsync("Sugar", 0.85, CancellationToken.None);
 
         Assert.Equal(existing.Id, result.Id);
-        Assert.Equal(200, result.GramsPerCup);
+        Assert.Equal(0.85, result.GramsPerMilliliter);
         Assert.True(result.LastModifiedUtc > existing.LastModifiedUtc);
     }
 
@@ -54,15 +54,15 @@ public class DensityEntryServiceTests
         // Issue #55: the database's citext index folds case but treats whitespace as
         // significant, so a trailing space slipped past the lookup and then hit the unique
         // index — a 409 conflict for a name that already exists.
-        var existing = new DensityEntry(Guid.NewGuid(), "butter", 100, SomeLastModifiedUtc);
+        var existing = new DensityEntry(Guid.NewGuid(), "butter", 0.90, SomeLastModifiedUtc);
         var repository = new FakeDensityEntryRepository(existing);
         var service = new DensityEntryService(repository);
 
-        var result = await service.UpsertAsync("butter ", 120, CancellationToken.None);
+        var result = await service.UpsertAsync("butter ", 0.96, CancellationToken.None);
 
         Assert.Equal(existing.Id, result.Id);
         Assert.Equal("butter", result.IngredientName);
-        Assert.Equal(120, result.GramsPerCup);
+        Assert.Equal(0.96, result.GramsPerMilliliter);
     }
 
     [Fact]
@@ -71,15 +71,15 @@ public class DensityEntryServiceTests
         // Same failure mode as the whitespace case, via Unicode canonical form: a composed
         // "é" and "e" + combining accent are different byte sequences to the database, so
         // only a canonicalized lookup can find the stored entry.
-        var existing = new DensityEntry(Guid.NewGuid(), "café", 110, SomeLastModifiedUtc);
+        var existing = new DensityEntry(Guid.NewGuid(), "café", 0.45, SomeLastModifiedUtc);
         var repository = new FakeDensityEntryRepository(existing);
         var service = new DensityEntryService(repository);
 
-        var result = await service.UpsertAsync("cafe\u0301", 120, CancellationToken.None);
+        var result = await service.UpsertAsync("cafe\u0301", 0.53, CancellationToken.None);
 
         Assert.Equal(existing.Id, result.Id);
         Assert.Equal("café", result.IngredientName);
-        Assert.Equal(120, result.GramsPerCup);
+        Assert.Equal(0.53, result.GramsPerMilliliter);
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class DensityEntryServiceTests
         var repository = new FakeDensityEntryRepository();
         var service = new DensityEntryService(repository);
 
-        await Assert.ThrowsAnyAsync<ArgumentException>(() => service.UpsertAsync(null!, 200, CancellationToken.None));
+        await Assert.ThrowsAnyAsync<ArgumentException>(() => service.UpsertAsync(null!, 0.85, CancellationToken.None));
     }
 
     /// Simulates the database's handling of names rather than the service's expectations:
