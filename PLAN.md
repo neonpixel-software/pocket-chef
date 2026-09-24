@@ -10,7 +10,7 @@ One SwiftUI codebase targets all three platforms (macOS, iPadOS, iOS). Local dat
 
 Recipe capture (typed text and URL extraction) runs entirely on-device via Apple Intelligence — no server round-trip, keeps it fast and private. Devices without Apple Intelligence support fall back straight to a blank structured entry form.
 
-A separate, purpose-built .NET API (hosted on an existing Ubuntu 26.04 VPS) does exactly one job: serve ingredient density data (grams per cup) for unit conversion. It is not involved in recipe storage, sync, or capture — fully decoupled from the client app.
+A separate, purpose-built .NET API (hosted on an existing Ubuntu 26.04 VPS) does exactly one job: serve ingredient density data (grams per millilitre) for unit conversion. It is not involved in recipe storage, sync, or capture — fully decoupled from the client app.
 
 ## Platform & deployment target
 
@@ -46,7 +46,7 @@ Priority for this project: maintainable, testable, scalable over fastest-to-ship
 - **Recipe** — title, ingredient lines, steps, source (`typed` or the original URL), tags.
 - **Ingredient line** — raw text as entered/extracted, plus (where AI could identify it) structured amount, unit, and ingredient name. The structured fields are what make conversion possible; lines without them show as-is.
 - **Tag** — name + flag for built-in preset vs. user-created. Many-to-many with recipes. Presets ship in-app (breakfast, lunch, dinner, dessert, etc.); users can add their own freely.
-- **Density entry** — ingredient name → grams-per-cup. Sourced from the .NET API, cached locally on-device.
+- **Density entry** — ingredient name → grams per millilitre. Metric is the base unit; cups and spoons are derived from it on the client, because "a cup" varies by country (US 236.6 ml, metric 250 ml). Sourced from the .NET API, cached locally on-device.
 
 ## Recipe capture
 
@@ -153,7 +153,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 **Checkpoint:** app fully navigable in English, Spanish, French, German, and Dutch; mechanism verified manually, translation quality flagged for human review before ship.
 
 ### Phase 8: Density API (.NET)
-- [x] **8.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams-per-cup), basic persistence. PostgreSQL chosen (via Podman), not SQLite.
+- [x] **8.1 API scaffold + `DensityEntry` model** — new .NET project (ingredient name → grams per millilitre; originally per cup, changed in #70), basic persistence. PostgreSQL chosen (via Podman), not SQLite.
   Acceptance: API runs locally, entries can be created/read directly against the database. Verified end-to-end: real migration applied to a locally running Postgres (via Podman), entry inserted and read back via `psql`, the `/health` endpoint responds, and the Dockerfile image builds and runs correctly against the same Postgres.
   `nuget` ecosystem entry added to `.github/dependabot.yml`.
 - [x] **8.2 Read endpoint + low-privilege key** — public-ish read endpoint gated by a read-only API key.
@@ -185,6 +185,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 
 ### Phase 11: Unit conversion
 - [ ] **11.1 Volume/weight toggle on recipe view** — converts each ingredient line using its cached density entry.
+  Note: density entries are grams per millilitre, so the conversion first turns the line's volume into millilitres. Which cup that means (US 236.6 ml vs metric 250 ml) is a client-side decision (e.g. defaulting from the device locale), not baked into the stored data.
   Acceptance: toggling shows correct gram values for ingredients with density data.
 - [ ] **11.2 Missing-density fallback** — ingredients without a cached density entry show their original measurement plus a "conversion not available" note instead of a guess.
   Acceptance: an ingredient known to be absent from the density table shows the fallback note, not a fabricated number.

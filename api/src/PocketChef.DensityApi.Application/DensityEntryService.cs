@@ -14,7 +14,7 @@ public sealed class DensityEntryService : IDensityEntryService
     public Task<IReadOnlyList<DensityEntry>> GetAllAsync(CancellationToken cancellationToken)
         => _repository.GetAllAsync(cancellationToken);
 
-    public async Task<DensityEntry> UpsertAsync(string ingredientName, double gramsPerCup, CancellationToken cancellationToken)
+    public async Task<DensityEntry> UpsertAsync(string ingredientName, double gramsPerMilliliter, CancellationToken cancellationToken)
     {
         // The database's citext index folds case but treats whitespace and Unicode canonical
         // form as significant (issue #55): a padded or decomposed name would miss the
@@ -28,7 +28,7 @@ public sealed class DensityEntryService : IDensityEntryService
         // updates an existing one — it exists so a future client (Phase 10.2's periodic
         // refresh) can ask "what changed since I last synced?" without downloading the whole
         // table every time.
-        var entry = new DensityEntry(existing?.Id ?? Guid.NewGuid(), name, gramsPerCup, DateTimeOffset.UtcNow);
+        var entry = new DensityEntry(existing?.Id ?? Guid.NewGuid(), name, gramsPerMilliliter, DateTimeOffset.UtcNow);
         return await _repository.UpsertAsync(entry, cancellationToken);
     }
 }

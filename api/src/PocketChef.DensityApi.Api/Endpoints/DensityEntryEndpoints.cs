@@ -11,7 +11,7 @@ public static class DensityEntryEndpoints
         endpoints.MapGet("/density-entries", async (IDensityEntryService service, CancellationToken cancellationToken) =>
         {
             var entries = await service.GetAllAsync(cancellationToken);
-            var response = entries.Select(entry => new DensityEntryResponse(entry.IngredientName, entry.GramsPerCup, entry.LastModifiedUtc));
+            var response = entries.Select(entry => new DensityEntryResponse(entry.IngredientName, entry.GramsPerMilliliter, entry.LastModifiedUtc));
             return Results.Ok(response);
         }).RequireApiKey(ApiKeyTier.Read)
           .RequireRateLimiting(RateLimitPolicies.Read);
@@ -20,8 +20,8 @@ public static class DensityEntryEndpoints
         {
             try
             {
-                var entry = await service.UpsertAsync(request.IngredientName, request.GramsPerCup, cancellationToken);
-                return Results.Ok(new DensityEntryResponse(entry.IngredientName, entry.GramsPerCup, entry.LastModifiedUtc));
+                var entry = await service.UpsertAsync(request.IngredientName, request.GramsPerMilliliter, cancellationToken);
+                return Results.Ok(new DensityEntryResponse(entry.IngredientName, entry.GramsPerMilliliter, entry.LastModifiedUtc));
             }
             catch (ArgumentException ex)
             {

@@ -1,6 +1,6 @@
 # PocketChef.DensityApi
 
-.NET 10 Minimal API serving ingredient density data (grams per cup). Clean
+.NET 10 Minimal API serving ingredient density data (grams per millilitre). Clean
 Architecture: `Domain` (entity + validation) → `Application` (services,
 repository interface) → `Infrastructure` (EF Core + PostgreSQL) →
 `Api` (Minimal API host).

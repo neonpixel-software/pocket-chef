@@ -30,7 +30,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
             .Options;
         await using var context = new DensityApiDbContext(options);
         await context.Database.MigrateAsync();
-        context.DensityEntries.Add(new DensityEntry(Guid.NewGuid(), "Flour", 120, SeededLastModifiedUtc));
+        context.DensityEntries.Add(new DensityEntry(Guid.NewGuid(), "Flour", 0.53, SeededLastModifiedUtc));
         await context.SaveChangesAsync();
 
         _factory = new DensityApiWebApplicationFactory { ConnectionString = _container.GetConnectionString() };
@@ -54,7 +54,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var entries = await response.Content.ReadFromJsonAsync<List<DensityEntryResponse>>();
         var entry = Assert.Single(entries!);
         Assert.Equal("Flour", entry.IngredientName);
-        Assert.Equal(120, entry.GramsPerCup);
+        Assert.Equal(0.53, entry.GramsPerMilliliter);
         Assert.Equal(SeededLastModifiedUtc, entry.LastModifiedUtc);
     }
 
@@ -76,12 +76,12 @@ public class DensityEntriesDataTests : IAsyncLifetime
         client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
 
         var before = DateTimeOffset.UtcNow;
-        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 200));
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 0.85));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<DensityEntryResponse>();
         Assert.Equal("Sugar", body!.IngredientName);
-        Assert.Equal(200, body.GramsPerCup);
+        Assert.Equal(0.85, body.GramsPerMilliliter);
         Assert.InRange(body.LastModifiedUtc, before, DateTimeOffset.UtcNow);
 
         var options = new DbContextOptionsBuilder<DensityApiDbContext>()
@@ -97,11 +97,11 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
 
-        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Flour", 130));
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Flour", 0.55));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<DensityEntryResponse>();
-        Assert.Equal(130, body!.GramsPerCup);
+        Assert.Equal(0.55, body!.GramsPerMilliliter);
         Assert.True(body.LastModifiedUtc > SeededLastModifiedUtc);
 
         var options = new DbContextOptionsBuilder<DensityApiDbContext>()
@@ -111,7 +111,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var entries = await context.DensityEntries.ToListAsync();
         var entry = Assert.Single(entries);
         Assert.Equal("Flour", entry.IngredientName);
-        Assert.Equal(130, entry.GramsPerCup);
+        Assert.Equal(0.55, entry.GramsPerMilliliter);
     }
 
     [Fact]
@@ -123,12 +123,12 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
 
-        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Flour ", 130));
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Flour ", 0.55));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<DensityEntryResponse>();
         Assert.Equal("Flour", body!.IngredientName);
-        Assert.Equal(130, body.GramsPerCup);
+        Assert.Equal(0.55, body.GramsPerMilliliter);
 
         var options = new DbContextOptionsBuilder<DensityApiDbContext>()
             .UseNpgsql(_container.GetConnectionString())
@@ -136,7 +136,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
         await using var context = new DensityApiDbContext(options);
         var entry = Assert.Single(await context.DensityEntries.ToListAsync());
         Assert.Equal("Flour", entry.IngredientName);
-        Assert.Equal(130, entry.GramsPerCup);
+        Assert.Equal(0.55, entry.GramsPerMilliliter);
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
 
-        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("   ", 200));
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("   ", 0.85));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -161,17 +161,17 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
 
-        var explicitNull = new StringContent("""{"ingredientName": null, "gramsPerCup": 200}""", Encoding.UTF8, "application/json");
+        var explicitNull = new StringContent("""{"ingredientName": null, "gramsPerMilliliter": 0.85}""", Encoding.UTF8, "application/json");
         var nullResponse = await client.PostAsync("/density-entries", explicitNull);
         Assert.Equal(HttpStatusCode.BadRequest, nullResponse.StatusCode);
 
-        var missing = new StringContent("""{"gramsPerCup": 200}""", Encoding.UTF8, "application/json");
+        var missing = new StringContent("""{"gramsPerMilliliter": 0.85}""", Encoding.UTF8, "application/json");
         var missingResponse = await client.PostAsync("/density-entries", missing);
         Assert.Equal(HttpStatusCode.BadRequest, missingResponse.StatusCode);
     }
 
     [Fact]
-    public async Task Post_WithValidWriteKey_NonPositiveGramsPerCup_ReturnsBadRequest()
+    public async Task Post_WithValidWriteKey_NonPositiveGramsPerMilliliter_ReturnsBadRequest()
     {
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
@@ -201,7 +201,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
         var client = factory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.WriteApiKey);
 
-        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Cocoa", 90));
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Cocoa", 0.38));
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
@@ -211,7 +211,7 @@ public class DensityEntriesDataTests : IAsyncLifetime
         public Task<IReadOnlyList<DensityEntry>> GetAllAsync(CancellationToken cancellationToken)
             => throw new NotSupportedException();
 
-        public Task<DensityEntry> UpsertAsync(string ingredientName, double gramsPerCup, CancellationToken cancellationToken)
+        public Task<DensityEntry> UpsertAsync(string ingredientName, double gramsPerMilliliter, CancellationToken cancellationToken)
             => throw new DensityEntryConflictException(ingredientName);
     }
 }

@@ -41,7 +41,7 @@ public class DensityEntriesAuthorizationTests : IClassFixture<DensityApiWebAppli
     {
         var client = _factory.CreateClient();
 
-        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 200));
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 0.85));
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
@@ -52,7 +52,7 @@ public class DensityEntriesAuthorizationTests : IClassFixture<DensityApiWebAppli
         var client = _factory.CreateClient();
         client.DefaultRequestHeaders.Add("X-Api-Key", DensityApiWebApplicationFactory.ReadApiKey);
 
-        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 200));
+        var response = await client.PostAsJsonAsync("/density-entries", new UpsertDensityEntryRequest("Sugar", 0.85));
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
