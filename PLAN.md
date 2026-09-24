@@ -72,7 +72,7 @@ Hosted on Nick's existing Ubuntu 26.04 VPS. Two access tiers:
 - **Read** — low-privilege API key baked into the app, used for fetching/refreshing density entries.
 - **Write** — higher-privilege API key held by Nick, used to add/edit entries. No admin UI needed yet; a script is enough for now.
 
-Seeded once from existing public ingredient-density data, then curated by hand over time through the authenticated write endpoints.
+Seeded once from USDA FoodData Central household-measure portion weights (public domain / CC0 1.0 — see Phase 9.1), then curated by hand over time through the authenticated write endpoints.
 
 **Refresh cadence:** the app checks for new/changed density entries periodically in the background, and also lets the user trigger a manual refresh. Either way, results are cached locally so conversion keeps working offline.
 
@@ -164,8 +164,9 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 **Checkpoint:** API works locally end-to-end with both key tiers enforced.
 
 ### Phase 9: Seed & deploy
-- [ ] **9.1 Seed data import** — one-off script loading existing public ingredient-density data into the database.
-  Acceptance: common ingredients (flour, sugar, butter, etc.) return sensible density values from the read endpoint.
+- [ ] **9.1 Seed data import** — one-off script loading ingredient densities derived from [USDA FoodData Central](https://fdc.nal.usda.gov) into the database.
+  Acceptance: common ingredients (flour, sugar, butter, etc.) return sensible density values from the read endpoint; every seed row carries its FDC provenance in the checked-in seed file.
+  Note: source and license decided up front (issue #50) because the repo is public and MIT-licensed — seed data scraped from an all-rights-reserved source couldn't ship here regardless of the repo's own license. FoodData Central data is public domain and published under CC0 1.0, so it can be checked in and redistributed without conditions (attribution is requested, not required — credit it in `api/README.md` anyway). Densities come from its household-measure portion weights (SR Legacy / Foundation Foods, e.g. "1 cup = 125 g"), converted to g/ml at the US cup (236.588 ml) or spoon the portion is quoted in. Rejected: the FAO/INFOODS Density Database (FAO copyright, not an open license) and baking-brand weight charts (all rights reserved). Provenance lives in the seed file itself — one row per entry with the FDC ID, the FDC food description, and the portion used — not in a database column: entries curated later through the write endpoints have no FDC source, and a `sourceUrl` column would mean a schema migration plus a write-contract change for data only the seed needs. Revisit if curation starts needing per-entry sources.
   Note: seed rows must go through the `DensityEntry` constructor (or canonicalize names to NFC + trim) — the citext index is byte-exact except for case, so a non-canonical seed row (padded, or a decomposed Unicode accent) could never be merged by a later upsert; it would 409 (issue #55).
 - [ ] **9.2 Deploy to Ubuntu VPS** — API running as a service on the existing 26.04 VPS, reachable over HTTPS.
   Acceptance: read endpoint reachable from outside the VPS over HTTPS with the read key; write endpoints not reachable without the write key.
