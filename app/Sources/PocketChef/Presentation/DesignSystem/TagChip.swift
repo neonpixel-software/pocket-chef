@@ -17,5 +17,7 @@ struct TagChip: View {
                 .background(isSelected ? PCColor.teal : PCColor.surface, in: Capsule())
         }
         .buttonStyle(.plain)
+        // Selection is otherwise shown only by the fill color, which assistive tech can't see.
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
