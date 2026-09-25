@@ -49,6 +49,13 @@ final class WebPageTextDecodingTests: XCTestCase {
         XCTAssertEqual(WebPageTextDecoding.truncated("Pancakes"), "Pancakes")
     }
 
+    func testPlainTextCapLeavesRoomInTheModelsContextWindow() {
+        // The on-device model's context is 4,096 tokens shared by instructions (~50), the
+        // CapturedRecipeSchema (~350) and the generated recipe (up to ~1,000). Page text measured
+        // as low as ~2.7 characters per token, so the cap must stay at or below ~6,000 (issue #74).
+        XCTAssertLessThanOrEqual(WebPageTextDecoding.maxPlainTextCharacters, 6000)
+    }
+
     func testTruncatedCapsLongText() {
         let long = String(repeating: "a", count: WebPageTextDecoding.maxPlainTextCharacters + 500)
 
