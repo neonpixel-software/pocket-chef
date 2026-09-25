@@ -1,7 +1,7 @@
 @testable import PocketChef
 import XCTest
 
-/// Verifies the String Catalog entries for the 3 capture-failure messages that
+/// Verifies the String Catalog entries for the 5 capture-failure messages that
 /// RecipeCaptureViewModel/RecipeURLCaptureViewModel assign via String(localized:) — reading the
 /// compiled catalog output directly per language (see LocalizationTestHelper) makes this
 /// deterministic regardless of the test process's own system language.
