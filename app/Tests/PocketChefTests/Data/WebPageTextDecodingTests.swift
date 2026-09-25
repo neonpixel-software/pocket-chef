@@ -84,4 +84,35 @@ final class WebPageTextDecodingTests: XCTestCase {
             XCTFail("Expected WebPageFetchError.tooLarge, got \(error)")
         }
     }
+
+    func testValidateStatusAcceptsSuccessfulResponses() throws {
+        for statusCode in [200, 203, 299] {
+            try WebPageTextDecoding.validateStatus(of: httpResponse(statusCode: statusCode))
+        }
+    }
+
+    func testValidateStatusThrowsHTTPStatusForErrorResponses() throws {
+        for statusCode in [404, 410, 500, 503, 199, 300] {
+            do {
+                try WebPageTextDecoding.validateStatus(of: httpResponse(statusCode: statusCode))
+                XCTFail("Expected WebPageFetchError.httpStatus(\(statusCode))")
+            } catch let WebPageFetchError.httpStatus(thrown) {
+                XCTAssertEqual(thrown, statusCode)
+            } catch {
+                XCTFail("Expected WebPageFetchError.httpStatus(\(statusCode)), got \(error)")
+            }
+        }
+    }
+
+    func testValidateStatusAllowsNonHTTPResponses() throws {
+        let url = try XCTUnwrap(URL(string: "file:///recipe.html"))
+        let response = URLResponse(url: url, mimeType: "text/html", expectedContentLength: 0, textEncodingName: nil)
+
+        try WebPageTextDecoding.validateStatus(of: response)
+    }
+
+    private func httpResponse(statusCode: Int) throws -> HTTPURLResponse {
+        let url = try XCTUnwrap(URL(string: "https://example.com/recipe"))
+        return try XCTUnwrap(HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil))
+    }
 }

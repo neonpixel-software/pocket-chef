@@ -7,6 +7,7 @@ protocol WebPageFetcher: Sendable {
 enum WebPageFetchError: Error {
     case invalidURL
     case requestFailed(underlying: Error)
+    case httpStatus(Int)
     case emptyContent
     case tooLarge
     case insecureConnection
