@@ -52,6 +52,25 @@ final class CapturedRecipeSchemaTests: XCTestCase {
         XCTAssertEqual(schema.toDomain().unit, "grams")
     }
 
+    func testToDomainDropsDescriptorUsedAsUnit() {
+        let schema = CapturedIngredientSchema(rawText: "1 large egg", amount: "1", unit: "large", ingredientName: "large egg")
+
+        let line = schema.toDomain()
+
+        XCTAssertEqual(line.amount, 1)
+        XCTAssertNil(line.unit)
+        XCTAssertEqual(line.ingredientName, "egg")
+    }
+
+    func testToDomainMovesIngredientFromUnitToEmptyName() {
+        let schema = CapturedIngredientSchema(rawText: "1 yellow onion", amount: "1", unit: "yellow onion", ingredientName: "")
+
+        let line = schema.toDomain()
+
+        XCTAssertNil(line.unit)
+        XCTAssertEqual(line.ingredientName, "yellow onion")
+    }
+
     func testRecipeToDomainMapsFieldsAndFiltersBlankSteps() {
         let schema = CapturedRecipeSchema(
             title: "Pancakes",

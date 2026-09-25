@@ -42,13 +42,22 @@ extension CapturedIngredientSchema {
     func toDomain() -> IngredientLine {
         let parsedAmount = IngredientAmountParser.parse(amount)
         let trimmedUnit = unit.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedName = ingredientName.trimmingCharacters(in: .whitespacesAndNewlines)
+        var name = ingredientName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let candidateUnit = trimmedUnit.isEmpty ? parsedAmount?.unit : trimmedUnit
+        var measurementUnit: String?
+        if let candidateUnit, IngredientDescriptors.isMeasurementUnit(candidateUnit) {
+            measurementUnit = candidateUnit
+        } else if name.isEmpty, let candidateUnit {
+            // The model sometimes puts the ingredient itself in the unit field ("yellow onion").
+            name = candidateUnit
+        }
+        name = IngredientDescriptors.removingSizeWords(from: name)
         return IngredientLine(
             id: UUID(),
             rawText: rawText,
             amount: parsedAmount?.value,
-            unit: trimmedUnit.isEmpty ? parsedAmount?.unit : trimmedUnit,
-            ingredientName: trimmedName.isEmpty ? nil : trimmedName
+            unit: measurementUnit,
+            ingredientName: name.isEmpty ? nil : name
         )
     }
 }
