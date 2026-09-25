@@ -31,6 +31,100 @@ final class CapturedRecipeSchemaTests: XCTestCase {
         XCTAssertNil(line.amount)
     }
 
+    func testToDomainParsesFractionAmounts() {
+        let schema = CapturedIngredientSchema(rawText: "1 1/2 tsp salt", amount: "1 1/2", unit: "tsp", ingredientName: "salt")
+
+        XCTAssertEqual(schema.toDomain().amount, 1.5)
+    }
+
+    func testToDomainTakesUnitFromAmountWhenUnitIsEmpty() {
+        let schema = CapturedIngredientSchema(rawText: "100g butter", amount: "100g", unit: "", ingredientName: "butter")
+
+        let line = schema.toDomain()
+
+        XCTAssertEqual(line.amount, 100)
+        XCTAssertEqual(line.unit, "g")
+    }
+
+    func testToDomainPrefersExplicitUnitOverOneInAmount() {
+        let schema = CapturedIngredientSchema(rawText: "100g butter", amount: "100g", unit: "grams", ingredientName: "butter")
+
+        XCTAssertEqual(schema.toDomain().unit, "grams")
+    }
+
+    func testToDomainDropsDescriptorUsedAsUnit() {
+        let schema = CapturedIngredientSchema(rawText: "1 large egg", amount: "1", unit: "large", ingredientName: "large egg")
+
+        let line = schema.toDomain()
+
+        XCTAssertEqual(line.amount, 1)
+        XCTAssertNil(line.unit)
+        XCTAssertEqual(line.ingredientName, "egg")
+    }
+
+    func testToDomainMovesIngredientFromUnitToEmptyName() {
+        let schema = CapturedIngredientSchema(rawText: "1 yellow onion", amount: "1", unit: "yellow onion", ingredientName: "")
+
+        let line = schema.toDomain()
+
+        XCTAssertNil(line.unit)
+        XCTAssertEqual(line.ingredientName, "yellow onion")
+    }
+
+    func testToDomainNeverUsesPlaceholderUnitAsName() {
+        let schema = CapturedIngredientSchema(rawText: "salt & pepper to taste", amount: "", unit: "none", ingredientName: "")
+
+        let line = schema.toDomain()
+
+        XCTAssertNil(line.unit)
+        XCTAssertNil(line.ingredientName)
+    }
+
+    func testToDomainTakesUnitFromRawTextWhenModelLeftItEmpty() {
+        let schema = CapturedIngredientSchema(rawText: "1/3 cup melted butter", amount: "1/3", unit: "", ingredientName: "butter")
+
+        let line = schema.toDomain()
+
+        XCTAssertEqual(line.amount, 1.0 / 3)
+        XCTAssertEqual(line.unit, "cup")
+    }
+
+    func testToDomainTakesUnitFromRawTextWhenAmountIsMidSentence() {
+        let schema = CapturedIngredientSchema(rawText: "Il vous faut 250 g de farine", amount: "250", unit: "", ingredientName: "farine")
+
+        XCTAssertEqual(schema.toDomain().unit, "g")
+    }
+
+    func testToDomainDoesNotMatchAmountInsideLongerNumber() {
+        let schema = CapturedIngredientSchema(rawText: "Pour 15 crêpes : 1 pincée de sel", amount: "1", unit: "", ingredientName: "sel")
+
+        XCTAssertEqual(schema.toDomain().unit, "pincée")
+    }
+
+    func testToDomainTakesUnitFromWordAmount() {
+        let schema = CapturedIngredientSchema(rawText: "a pinch of salt", amount: "a pinch", unit: "", ingredientName: "salt")
+
+        let line = schema.toDomain()
+
+        XCTAssertNil(line.amount)
+        XCTAssertEqual(line.unit, "pinch")
+    }
+
+    func testRecipeToDomainDropsIngredientsNotInSource() {
+        let schema = CapturedRecipeSchema(
+            title: "Crêpes",
+            ingredients: [
+                CapturedIngredientSchema(rawText: "250 g de farine", amount: "250", unit: "g", ingredientName: "farine"),
+                CapturedIngredientSchema(rawText: "eau", amount: "", unit: "", ingredientName: "eau"),
+            ],
+            steps: ["Mélanger"]
+        )
+
+        let recipe = schema.toDomain(source: "Il faut 250 g de farine. Mélanger.")
+
+        XCTAssertEqual(recipe.ingredients.map(\.rawText), ["250 g de farine"])
+    }
+
     func testRecipeToDomainMapsFieldsAndFiltersBlankSteps() {
         let schema = CapturedRecipeSchema(
             title: "Pancakes",

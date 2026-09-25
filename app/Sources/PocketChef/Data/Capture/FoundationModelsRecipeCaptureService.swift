@@ -18,11 +18,20 @@ final class FoundationModelsRecipeCaptureService: RecipeCaptureService {
         let session = LanguageModelSession(instructions: {
             "Extract this recipe into a structured title, ingredient lines, and steps. " +
                 "Preserve the ingredient's exact original wording in rawText even when you " +
-                "also identify amount/unit/name."
+                "also identify amount/unit/name. List only food ingredients; leave out " +
+                "equipment such as pans or skewers."
         })
         do {
-            let result = try await session.respond(to: text, generating: CapturedRecipeSchema.self)
-            return result.content.toDomain()
+            // Greedy sampling: with the default sampling the model sometimes writes garbled
+            // quantities ("1±³" for "1 1/2") that no parser can recover (issue #76).
+            // `sampling:` is deprecated in the Xcode 27 SDK in favour of `samplingMode:`, but CI's
+            // macos-26 runner SDK doesn't have `samplingMode:` yet. Switch once CI moves to Xcode 27.
+            let result = try await session.respond(
+                to: text,
+                generating: CapturedRecipeSchema.self,
+                options: GenerationOptions(sampling: .greedy)
+            )
+            return result.content.toDomain(source: text)
         } catch {
             // Preserve the original error (guardrail rejection, model unavailable, schema
             // mismatch, etc.) so on-device verification can distinguish failure causes rather
