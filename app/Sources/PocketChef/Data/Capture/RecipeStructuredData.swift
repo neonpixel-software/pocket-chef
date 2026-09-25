@@ -66,9 +66,10 @@ enum RecipeStructuredData {
         return sections.joined(separator: "\n\n")
     }
 
-    /// `recipeIngredient` is usually an array of strings, but schema.org also allows a single string.
+    /// `recipeIngredient` is usually an array of strings, but schema.org also allows a single
+    /// string, which is split on line breaks like single-string `recipeInstructions`.
     private static func ingredientLines(from value: Any?) -> [String] {
-        let items = value as? [Any] ?? (value as? String).map { [$0] } ?? []
+        let items = value as? [Any] ?? (value as? String)?.components(separatedBy: .newlines) ?? []
         return items.compactMap { $0 as? String }.map(cleaned).filter { !$0.isEmpty }
     }
 
