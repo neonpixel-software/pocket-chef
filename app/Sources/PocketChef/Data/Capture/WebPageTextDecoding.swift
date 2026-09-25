@@ -7,9 +7,11 @@ enum WebPageTextDecoding {
     /// almost certainly not a page the model could use.
     static let maxDownloadBytes = 2 * 1024 * 1024
 
-    /// Cap on the converted plain text handed to the model, whose context window is far
-    /// smaller than the download cap allows for.
-    static let maxPlainTextCharacters = 12000
+    /// Cap on the converted plain text handed to the model. Its context is 4,096 tokens shared
+    /// by the instructions (~50), the CapturedRecipeSchema (~350) and the generated recipe (up to
+    /// ~1,000), leaving ~2,500 for page text. Flattened pages measured as low as ~2.7 characters
+    /// per token on device, so 6,000 characters fits; 12,000 overflowed on most sites (issue #74).
+    static let maxPlainTextCharacters = 6000
 
     /// Decodes using, in order: the charset the server declared, a `<meta charset>` in the
     /// first KB, UTF-8, then windows-1252 and ISO-8859-1 for legacy pages. ISO-8859-1 maps
