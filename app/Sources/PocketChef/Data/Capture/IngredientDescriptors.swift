@@ -37,6 +37,11 @@ enum IngredientDescriptors {
         "large", "medium", "small", "extra-large", "jumbo",
     ]
 
+    /// Placeholders the model writes instead of leaving a field empty.
+    static func isPlaceholder(_ text: String) -> Bool {
+        ["none", "n/a", "na", "-"].contains(text.lowercased())
+    }
+
     static func isMeasurementUnit(_ text: String) -> Bool {
         var unit = text.lowercased()
         if unit.hasSuffix("."), !measurementUnits.contains(unit) {

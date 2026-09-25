@@ -47,7 +47,7 @@ extension CapturedIngredientSchema {
         var measurementUnit: String?
         if let candidateUnit, IngredientDescriptors.isMeasurementUnit(candidateUnit) {
             measurementUnit = candidateUnit
-        } else if name.isEmpty, let candidateUnit {
+        } else if name.isEmpty, let candidateUnit, !IngredientDescriptors.isPlaceholder(candidateUnit) {
             // The model sometimes puts the ingredient itself in the unit field ("yellow onion").
             name = candidateUnit
         }

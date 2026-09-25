@@ -71,6 +71,15 @@ final class CapturedRecipeSchemaTests: XCTestCase {
         XCTAssertEqual(line.ingredientName, "yellow onion")
     }
 
+    func testToDomainNeverUsesPlaceholderUnitAsName() {
+        let schema = CapturedIngredientSchema(rawText: "salt & pepper to taste", amount: "", unit: "none", ingredientName: "")
+
+        let line = schema.toDomain()
+
+        XCTAssertNil(line.unit)
+        XCTAssertNil(line.ingredientName)
+    }
+
     func testRecipeToDomainMapsFieldsAndFiltersBlankSteps() {
         let schema = CapturedRecipeSchema(
             title: "Pancakes",
