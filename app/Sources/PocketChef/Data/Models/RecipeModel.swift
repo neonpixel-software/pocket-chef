@@ -6,6 +6,7 @@ final class RecipeModel {
     var id: UUID = UUID()
     var title: String = ""
     var steps: [String] = []
+    var equipment: [String] = []
     var isTypedSource: Bool = false
     var sourceURL: URL?
     @Relationship(deleteRule: .cascade) var ingredients: [IngredientLineModel]? = []
@@ -15,6 +16,7 @@ final class RecipeModel {
         id: UUID = UUID(),
         title: String,
         steps: [String],
+        equipment: [String] = [],
         isTypedSource: Bool,
         sourceURL: URL? = nil,
         ingredients: [IngredientLineModel] = [],
@@ -23,6 +25,7 @@ final class RecipeModel {
         self.id = id
         self.title = title
         self.steps = steps
+        self.equipment = equipment
         self.isTypedSource = isTypedSource
         self.sourceURL = sourceURL
         self.ingredients = ingredients

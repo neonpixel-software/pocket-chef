@@ -66,6 +66,7 @@ final class RecipeFormViewModelTests: XCTestCase {
             id: UUID(),
             title: "Pancakes",
             ingredients: [IngredientLine(id: UUID(), rawText: "2 cups flour", amount: 2, unit: "cup", ingredientName: "flour")],
+            equipment: ["griddle", "whisk"],
             steps: ["Mix", "Cook"],
             source: .typed,
             tags: [Tag(id: UUID(), name: "Breakfast", isPreset: true)]
@@ -74,6 +75,7 @@ final class RecipeFormViewModelTests: XCTestCase {
         let viewModel = makeViewModel(mode: .edit(original))
 
         XCTAssertEqual(viewModel.title, "Pancakes")
+        XCTAssertEqual(viewModel.equipment.map(\.name), ["griddle", "whisk"])
         XCTAssertEqual(viewModel.steps.map(\.text), ["Mix", "Cook"])
         XCTAssertEqual(viewModel.ingredients.first?.amount, "2")
         XCTAssertEqual(viewModel.ingredients.first?.unit, "cup")

@@ -104,6 +104,33 @@ final class RecipeFormViewTests: XCTestCase {
         XCTAssertEqual(viewModel.ingredients.count, 1)
     }
 
+    func testAddEquipmentButtonAddsRow() throws {
+        let viewModel = makeViewModel()
+        let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
+
+        XCTAssertEqual(viewModel.equipment.count, 0)
+        try sut.inspect().find(button: "Add Equipment").tap()
+        XCTAssertEqual(viewModel.equipment.count, 1)
+    }
+
+    func testEquipmentRowControlsMoveAndDelete() throws {
+        let viewModel = makeViewModel()
+        viewModel.addEquipment()
+        viewModel.addEquipment()
+        viewModel.equipment[0].name = "loaf pan"
+        viewModel.equipment[1].name = "whisk"
+        let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
+
+        let moveDownButtons = try sut.inspect().findAll(where: { try $0.accessibilityLabel().string() == "Move down" })
+        XCTAssertEqual(moveDownButtons.count, 2)
+        try moveDownButtons[0].button().tap()
+        XCTAssertEqual(viewModel.equipment.map(\.name), ["whisk", "loaf pan"])
+
+        let deleteButtons = try sut.inspect().findAll(where: { try $0.accessibilityLabel().string() == "Delete" })
+        try deleteButtons[1].button().tap()
+        XCTAssertEqual(viewModel.equipment.map(\.name), ["whisk"])
+    }
+
     func testAddStepButtonAddsRow() throws {
         let viewModel = makeViewModel()
         let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })

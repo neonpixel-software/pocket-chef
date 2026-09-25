@@ -44,6 +44,16 @@ struct IngredientLineDraft: Identifiable, Equatable {
     }
 }
 
+struct EquipmentDraft: Identifiable, Equatable {
+    let id: UUID
+    var name: String
+
+    init(id: UUID = UUID(), name: String = "") {
+        self.id = id
+        self.name = name
+    }
+}
+
 struct StepDraft: Identifiable, Equatable {
     let id: UUID
     var text: String
@@ -58,6 +68,7 @@ struct StepDraft: Identifiable, Equatable {
 final class RecipeFormViewModel {
     var title: String
     var ingredients: [IngredientLineDraft]
+    var equipment: [EquipmentDraft]
     var steps: [StepDraft]
     private(set) var allTags: [Tag] = []
     var selectedTagIDs: Set<UUID>
@@ -91,11 +102,13 @@ final class RecipeFormViewModel {
         case .create:
             title = ""
             ingredients = []
+            equipment = []
             steps = []
             initialTags = []
         case let .edit(recipe), let .capture(recipe):
             title = recipe.title
             ingredients = recipe.ingredients.map { IngredientLineDraft(ingredientLine: $0) }
+            equipment = recipe.equipment.map { EquipmentDraft(name: $0) }
             steps = recipe.steps.map { StepDraft(text: $0) }
             initialTags = recipe.tags
         }
@@ -123,6 +136,25 @@ final class RecipeFormViewModel {
     func moveIngredientDown(at index: Int) {
         guard ingredients.indices.contains(index), index < ingredients.count - 1 else { return }
         ingredients.swapAt(index, index + 1)
+    }
+
+    func addEquipment() {
+        equipment.append(EquipmentDraft())
+    }
+
+    func removeEquipment(at index: Int) {
+        guard equipment.indices.contains(index) else { return }
+        equipment.remove(at: index)
+    }
+
+    func moveEquipmentUp(at index: Int) {
+        guard equipment.indices.contains(index), index > 0 else { return }
+        equipment.swapAt(index, index - 1)
+    }
+
+    func moveEquipmentDown(at index: Int) {
+        guard equipment.indices.contains(index), index < equipment.count - 1 else { return }
+        equipment.swapAt(index, index + 1)
     }
 
     func addStep() {
@@ -233,6 +265,9 @@ final class RecipeFormViewModel {
                 ingredientName: name.isEmpty ? nil : name
             )
         }
+        let builtEquipment = equipment
+            .map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
         let builtSteps = steps
             .map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
@@ -256,6 +291,7 @@ final class RecipeFormViewModel {
             id: id,
             title: trimmedTitle,
             ingredients: builtIngredients,
+            equipment: builtEquipment,
             steps: builtSteps,
             source: source,
             tags: selectedTags

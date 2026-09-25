@@ -32,6 +32,22 @@ struct RecipeFormView: View {
                         }
                     }
 
+                    formSection(title: String(localized: "Equipment"), accent: PCColor.deepTeal) {
+                        VStack(spacing: 12) {
+                            ForEach(Array(viewModel.equipment.enumerated()), id: \.element.id) { index, _ in
+                                EquipmentRow(
+                                    name: $viewModel.equipment[index].name,
+                                    canMoveUp: index > 0,
+                                    canMoveDown: index < viewModel.equipment.count - 1,
+                                    onMoveUp: { viewModel.moveEquipmentUp(at: index) },
+                                    onMoveDown: { viewModel.moveEquipmentDown(at: index) },
+                                    onDelete: { viewModel.removeEquipment(at: index) }
+                                )
+                            }
+                            addButton(title: String(localized: "Add Equipment")) { viewModel.addEquipment() }
+                        }
+                    }
+
                     formSection(title: String(localized: "Steps"), accent: PCColor.pink) {
                         VStack(spacing: 12) {
                             ForEach(Array(viewModel.steps.enumerated()), id: \.element.id) { index, _ in
@@ -165,6 +181,29 @@ private struct IngredientRow: View {
             .padding(12)
             .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 12))
             .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
+
+            RowControls(canMoveUp: canMoveUp, canMoveDown: canMoveDown, onMoveUp: onMoveUp, onMoveDown: onMoveDown, onDelete: onDelete)
+        }
+    }
+}
+
+private struct EquipmentRow: View {
+    @Binding var name: String
+    let canMoveUp: Bool
+    let canMoveDown: Bool
+    let onMoveUp: () -> Void
+    let onMoveDown: () -> Void
+    let onDelete: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            TextField("Tool or cookware", text: $name)
+                .font(PCFont.body(15))
+                .foregroundStyle(PCColor.textPrimary)
+                .textFieldStyle(.plain)
+                .padding(12)
+                .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 12))
+                .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
 
             RowControls(canMoveUp: canMoveUp, canMoveDown: canMoveDown, onMoveUp: onMoveUp, onMoveDown: onMoveDown, onDelete: onDelete)
         }

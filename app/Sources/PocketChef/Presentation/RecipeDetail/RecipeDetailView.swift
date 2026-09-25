@@ -65,6 +65,33 @@ struct RecipeDetailView: View {
                     .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
                 }
 
+                // Hidden when empty: most recipes, including every one saved before #82, have none.
+                if !recipe.equipment.isEmpty {
+                    section(title: String(localized: "Equipment"), accent: PCColor.deepTeal) {
+                        VStack(spacing: 0) {
+                            ForEach(Array(recipe.equipment.enumerated()), id: \.offset) { index, item in
+                                HStack(spacing: 12) {
+                                    Circle()
+                                        .fill(PCColor.deepTeal)
+                                        .frame(width: 8, height: 8)
+                                    Text(item)
+                                        .font(PCFont.body(15))
+                                        .foregroundStyle(PCColor.textPrimary)
+                                    Spacer()
+                                }
+                                .padding(.vertical, 12)
+
+                                if index < recipe.equipment.count - 1 {
+                                    Divider().opacity(0.3)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 14))
+                        .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
+                    }
+                }
+
                 section(title: String(localized: "Steps"), accent: PCColor.pink) {
                     if recipe.steps.isEmpty {
                         Text("No steps listed")

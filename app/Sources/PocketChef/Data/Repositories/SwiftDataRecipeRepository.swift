@@ -29,6 +29,7 @@ final class SwiftDataRecipeRepository: RecipeRepository {
 
         model.title = recipe.title
         model.steps = recipe.steps
+        model.equipment = recipe.equipment
         switch recipe.source {
         case .typed:
             model.isTypedSource = true

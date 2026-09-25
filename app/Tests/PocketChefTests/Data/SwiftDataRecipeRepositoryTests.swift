@@ -43,6 +43,8 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
         let waffles = try XCTUnwrap(recipes.first { $0.title == "Waffles" })
         XCTAssertEqual(waffles.ingredients.first?.ingredientName, "flour")
         XCTAssertEqual(waffles.tags.first?.name, "Breakfast")
+        // Rows saved before equipment existed (#82) have none.
+        XCTAssertEqual(recipes.first?.equipment, [])
     }
 
     func testFetchAllMapsURLSourceRecipe() throws {
@@ -64,6 +66,7 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
             id: UUID(),
             title: "Waffles",
             ingredients: [IngredientLine(id: UUID(), rawText: "2 cups flour", amount: 2, unit: "cup", ingredientName: "flour")],
+            equipment: ["waffle iron"],
             steps: ["Cook in waffle iron"],
             source: .typed,
             tags: []
@@ -92,6 +95,7 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
             id: recipeID,
             title: "New Title",
             ingredients: [IngredientLine(id: UUID(), rawText: "2 cups sugar", amount: 2, unit: "cup", ingredientName: "sugar")],
+            equipment: ["saucepan"],
             steps: ["New step"],
             source: .typed,
             tags: []
