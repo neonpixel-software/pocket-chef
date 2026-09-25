@@ -70,8 +70,8 @@ extension CapturedIngredientSchema {
         )
     }
 
-    /// The unit as written in rawText right after the amount ("1/3 cup butter"), or at the end
-    /// of an amount that isn't a number ("a pinch").
+    /// The unit as written in rawText right after the amount ("1/3 cup butter", "Il vous faut
+    /// 250 g de farine"), or at the end of an amount that isn't a number ("a pinch").
     private func unitWrittenInText(amountParsed: Bool) -> String? {
         let trimmedAmount = amount.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedAmount.isEmpty else { return nil }
@@ -79,7 +79,10 @@ extension CapturedIngredientSchema {
             return unit
         }
         let line = rawText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let range = line.range(of: trimmedAmount, options: [.anchored, .caseInsensitive]) else { return nil }
+        // The first occurrence of the amount that isn't part of a longer number, so "1" doesn't
+        // match inside "15".
+        let pattern = #"(?<![\d/.,])"# + NSRegularExpression.escapedPattern(for: trimmedAmount) + #"(?![\d/.,])"#
+        guard let range = line.range(of: pattern, options: [.regularExpression, .caseInsensitive]) else { return nil }
         return IngredientDescriptors.leadingUnit(in: String(line[range.upperBound...]))
     }
 }

@@ -34,6 +34,18 @@ final class IngredientAmountParserTests: XCTestCase {
         XCTAssertNil(IngredientAmountParser.parse("2")?.unit)
     }
 
+    func testKeepsQuantityBeforeMultiWordUnit() {
+        XCTAssertEqual(IngredientAmountParser.parse("1/2 fl oz"), .init(value: 0.5, unit: "fl oz"))
+        XCTAssertEqual(IngredientAmountParser.parse("1/2 c. à s."), .init(value: 0.5, unit: "c. à s."))
+        XCTAssertEqual(IngredientAmountParser.parse("1/2 cuillère à soupe"), .init(value: 0.5, unit: "cuillère à soupe"))
+    }
+
+    func testParsesDecimalComma() {
+        XCTAssertEqual(IngredientAmountParser.parse("2,5")?.value, 2.5)
+        XCTAssertEqual(IngredientAmountParser.parse("0,25 l"), .init(value: 0.25, unit: "l"))
+        XCTAssertNil(IngredientAmountParser.parse("1,000"))
+    }
+
     func testRejectsUnparseableText() {
         XCTAssertNil(IngredientAmountParser.parse(""))
         XCTAssertNil(IngredientAmountParser.parse("a few"))
@@ -43,5 +55,7 @@ final class IngredientAmountParserTests: XCTestCase {
         XCTAssertNil(IngredientAmountParser.parse("1 2 3"))
         XCTAssertNil(IngredientAmountParser.parse("x½"))
         XCTAssertNil(IngredientAmountParser.parse("2 cups 3"))
+        XCTAssertNil(IngredientAmountParser.parse("-5"))
+        XCTAssertNil(IngredientAmountParser.parse("0"))
     }
 }

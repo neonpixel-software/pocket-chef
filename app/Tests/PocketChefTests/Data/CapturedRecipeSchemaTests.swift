@@ -89,6 +89,18 @@ final class CapturedRecipeSchemaTests: XCTestCase {
         XCTAssertEqual(line.unit, "cup")
     }
 
+    func testToDomainTakesUnitFromRawTextWhenAmountIsMidSentence() {
+        let schema = CapturedIngredientSchema(rawText: "Il vous faut 250 g de farine", amount: "250", unit: "", ingredientName: "farine")
+
+        XCTAssertEqual(schema.toDomain().unit, "g")
+    }
+
+    func testToDomainDoesNotMatchAmountInsideLongerNumber() {
+        let schema = CapturedIngredientSchema(rawText: "Pour 15 crêpes : 1 pincée de sel", amount: "1", unit: "", ingredientName: "sel")
+
+        XCTAssertEqual(schema.toDomain().unit, "pincée")
+    }
+
     func testToDomainTakesUnitFromWordAmount() {
         let schema = CapturedIngredientSchema(rawText: "a pinch of salt", amount: "a pinch", unit: "", ingredientName: "salt")
 

@@ -14,6 +14,12 @@ final class IngredientDescriptorsTests: XCTestCase {
         }
     }
 
+    func testIgnoresAccentsAndKnowsFrenchGr() {
+        for unit in ["cuillere a soupe", "Cuillère À Soupe", "pincee", "gr", "gr."] {
+            XCTAssertTrue(IngredientDescriptors.isMeasurementUnit(unit), unit)
+        }
+    }
+
     func testRejectsDescriptorsAndIngredients() {
         for unit in ["large", "yellow", "yellow onion", "egg", "pcs", "none", "item", "loaf pan"] {
             XCTAssertFalse(IngredientDescriptors.isMeasurementUnit(unit), unit)

@@ -5,8 +5,9 @@ import Foundation
 /// instructions doesn't stop it, so the mapping filters them out itself.
 enum IngredientDescriptors {
     /// Measurement units in the languages the app ships in (en, es, fr, de, nl), lowercased.
-    /// Plurals are matched by `isMeasurementUnit` stripping a trailing "s", "es" or "n".
-    private static let measurementUnits: Set<String> = [
+    /// Plurals are matched by `isMeasurementUnit` stripping a trailing "s", "es" or "n", and
+    /// accents are ignored ("cuillere a soupe" matches).
+    private static let measurementUnits: Set<String> = Set([
         // English
         "cup", "c", "tablespoon", "tbsp", "tbs", "tbl", "teaspoon", "tsp", "t",
         "gram", "g", "kilogram", "kg", "milligram", "mg", "ounce", "oz", "fl oz", "fluid ounce",
@@ -21,14 +22,14 @@ enum IngredientDescriptors {
         // French
         "cuillère à soupe", "cuillères à soupe", "c. à s.", "càs", "cs", "cuillère à café",
         "cuillères à café", "c. à c.", "càc", "cc", "tasse", "pincée", "gousse", "boîte",
-        "tranche", "botte", "sachet", "verre", "gramme", "litre",
+        "tranche", "botte", "sachet", "verre", "gramme", "gr", "litre",
         // German
         "el", "tl", "esslöffel", "teelöffel", "tasse", "prise", "msp", "messerspitze", "bund",
         "dose", "päckchen", "pck", "scheibe", "zehe", "becher", "zweig",
         // Dutch
         "eetlepel", "theelepel", "kopje", "snufje", "teen", "teentje", "blik", "plak", "bosje",
         "zakje", "takje",
-    ]
+    ].map(folded))
 
     /// Size words dropped from the front of a name, so "large yellow onion" reads "yellow
     /// onion". Colour and variety words stay: "brown sugar" and "green onion" are different
@@ -43,7 +44,7 @@ enum IngredientDescriptors {
     }
 
     static func isMeasurementUnit(_ text: String) -> Bool {
-        var unit = text.lowercased()
+        var unit = folded(text)
         if unit.hasSuffix("."), !measurementUnits.contains(unit) {
             unit.removeLast()
         }

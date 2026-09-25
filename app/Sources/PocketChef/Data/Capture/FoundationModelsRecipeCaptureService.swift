@@ -27,7 +27,7 @@ final class FoundationModelsRecipeCaptureService: RecipeCaptureService {
             let result = try await session.respond(
                 to: text,
                 generating: CapturedRecipeSchema.self,
-                options: GenerationOptions(sampling: .greedy)
+                options: GenerationOptions(samplingMode: .greedy)
             )
             return result.content.toDomain(source: text)
         } catch {
