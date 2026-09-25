@@ -48,10 +48,7 @@ enum RecipeStructuredData {
     }
 
     private static func format(_ recipe: [String: Any]) -> String? {
-        let ingredients = (recipe["recipeIngredient"] as? [Any] ?? [])
-            .compactMap { $0 as? String }
-            .map(cleaned)
-            .filter { !$0.isEmpty }
+        let ingredients = ingredientLines(from: recipe["recipeIngredient"])
         let steps = instructionSteps(from: recipe["recipeInstructions"])
         guard !ingredients.isEmpty || !steps.isEmpty else { return nil }
 
@@ -67,6 +64,12 @@ enum RecipeStructuredData {
             sections.append((["Steps:"] + numbered).joined(separator: "\n"))
         }
         return sections.joined(separator: "\n\n")
+    }
+
+    /// `recipeIngredient` is usually an array of strings, but schema.org also allows a single string.
+    private static func ingredientLines(from value: Any?) -> [String] {
+        let items = value as? [Any] ?? (value as? String).map { [$0] } ?? []
+        return items.compactMap { $0 as? String }.map(cleaned).filter { !$0.isEmpty }
     }
 
     /// `recipeInstructions` may be one string, an array of strings, `HowToStep`s, or

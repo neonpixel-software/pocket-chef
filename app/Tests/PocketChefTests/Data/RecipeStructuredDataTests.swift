@@ -99,6 +99,12 @@ final class RecipeStructuredDataTests: XCTestCase {
         XCTAssertEqual(RecipeStructuredData.recipeText(fromHTML: html), "Tea\n\nIngredients:\n- 1 tea bag\n\nSteps:\n1. Boil water.\n2. Steep 3 minutes.")
     }
 
+    func testAcceptsSingleStringIngredient() {
+        let html = page(jsonLD: #"{"@type":"Recipe","name":"Toast","recipeIngredient":"1 slice bread","recipeInstructions":"Toast it."}"#)
+
+        XCTAssertEqual(RecipeStructuredData.recipeText(fromHTML: html), "Toast\n\nIngredients:\n- 1 slice bread\n\nSteps:\n1. Toast it.")
+    }
+
     func testFallsBackToStepNameWhenTextIsMissing() {
         let html = page(jsonLD: #"{"@type":"Recipe","name":"Toast","recipeInstructions":[{"@type":"HowToStep","name":"Toast the bread."}]}"#)
 
