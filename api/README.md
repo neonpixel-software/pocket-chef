@@ -30,6 +30,9 @@ Seed density values come from [USDA FoodData Central](https://fdc.nal.usda.gov/)
 cites its FDC ID. Don't add values copied from sources whose license doesn't
 permit redistribution in this MIT-licensed repo (see PLAN.md Phase 9.1).
 
+> U.S. Department of Agriculture, Agricultural Research Service.
+> FoodData Central. fdc.nal.usda.gov.
+
 ## Testing
 
 ```sh
