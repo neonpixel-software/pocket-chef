@@ -18,7 +18,9 @@ enum IngredientAmountParser {
 
     /// Accepts "2", "1.5", "1/2", "1 1/2", "½", "1½", "1 ½", optionally followed by a
     /// unit ("100g", "1/2 cup"). Returns nil for anything else, including ranges ("2-3")
-    /// and words ("a few").
+    /// and words ("a few"). Compound amounts ("1 cup plus 2 tablespoons") are not supported:
+    /// the model returns a single, usually wrong, number for them, and the user corrects it
+    /// on the review screen.
     static func parse(_ text: String) -> ParsedAmount? {
         let normalized = text
             .replacingOccurrences(of: "\u{2044}", with: "/") // fraction slash, as in "1⁄2"
