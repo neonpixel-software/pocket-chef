@@ -1,5 +1,14 @@
 name: CI
 
+# Action pinning policy (issue #54) — the split is deliberate, keep it when adding steps:
+# - First-party actions/* float on major tags (actions/checkout@v7). They come from GitHub,
+#   which we already trust to run the workflow at all, and SonarCloud's S7637 rule exempts them.
+# - Third-party actions are pinned to a full commit SHA with the tag as a trailing comment
+#   (owner/action@<40-char sha> # vN). SonarCloud's own analysis of this file enforces that
+#   (githubactions:S7637) and fails the security-rating gate on a bare tag.
+# Dependabot bumps both forms: for a SHA pin it matches the SHA to its release tag and rewrites
+# the SHA and the "# vN" comment together — keep that comment so the pin stays readable.
+
 on:
   pull_request:
     branches: [main]
