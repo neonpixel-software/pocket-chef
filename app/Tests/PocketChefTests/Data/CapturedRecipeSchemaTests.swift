@@ -31,6 +31,27 @@ final class CapturedRecipeSchemaTests: XCTestCase {
         XCTAssertNil(line.amount)
     }
 
+    func testToDomainParsesFractionAmounts() {
+        let schema = CapturedIngredientSchema(rawText: "1 1/2 tsp salt", amount: "1 1/2", unit: "tsp", ingredientName: "salt")
+
+        XCTAssertEqual(schema.toDomain().amount, 1.5)
+    }
+
+    func testToDomainTakesUnitFromAmountWhenUnitIsEmpty() {
+        let schema = CapturedIngredientSchema(rawText: "100g butter", amount: "100g", unit: "", ingredientName: "butter")
+
+        let line = schema.toDomain()
+
+        XCTAssertEqual(line.amount, 100)
+        XCTAssertEqual(line.unit, "g")
+    }
+
+    func testToDomainPrefersExplicitUnitOverOneInAmount() {
+        let schema = CapturedIngredientSchema(rawText: "100g butter", amount: "100g", unit: "grams", ingredientName: "butter")
+
+        XCTAssertEqual(schema.toDomain().unit, "grams")
+    }
+
     func testRecipeToDomainMapsFieldsAndFiltersBlankSteps() {
         let schema = CapturedRecipeSchema(
             title: "Pancakes",

@@ -18,10 +18,17 @@ final class FoundationModelsRecipeCaptureService: RecipeCaptureService {
         let session = LanguageModelSession(instructions: {
             "Extract this recipe into a structured title, ingredient lines, and steps. " +
                 "Preserve the ingredient's exact original wording in rawText even when you " +
-                "also identify amount/unit/name."
+                "also identify amount/unit/name. List only food ingredients; leave out " +
+                "equipment such as pans or skewers."
         })
         do {
-            let result = try await session.respond(to: text, generating: CapturedRecipeSchema.self)
+            // Greedy sampling: with the default sampling the model sometimes writes garbled
+            // quantities ("1±³" for "1 1/2") that no parser can recover (issue #76).
+            let result = try await session.respond(
+                to: text,
+                generating: CapturedRecipeSchema.self,
+                options: GenerationOptions(sampling: .greedy)
+            )
             return result.content.toDomain()
         } catch {
             // Preserve the original error (guardrail rejection, model unavailable, schema

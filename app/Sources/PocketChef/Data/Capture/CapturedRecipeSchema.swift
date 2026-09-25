@@ -15,7 +15,7 @@ struct CapturedRecipeSchema {
 struct CapturedIngredientSchema {
     @Guide(description: "The ingredient exactly as written in the source text, e.g. '2 cups flour'")
     let rawText: String
-    @Guide(description: "Numeric quantity as a plain number string (e.g. \"2\", \"1.5\") if stated, else empty")
+    @Guide(description: "The quantity exactly as written (e.g. \"2\", \"1.5\", \"1/2\", \"1 1/2\", \"½\") if stated, else empty. Don't convert fractions")
     let amount: String
     @Guide(description: "Unit of measurement (e.g. \"cup\", \"tsp\", \"g\") if stated, else empty")
     let unit: String
@@ -40,14 +40,14 @@ extension CapturedRecipeSchema {
 
 extension CapturedIngredientSchema {
     func toDomain() -> IngredientLine {
-        let trimmedAmount = amount.trimmingCharacters(in: .whitespacesAndNewlines)
+        let parsedAmount = IngredientAmountParser.parse(amount)
         let trimmedUnit = unit.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedName = ingredientName.trimmingCharacters(in: .whitespacesAndNewlines)
         return IngredientLine(
             id: UUID(),
             rawText: rawText,
-            amount: Double(trimmedAmount),
-            unit: trimmedUnit.isEmpty ? nil : trimmedUnit,
+            amount: parsedAmount?.value,
+            unit: trimmedUnit.isEmpty ? parsedAmount?.unit : trimmedUnit,
             ingredientName: trimmedName.isEmpty ? nil : trimmedName
         )
     }
