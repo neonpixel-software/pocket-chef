@@ -62,4 +62,49 @@ enum IngredientDescriptors {
         }
         return words.joined(separator: " ")
     }
+
+    /// The longest run of up to three words at the start of `text` that is a measurement unit,
+    /// so "cuillères à soupe de sucre" gives "cuillères à soupe".
+    static func leadingUnit(in text: String) -> String? {
+        let words = text.split(whereSeparator: \.isWhitespace)
+        for count in stride(from: min(3, words.count), through: 1, by: -1) {
+            let candidate = words.prefix(count).joined(separator: " ")
+            if isMeasurementUnit(candidate) {
+                return candidate
+            }
+        }
+        return nil
+    }
+
+    /// The longest run of up to three words at the end of `text` that is a measurement unit,
+    /// so "a pinch" gives "pinch".
+    static func trailingUnit(in text: String) -> String? {
+        let words = text.split(whereSeparator: \.isWhitespace)
+        for count in stride(from: min(3, words.count), through: 1, by: -1) {
+            let candidate = words.suffix(count).joined(separator: " ")
+            if isMeasurementUnit(candidate) {
+                return candidate
+            }
+        }
+        return nil
+    }
+
+    /// Whether the ingredient line or its name occurs in `source` as whole words, ignoring case,
+    /// accents and spacing. The model occasionally adds an ingredient that isn't in the recipe
+    /// ("eau" in a crêpe recipe that never mentions water).
+    static func appears(in source: String, rawText: String, name: String) -> Bool {
+        let haystack = folded(source)
+        return [rawText, name].contains { candidate in
+            let needle = folded(candidate)
+            guard !needle.isEmpty else { return false }
+            let pattern = "(?<![\\p{L}\\p{N}])" + NSRegularExpression.escapedPattern(for: needle) + "(?![\\p{L}\\p{N}])"
+            return haystack.range(of: pattern, options: .regularExpression) != nil
+        }
+    }
+
+    private static func folded(_ text: String) -> String {
+        text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
+    }
 }

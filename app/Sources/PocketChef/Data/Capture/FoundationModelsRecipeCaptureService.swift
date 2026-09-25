@@ -29,7 +29,7 @@ final class FoundationModelsRecipeCaptureService: RecipeCaptureService {
                 generating: CapturedRecipeSchema.self,
                 options: GenerationOptions(sampling: .greedy)
             )
-            return result.content.toDomain()
+            return result.content.toDomain(source: text)
         } catch {
             // Preserve the original error (guardrail rejection, model unavailable, schema
             // mismatch, etc.) so on-device verification can distinguish failure causes rather

@@ -28,4 +28,27 @@ final class IngredientDescriptorsTests: XCTestCase {
         XCTAssertEqual(IngredientDescriptors.removingSizeWords(from: "egg, large"), "egg, large")
         XCTAssertEqual(IngredientDescriptors.removingSizeWords(from: "large"), "large")
     }
+
+    func testFindsUnitAtStartOfText() {
+        XCTAssertEqual(IngredientDescriptors.leadingUnit(in: "cup melted butter"), "cup")
+        XCTAssertEqual(IngredientDescriptors.leadingUnit(in: "cuillères à soupe de sucre"), "cuillères à soupe")
+        XCTAssertEqual(IngredientDescriptors.leadingUnit(in: "pincée de sel"), "pincée")
+        XCTAssertNil(IngredientDescriptors.leadingUnit(in: "egg beaten"))
+        XCTAssertNil(IngredientDescriptors.leadingUnit(in: ""))
+    }
+
+    func testFindsUnitAtEndOfText() {
+        XCTAssertEqual(IngredientDescriptors.trailingUnit(in: "a pinch"), "pinch")
+        XCTAssertNil(IngredientDescriptors.trailingUnit(in: "a few"))
+    }
+
+    func testIngredientAppearsInSourceAsWholeWords() {
+        let source = "Pour 15 crêpes : 250 g de farine, 4 œufs et 1 pincée de sel. Faire un gâteau."
+
+        XCTAssertTrue(IngredientDescriptors.appears(in: source, rawText: "250 g de farine", name: "farine"))
+        XCTAssertTrue(IngredientDescriptors.appears(in: source, rawText: "4 oeufs", name: "œufs"))
+        XCTAssertTrue(IngredientDescriptors.appears(in: source, rawText: "1 PINCEE  de sel", name: ""))
+        XCTAssertFalse(IngredientDescriptors.appears(in: source, rawText: "eau", name: "eau"))
+        XCTAssertFalse(IngredientDescriptors.appears(in: source, rawText: "", name: ""))
+    }
 }

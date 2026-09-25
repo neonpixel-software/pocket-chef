@@ -24,11 +24,16 @@ struct CapturedIngredientSchema {
 }
 
 extension CapturedRecipeSchema {
-    func toDomain() -> Recipe {
-        Recipe(
+    /// Maps to a `Recipe`. With `source`, ingredients the model invented (neither the line
+    /// nor the name appears in the source text) are dropped.
+    func toDomain(source: String? = nil) -> Recipe {
+        let grounded = source.map { source in
+            ingredients.filter { IngredientDescriptors.appears(in: source, rawText: $0.rawText, name: $0.ingredientName) }
+        } ?? ingredients
+        return Recipe(
             id: UUID(),
             title: title,
-            ingredients: ingredients.map { $0.toDomain() },
+            ingredients: grounded.map { $0.toDomain() },
             steps: steps
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty },
@@ -47,9 +52,13 @@ extension CapturedIngredientSchema {
         var measurementUnit: String?
         if let candidateUnit, IngredientDescriptors.isMeasurementUnit(candidateUnit) {
             measurementUnit = candidateUnit
-        } else if name.isEmpty, let candidateUnit, !IngredientDescriptors.isPlaceholder(candidateUnit) {
-            // The model sometimes puts the ingredient itself in the unit field ("yellow onion").
-            name = candidateUnit
+        } else {
+            if name.isEmpty, let candidateUnit, !IngredientDescriptors.isPlaceholder(candidateUnit) {
+                // The model sometimes puts the ingredient itself in the unit field ("yellow onion").
+                name = candidateUnit
+            }
+            // The model also leaves the unit empty when the line has one ("1/3 cup butter").
+            measurementUnit = unitWrittenInText(amountParsed: parsedAmount != nil)
         }
         name = IngredientDescriptors.removingSizeWords(from: name)
         return IngredientLine(
@@ -59,5 +68,18 @@ extension CapturedIngredientSchema {
             unit: measurementUnit,
             ingredientName: name.isEmpty ? nil : name
         )
+    }
+
+    /// The unit as written in rawText right after the amount ("1/3 cup butter"), or at the end
+    /// of an amount that isn't a number ("a pinch").
+    private func unitWrittenInText(amountParsed: Bool) -> String? {
+        let trimmedAmount = amount.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedAmount.isEmpty else { return nil }
+        if !amountParsed, let unit = IngredientDescriptors.trailingUnit(in: trimmedAmount) {
+            return unit
+        }
+        let line = rawText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let range = line.range(of: trimmedAmount, options: [.anchored, .caseInsensitive]) else { return nil }
+        return IngredientDescriptors.leadingUnit(in: String(line[range.upperBound...]))
     }
 }
