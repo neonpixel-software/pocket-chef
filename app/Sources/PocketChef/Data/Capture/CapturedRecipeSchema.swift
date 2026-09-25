@@ -7,6 +7,8 @@ struct CapturedRecipeSchema {
     let title: String
     @Guide(description: "Each ingredient as a separate structured line")
     let ingredients: [CapturedIngredientSchema]
+    @Guide(description: "Tools and cookware the recipe needs, e.g. loaf pan, whisk")
+    let equipment: [String]
     @Guide(description: "Each preparation step in order, one instruction per entry")
     let steps: [String]
 }
@@ -24,16 +26,33 @@ struct CapturedIngredientSchema {
 }
 
 extension CapturedRecipeSchema {
-    /// Maps to a `Recipe`. With `source`, ingredients the model invented (neither the line
-    /// nor the name appears in the source text) are dropped.
+    /// Maps to a `Recipe`. With `source`, ingredients and equipment the model invented (not
+    /// in the source text) are dropped. An ingredient without a measurement unit whose line or
+    /// name is also one of the equipment items is dropped too: the model sometimes lists a tool
+    /// in both ("8x4-inch loaf pan" named "loaf pan", issue #82). It gives such lines an amount
+    /// ("1 loaf pan"), so the unit is what tells them apart from food: "¼ cup butter" is kept
+    /// even if the model also lists "butter" as equipment for "butter the pan".
     func toDomain(source: String? = nil) -> Recipe {
+        let trimmedEquipment = equipment
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && !IngredientDescriptors.isPlaceholder($0) }
+        let groundedEquipment = source.map { source in
+            trimmedEquipment.filter { IngredientDescriptors.appears(in: source, rawText: $0, name: "") }
+        } ?? trimmedEquipment
         let grounded = source.map { source in
             ingredients.filter { IngredientDescriptors.appears(in: source, rawText: $0.rawText, name: $0.ingredientName) }
         } ?? ingredients
+        let mappedIngredients = grounded.map { $0.toDomain() }.filter { line in
+            guard line.unit == nil else { return true }
+            return !groundedEquipment.contains { item in
+                IngredientDescriptors.isSameText(item, line.rawText) || IngredientDescriptors.isSameText(item, line.ingredientName ?? "")
+            }
+        }
         return Recipe(
             id: UUID(),
             title: title,
-            ingredients: grounded.map { $0.toDomain() },
+            ingredients: mappedIngredients,
+            equipment: groundedEquipment,
             steps: steps
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty },

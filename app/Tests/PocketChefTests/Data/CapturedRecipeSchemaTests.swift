@@ -117,6 +117,7 @@ final class CapturedRecipeSchemaTests: XCTestCase {
                 CapturedIngredientSchema(rawText: "250 g de farine", amount: "250", unit: "g", ingredientName: "farine"),
                 CapturedIngredientSchema(rawText: "eau", amount: "", unit: "", ingredientName: "eau"),
             ],
+            equipment: [],
             steps: ["Mélanger"]
         )
 
@@ -129,6 +130,7 @@ final class CapturedRecipeSchemaTests: XCTestCase {
         let schema = CapturedRecipeSchema(
             title: "Pancakes",
             ingredients: [CapturedIngredientSchema(rawText: "1 egg", amount: "1", unit: "", ingredientName: "egg")],
+            equipment: [],
             steps: ["Mix", "  ", "Cook"]
         )
 
@@ -140,5 +142,66 @@ final class CapturedRecipeSchemaTests: XCTestCase {
         XCTAssertEqual(recipe.steps, ["Mix", "Cook"])
         XCTAssertEqual(recipe.source, .typed)
         XCTAssertEqual(recipe.tags, [])
+    }
+
+    // MARK: equipment (issue #82)
+
+    func testRecipeToDomainTrimsEquipmentAndDropsBlanksAndPlaceholders() {
+        let schema = CapturedRecipeSchema(title: "Bread", ingredients: [], equipment: ["  loaf pan ", "", "none"], steps: [])
+
+        XCTAssertEqual(schema.toDomain().equipment, ["loaf pan"])
+    }
+
+    func testRecipeToDomainDropsEquipmentNotInSource() {
+        let schema = CapturedRecipeSchema(title: "Bread", ingredients: [], equipment: ["Loaf pan", "stand mixer"], steps: [])
+
+        let recipe = schema.toDomain(source: "Grease an 8x4-inch loaf pan and bake.")
+
+        XCTAssertEqual(recipe.equipment, ["Loaf pan"])
+    }
+
+    func testRecipeToDomainDropsIngredientTheModelAlsoListedAsEquipment() {
+        let schema = CapturedRecipeSchema(
+            title: "Zucchini Bread",
+            ingredients: [
+                CapturedIngredientSchema(rawText: "100g walnuts", amount: "100", unit: "g", ingredientName: "walnuts"),
+                // The model gives tool lines an amount of 1 (seen on device).
+                CapturedIngredientSchema(rawText: "8x4-inch loaf pan", amount: "1", unit: "", ingredientName: "loaf pan"),
+                CapturedIngredientSchema(rawText: "toothpick or wooden skewer", amount: "1", unit: "", ingredientName: ""),
+            ],
+            equipment: ["loaf pan", "Toothpick or wooden skewer"],
+            steps: []
+        )
+
+        let recipe = schema.toDomain(source: "100g walnuts, 8x4-inch loaf pan, toothpick or wooden skewer")
+
+        XCTAssertEqual(recipe.ingredients.map(\.rawText), ["100g walnuts"])
+        XCTAssertEqual(recipe.equipment, ["loaf pan", "Toothpick or wooden skewer"])
+    }
+
+    func testRecipeToDomainKeepsIngredientThatOnlyMentionsEquipment() {
+        let schema = CapturedRecipeSchema(
+            title: "Kebabs",
+            ingredients: [
+                CapturedIngredientSchema(rawText: "8 wooden skewers for kebabs", amount: "8", unit: "", ingredientName: "wooden skewers"),
+                CapturedIngredientSchema(rawText: "¼ cup butter plus more for the pan", amount: "¼", unit: "cup", ingredientName: "butter"),
+            ],
+            equipment: ["pan", "skewers"],
+            steps: []
+        )
+
+        XCTAssertEqual(schema.toDomain().ingredients.count, 2)
+    }
+
+    func testRecipeToDomainKeepsMeasuredIngredientTheModelAlsoListedAsEquipment() {
+        // "Butter the pan" can make the model list butter as equipment.
+        let schema = CapturedRecipeSchema(
+            title: "Cake",
+            ingredients: [CapturedIngredientSchema(rawText: "¼ cup butter", amount: "¼", unit: "cup", ingredientName: "butter")],
+            equipment: ["butter", "cake pan"],
+            steps: []
+        )
+
+        XCTAssertEqual(schema.toDomain().ingredients.map(\.ingredientName), ["butter"])
     }
 }

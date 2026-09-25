@@ -44,8 +44,13 @@ private func makeViewModel(
 
 @MainActor
 final class RecipeDetailViewTests: XCTestCase {
-    private func makeRecipe(ingredients: [IngredientLine] = [], steps: [String] = [], tags: [Tag] = []) -> Recipe {
-        Recipe(id: UUID(), title: "Waffles", ingredients: ingredients, steps: steps, source: .typed, tags: tags)
+    private func makeRecipe(
+        ingredients: [IngredientLine] = [],
+        equipment: [String] = [],
+        steps: [String] = [],
+        tags: [Tag] = []
+    ) -> Recipe {
+        Recipe(id: UUID(), title: "Waffles", ingredients: ingredients, equipment: equipment, steps: steps, source: .typed, tags: tags)
     }
 
     func testEmptyIngredientsAndStepsShowPlaceholderText() throws {
@@ -67,6 +72,21 @@ final class RecipeDetailViewTests: XCTestCase {
         XCTAssertNoThrow(try sut.inspect().find(text: "2 cups flour"))
         XCTAssertNoThrow(try sut.inspect().find(text: "Mix"))
         XCTAssertNoThrow(try sut.inspect().find(text: "Cook"))
+    }
+
+    func testEquipmentRendersInItsOwnSection() throws {
+        let viewModel = makeViewModel(recipe: makeRecipe(equipment: ["waffle iron"]))
+        let sut = RecipeDetailView(viewModel: viewModel)
+
+        XCTAssertNoThrow(try sut.inspect().find(text: "EQUIPMENT"))
+        XCTAssertNoThrow(try sut.inspect().find(text: "waffle iron"))
+    }
+
+    func testEquipmentSectionIsHiddenWhenEmpty() throws {
+        let viewModel = makeViewModel(recipe: makeRecipe())
+        let sut = RecipeDetailView(viewModel: viewModel)
+
+        XCTAssertThrowsError(try sut.inspect().find(text: "EQUIPMENT"))
     }
 
     func testAssignedTagsRenderAsChips() throws {

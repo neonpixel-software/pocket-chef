@@ -16,10 +16,10 @@ final class FoundationModelsRecipeCaptureService: RecipeCaptureService {
 
     func captureRecipe(from text: String) async throws -> Recipe {
         let session = LanguageModelSession(instructions: {
-            "Extract this recipe into a structured title, ingredient lines, and steps. " +
-                "Preserve the ingredient's exact original wording in rawText even when you " +
-                "also identify amount/unit/name. List only food ingredients; leave out " +
-                "equipment such as pans or skewers."
+            "Extract this recipe into a structured title, ingredient lines, equipment, and " +
+                "steps. Preserve the ingredient's exact original wording in rawText even when " +
+                "you also identify amount/unit/name. Put tools and cookware such as pans or " +
+                "skewers in equipment, not ingredients."
         })
         do {
             // Greedy sampling: with the default sampling the model sometimes writes garbled

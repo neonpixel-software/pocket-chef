@@ -103,6 +103,11 @@ enum IngredientDescriptors {
         }
     }
 
+    /// Whether two texts are equal ignoring case, accents and spacing.
+    static func isSameText(_ lhs: String, _ rhs: String) -> Bool {
+        folded(lhs) == folded(rhs)
+    }
+
     private static func folded(_ text: String) -> String {
         text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
             .split(whereSeparator: \.isWhitespace)
