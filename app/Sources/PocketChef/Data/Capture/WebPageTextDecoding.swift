@@ -50,6 +50,15 @@ enum WebPageTextDecoding {
         }
     }
 
+    /// Throws for a non-2xx HTTP status so an error page never reaches the model — a 404 was
+    /// otherwise captured as a recipe titled "ERROR 404" (issue #75). Non-HTTP responses pass.
+    static func validateStatus(of response: URLResponse) throws {
+        guard let httpResponse = response as? HTTPURLResponse else { return }
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw WebPageFetchError.httpStatus(httpResponse.statusCode)
+        }
+    }
+
     private static func encoding(forName name: String) -> String.Encoding? {
         let cfEncoding = CFStringConvertIANACharSetNameToEncoding(name as CFString)
         guard cfEncoding != kCFStringEncodingInvalidId else { return nil }

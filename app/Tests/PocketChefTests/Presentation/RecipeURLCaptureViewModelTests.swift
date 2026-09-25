@@ -60,6 +60,16 @@ final class RecipeURLCaptureViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "Couldn't load that page. Check the link and try again.")
     }
 
+    func testCaptureSetsPageLoadMessageOnHTTPStatusError() async {
+        let viewModel = RecipeURLCaptureViewModel(captureRecipeFromURLUseCase: FakeCaptureRecipeFromURLUseCase(result: .failure(WebPageFetchError.httpStatus(404))))
+        viewModel.urlText = "https://example.com/missing-recipe"
+
+        let result = await viewModel.capture()
+
+        XCTAssertNil(result)
+        XCTAssertEqual(viewModel.errorMessage, "Couldn't load that page. Check the link and try again.")
+    }
+
     func testCaptureSetsTooLargeMessageOnTooLargeError() async {
         let viewModel = RecipeURLCaptureViewModel(captureRecipeFromURLUseCase: FakeCaptureRecipeFromURLUseCase(result: .failure(WebPageFetchError.tooLarge)))
         viewModel.urlText = "https://example.com/recipe"
