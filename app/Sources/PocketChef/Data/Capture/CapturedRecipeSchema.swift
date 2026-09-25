@@ -27,9 +27,11 @@ struct CapturedIngredientSchema {
 
 extension CapturedRecipeSchema {
     /// Maps to a `Recipe`. With `source`, ingredients and equipment the model invented (not
-    /// in the source text) are dropped. An ingredient whose line or name is also one of the
-    /// equipment items is dropped too: the model sometimes lists a tool in both ("8x4-inch loaf
-    /// pan" named "loaf pan", issue #82).
+    /// in the source text) are dropped. An ingredient without a measurement unit whose line or
+    /// name is also one of the equipment items is dropped too: the model sometimes lists a tool
+    /// in both ("8x4-inch loaf pan" named "loaf pan", issue #82). It gives such lines an amount
+    /// ("1 loaf pan"), so the unit is what tells them apart from food: "¼ cup butter" is kept
+    /// even if the model also lists "butter" as equipment for "butter the pan".
     func toDomain(source: String? = nil) -> Recipe {
         let trimmedEquipment = equipment
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -37,18 +39,19 @@ extension CapturedRecipeSchema {
         let groundedEquipment = source.map { source in
             trimmedEquipment.filter { IngredientDescriptors.appears(in: source, rawText: $0, name: "") }
         } ?? trimmedEquipment
-        let grounded = ingredients.filter { ingredient in
-            if let source, !IngredientDescriptors.appears(in: source, rawText: ingredient.rawText, name: ingredient.ingredientName) {
-                return false
-            }
+        let grounded = source.map { source in
+            ingredients.filter { IngredientDescriptors.appears(in: source, rawText: $0.rawText, name: $0.ingredientName) }
+        } ?? ingredients
+        let mappedIngredients = grounded.map { $0.toDomain() }.filter { line in
+            guard line.unit == nil else { return true }
             return !groundedEquipment.contains { item in
-                IngredientDescriptors.isSameText(item, ingredient.rawText) || IngredientDescriptors.isSameText(item, ingredient.ingredientName)
+                IngredientDescriptors.isSameText(item, line.rawText) || IngredientDescriptors.isSameText(item, line.ingredientName ?? "")
             }
         }
         return Recipe(
             id: UUID(),
             title: title,
-            ingredients: grounded.map { $0.toDomain() },
+            ingredients: mappedIngredients,
             equipment: groundedEquipment,
             steps: steps
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
