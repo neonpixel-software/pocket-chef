@@ -82,7 +82,7 @@ final class RecipeFormViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.ingredients.first?.ingredientName, "flour")
     }
 
-    func testEditModeFormatsFractionalAmountWithoutTrailingZero() {
+    func testEditModeFormatsFractionalAmountAsAFraction() {
         let original = Recipe(
             id: UUID(),
             title: "Pancakes",
@@ -94,7 +94,7 @@ final class RecipeFormViewModelTests: XCTestCase {
 
         let viewModel = makeViewModel(mode: .edit(original))
 
-        XCTAssertEqual(viewModel.ingredients.first?.amount, "1.5")
+        XCTAssertEqual(viewModel.ingredients.first?.amount, "1½")
     }
 
     func testSaveInEditModePreservesRawOnlyIngredientLineUntouchedByStructuredFields() throws {
