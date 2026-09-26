@@ -58,6 +58,9 @@ struct RecipeListView: View {
                         }
                     }
                 }
+                // The empty and error states only take the height they need; without this the
+                // whole column (header included) gets centered in the window instead of pinned to the top.
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .background(PCColor.background)
             .safeAreaInset(edge: .top, spacing: 0) {
