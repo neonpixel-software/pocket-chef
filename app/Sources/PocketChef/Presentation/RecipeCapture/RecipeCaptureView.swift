@@ -1,12 +1,15 @@
 import SwiftUI
 
 struct RecipeCaptureView: View {
-    @Bindable private var viewModel: RecipeCaptureViewModel
+    /// Owned as @State: the list builds the view model inside a `.sheet` closure, which runs
+    /// again whenever the list re-renders. With @Bindable the sheet switched to that new view
+    /// model and lost the typed text and any capture in progress (#89).
+    @State private var viewModel: RecipeCaptureViewModel
     @Environment(\.dismiss) private var dismiss
     let onCaptured: (Recipe) -> Void
 
     init(viewModel: RecipeCaptureViewModel, onCaptured: @escaping (Recipe) -> Void) {
-        _viewModel = Bindable(viewModel)
+        _viewModel = State(initialValue: viewModel)
         self.onCaptured = onCaptured
     }
 
