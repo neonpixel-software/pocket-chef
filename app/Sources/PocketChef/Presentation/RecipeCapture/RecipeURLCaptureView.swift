@@ -4,12 +4,15 @@ struct RecipeURLCaptureView: View {
     /// Example placeholder text for the URL field, not a real endpoint.
     private static let urlFieldPlaceholder = "https://example.com/recipe"
 
-    @Bindable private var viewModel: RecipeURLCaptureViewModel
+    /// Owned as @State: the list builds the view model inside a `.sheet` closure, which runs
+    /// again whenever the list re-renders. With @Bindable the sheet switched to that new view
+    /// model and lost the pasted link and any fetch in progress (#89).
+    @State private var viewModel: RecipeURLCaptureViewModel
     @Environment(\.dismiss) private var dismiss
     let onCaptured: (Recipe) -> Void
 
     init(viewModel: RecipeURLCaptureViewModel, onCaptured: @escaping (Recipe) -> Void) {
-        _viewModel = Bindable(viewModel)
+        _viewModel = State(initialValue: viewModel)
         self.onCaptured = onCaptured
     }
 

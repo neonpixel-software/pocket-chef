@@ -1,7 +1,10 @@
 import SwiftUI
 
 struct RecipeDetailView: View {
-    @Bindable private var viewModel: RecipeDetailViewModel
+    /// Owned as @State: the list builds the view model inside its NavigationLink destination,
+    /// which runs again whenever the list re-renders. With @Bindable the detail switched to
+    /// that new view model and lost an open edit sheet or delete confirmation (#89).
+    @State private var viewModel: RecipeDetailViewModel
     @Environment(\.dismiss) private var dismiss
 
     /// Invoked whenever this recipe is edited or deleted, so the list that pushed this
@@ -10,7 +13,7 @@ struct RecipeDetailView: View {
     private let onRecipeChanged: () -> Void
 
     init(viewModel: RecipeDetailViewModel, onRecipeChanged: @escaping () -> Void = { /* no-op: not every caller needs to react to changes */ }) {
-        _viewModel = Bindable(viewModel)
+        _viewModel = State(initialValue: viewModel)
         self.onRecipeChanged = onRecipeChanged
     }
 
