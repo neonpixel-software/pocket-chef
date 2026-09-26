@@ -1,4 +1,5 @@
 @testable import PocketChef
+import SwiftUI
 import ViewInspector
 import XCTest
 
@@ -137,5 +138,14 @@ final class RecipeDetailViewTests: XCTestCase {
         XCTAssertFalse(viewModel.isPresentingEdit)
         try sut.inspect().find(button: "Edit").tap()
         XCTAssertTrue(viewModel.isPresentingEdit)
+    }
+
+    /// Regression guard for #89: the list builds the view model inside a NavigationLink destination, which runs
+    /// again on every list re-render. The view must own the first instance (@State); with
+    /// @Bindable it switched to the new one and lost its state.
+    func testDetailOwnsItsViewModelAsState() {
+        let sut = RecipeDetailView(viewModel: makeViewModel(recipe: makeRecipe()))
+        let storage = Mirror(reflecting: sut).children.first { $0.label == "_viewModel" }?.value
+        XCTAssertTrue(storage is State<RecipeDetailViewModel>)
     }
 }

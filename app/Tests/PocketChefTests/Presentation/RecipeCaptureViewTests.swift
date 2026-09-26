@@ -1,4 +1,5 @@
 @testable import PocketChef
+import SwiftUI
 import ViewInspector
 import XCTest
 
@@ -50,6 +51,15 @@ final class RecipeCaptureViewTests: XCTestCase {
         let sut = RecipeCaptureView(viewModel: viewModel, onCaptured: { _ in })
 
         XCTAssertNoThrow(try sut.inspect().find(text: viewModel.errorMessage ?? ""))
+    }
+
+    /// Regression guard for #89: the list builds the view model inside a `.sheet` closure, which runs
+    /// again on every list re-render. The view must own the first instance (@State); with
+    /// @Bindable it switched to the new one and lost its state.
+    func testCaptureViewOwnsItsViewModelAsState() {
+        let sut = RecipeCaptureView(viewModel: makeViewModel(), onCaptured: { _ in })
+        let storage = Mirror(reflecting: sut).children.first { $0.label == "_viewModel" }?.value
+        XCTAssertTrue(storage is State<RecipeCaptureViewModel>)
     }
 
     private func makeViewModel() -> RecipeCaptureViewModel {
