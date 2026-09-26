@@ -14,33 +14,34 @@ struct IngredientLineDraft: Identifiable, Equatable {
     var amount: String
     var unit: String
     var ingredientName: String
-    /// The original rawText this row was hydrated from, if any (e.g. an AI-captured
-    /// line with no structured fields). Preserved so that saving an edit without
-    /// touching this row doesn't silently drop an ingredient the structured fields
-    /// alone can't represent — see buildRecipe().
-    fileprivate let originalRawText: String
+    /// The line this row was hydrated from, if any. Preserved so that saving without
+    /// touching this row keeps its original wording ("1 ⅔ cups", "1 cup plus 2
+    /// tablespoons") and doesn't drop an ingredient the structured fields alone can't
+    /// represent — see buildRecipe().
+    fileprivate let original: IngredientLine?
 
     init(id: UUID = UUID(), amount: String = "", unit: String = "", ingredientName: String = "") {
         self.id = id
         self.amount = amount
         self.unit = unit
         self.ingredientName = ingredientName
-        originalRawText = ""
+        original = nil
     }
 
     init(ingredientLine: IngredientLine) {
         id = ingredientLine.id
-        amount = ingredientLine.amount.map(Self.formatAmount) ?? ""
+        amount = ingredientLine.amount.map(IngredientAmountFormatter.format) ?? ""
         unit = ingredientLine.unit ?? ""
         ingredientName = ingredientLine.ingredientName ?? ""
-        originalRawText = ingredientLine.rawText
+        original = ingredientLine
     }
 
-    /// Avoids "2.0" round-tripping into the field for a whole-number amount typed as "2".
-    private static func formatAmount(_ amount: Double) -> String {
-        amount.truncatingRemainder(dividingBy: 1) == 0
-            ? String(Int(amount))
-            : String(amount)
+    /// True while the fields still hold exactly what they were hydrated with.
+    fileprivate var isUnchangedFromOriginal: Bool {
+        guard let original else { return false }
+        return amount == (original.amount.map(IngredientAmountFormatter.format) ?? "")
+            && unit == (original.unit ?? "")
+            && ingredientName == (original.ingredientName ?? "")
     }
 }
 
@@ -243,6 +244,12 @@ final class RecipeFormViewModel {
     private func buildRecipe() -> Recipe {
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let builtIngredients = ingredients.compactMap { draft -> IngredientLine? in
+            // An untouched row saves exactly as loaded, so the original wording and the
+            // unrounded amount survive a save from the review or edit screen (issue #87).
+            if let original = draft.original, draft.isUnchangedFromOriginal, !original.rawText.isEmpty {
+                return original
+            }
+
             let amount = draft.amount.trimmingCharacters(in: .whitespacesAndNewlines)
             let unit = draft.unit.trimmingCharacters(in: .whitespacesAndNewlines)
             let name = draft.ingredientName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -252,15 +259,18 @@ final class RecipeFormViewModel {
                 // hydrated from an existing line with no structured data (e.g. a raw
                 // AI-captured ingredient), keep it as-is rather than silently dropping
                 // it just because the structured-only form can't represent it.
-                guard !draft.originalRawText.isEmpty else { return nil }
-                return IngredientLine(id: draft.id, rawText: draft.originalRawText)
+                guard let original = draft.original, !original.rawText.isEmpty else { return nil }
+                return IngredientLine(id: draft.id, rawText: original.rawText)
             }
 
             let rawText = [amount, unit, name].filter { !$0.isEmpty }.joined(separator: " ")
+            // Accepts what cooks type ("1 1/2", "1½", "2,5") as well as plain decimals. A
+            // unit typed into the Amount field ("100g") isn't split out, so that stays nil.
+            let parsedAmount = IngredientAmountParser.parse(amount).flatMap { $0.unit == nil ? $0.value : nil }
             return IngredientLine(
                 id: draft.id,
                 rawText: rawText,
-                amount: Double(amount),
+                amount: parsedAmount,
                 unit: unit.isEmpty ? nil : unit,
                 ingredientName: name.isEmpty ? nil : name
             )
