@@ -110,6 +110,28 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
         XCTAssertEqual(remainingIngredients.map(\.rawText), ["2 cups sugar"])
     }
 
+    /// SwiftData doesn't keep the order of to-many relationships (#86). 20 lines make an
+    /// in-order result by chance vanishingly unlikely; reading through a fresh context
+    /// makes the order come from the store, not the inserting context's in-memory array.
+    func testCreateAndUpdatePreserveIngredientOrderAcrossContexts() throws {
+        let context = try makeInMemoryContext()
+        let repository = SwiftDataRecipeRepository(modelContext: context)
+        let ingredients = (1...20).map { IngredientLine(id: UUID(), rawText: "ingredient \($0)") }
+        let recipe = Recipe(id: UUID(), title: "Long", ingredients: ingredients, steps: [], source: .typed, tags: [])
+
+        try repository.create(recipe)
+
+        let freshRepository = SwiftDataRecipeRepository(modelContext: ModelContext(context.container))
+        XCTAssertEqual(try freshRepository.fetchAll().first?.ingredients, ingredients)
+
+        var reordered = recipe
+        reordered.ingredients = ingredients.reversed()
+        try repository.update(reordered)
+
+        let secondFreshRepository = SwiftDataRecipeRepository(modelContext: ModelContext(context.container))
+        XCTAssertEqual(try secondFreshRepository.fetchAll().first?.ingredients, reordered.ingredients)
+    }
+
     func testCreateResolvesTagsToExistingTagModelRowsWithoutDuplicating() throws {
         let context = try makeInMemoryContext()
         let tagID = UUID()

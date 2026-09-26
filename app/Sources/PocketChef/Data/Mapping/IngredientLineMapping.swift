@@ -13,13 +13,14 @@ extension IngredientLineModel {
 }
 
 extension IngredientLine {
-    func toModel() -> IngredientLineModel {
+    func toModel(position: Int) -> IngredientLineModel {
         IngredientLineModel(
             id: id,
             rawText: rawText,
             amount: amount,
             unit: unit,
-            ingredientName: ingredientName
+            ingredientName: ingredientName,
+            position: position
         )
     }
 }

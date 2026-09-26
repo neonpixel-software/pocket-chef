@@ -5,7 +5,7 @@ extension RecipeModel {
         Recipe(
             id: id,
             title: title,
-            ingredients: (ingredients ?? []).map { $0.toDomain() },
+            ingredients: (ingredients ?? []).sorted { $0.position < $1.position }.map { $0.toDomain() },
             equipment: equipment,
             steps: steps,
             // isTypedSource/sourceURL are only ever set together via toModel(), so this pairing always holds.
@@ -38,7 +38,13 @@ extension Recipe {
             equipment: equipment,
             isTypedSource: isTyped,
             sourceURL: url,
-            ingredients: ingredients.map { $0.toModel() }
+            ingredients: ingredientModels()
         )
+    }
+
+    /// Ingredient rows numbered by their index, since SwiftData doesn't keep the
+    /// order of to-many relationships (RecipeModel.toDomain() sorts by position).
+    func ingredientModels() -> [IngredientLineModel] {
+        ingredients.enumerated().map { index, line in line.toModel(position: index) }
     }
 }
