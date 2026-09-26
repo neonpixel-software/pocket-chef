@@ -43,7 +43,7 @@ final class SwiftDataRecipeRepository: RecipeRepository {
         // the relationship array, so old children must be deleted explicitly here or
         // they leak as orphaned rows.
         (model.ingredients ?? []).forEach { modelContext.delete($0) }
-        model.ingredients = recipe.ingredients.map { $0.toModel() }
+        model.ingredients = recipe.ingredientModels()
 
         // Tags are a shared (non-owned) relationship: resolve to the existing,
         // already-persisted TagModel rows by id rather than remapping via
