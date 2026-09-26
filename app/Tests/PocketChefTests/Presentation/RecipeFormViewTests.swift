@@ -1,4 +1,5 @@
 @testable import PocketChef
+import SwiftUI
 import ViewInspector
 import XCTest
 
@@ -13,6 +14,10 @@ private struct NoOpUpdateRecipeUseCase: UpdateRecipeUseCase {
 
 private struct NoOpCreateRecipeUseCase: CreateRecipeUseCase {
     func execute(_: Recipe) throws {}
+}
+
+private struct NoOpDeleteRecipeUseCase: DeleteRecipeUseCase {
+    func execute(id _: UUID) throws {}
 }
 
 private struct FakeFetchTagsUseCase: FetchTagsUseCase {
@@ -221,5 +226,35 @@ final class RecipeFormViewTests: XCTestCase {
 
         XCTAssertEqual(viewModel.allTags.map(\.name), ["Spicy"])
         XCTAssertTrue(viewModel.selectedTagIDs.contains(viewModel.allTags[0].id))
+    }
+
+    func testEditFormFromDetailListsPresetTagChips() throws {
+        let presets = ["Breakfast", "Dessert", "Dinner", "Lunch", "Snack"].map { Tag(id: UUID(), name: $0, isPreset: true) }
+        let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [presets[0]])
+        let detailViewModel = RecipeDetailViewModel(
+            recipe: recipe,
+            createRecipeUseCase: NoOpCreateRecipeUseCase(),
+            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
+            deleteRecipeUseCase: NoOpDeleteRecipeUseCase(),
+            fetchTagsUseCase: FakeFetchTagsUseCase(result: .success(presets)),
+            findOrCreateTagUseCase: FakeFindOrCreateTagUseCase()
+        )
+        let viewModel = detailViewModel.makeEditFormViewModel()
+        viewModel.loadTags() // .task doesn't run without real hosting; call directly
+        let sut = RecipeFormView(viewModel: viewModel, onSave: { _ in })
+
+        for preset in presets {
+            XCTAssertNoThrow(try sut.inspect().find(button: preset.name), "missing chip: \(preset.name)")
+        }
+    }
+
+    /// Regression guard for #84: callers build the view model inside a `.sheet` closure that
+    /// runs again on every re-render of the presenting view. The form must own the first
+    /// instance (@State) — with @Bindable it switched to the new one, whose tags never loaded.
+    func testFormOwnsItsViewModelAsState() {
+        let sut = RecipeFormView(viewModel: makeViewModel(), onSave: { _ in })
+
+        let storage = Mirror(reflecting: sut).children.first { $0.label == "_viewModel" }?.value
+        XCTAssertTrue(storage is State<RecipeFormViewModel>)
     }
 }
