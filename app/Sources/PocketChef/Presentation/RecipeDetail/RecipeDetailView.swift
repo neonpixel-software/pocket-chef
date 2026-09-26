@@ -4,6 +4,9 @@ struct RecipeDetailView: View {
     /// Owned as @State: the list builds the view model inside its NavigationLink destination,
     /// which runs again whenever the list re-renders. With @Bindable the detail switched to
     /// that new view model and lost an open edit sheet or delete confirmation (#89).
+    /// The trade-off: the detail keeps its first view model even after the list reloads, so it
+    /// only stays current because no other screen can change a recipe while its detail is showing.
+    /// If that changes (search, sync), refresh `viewModel.recipe` from the repository here.
     @State private var viewModel: RecipeDetailViewModel
     @Environment(\.dismiss) private var dismiss
 
