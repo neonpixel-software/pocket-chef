@@ -25,6 +25,12 @@ final class IngredientAmountFormatterTests: XCTestCase {
 
     func testKeepsATinyAmountRatherThanRoundingItToZero() {
         XCTAssertEqual(IngredientAmountFormatter.format(0.001), "0.001")
+        XCTAssertEqual(IngredientAmountFormatter.format(1e-7), "1e-07")
+    }
+
+    func testShowsAmountsTheParserWouldRejectFaithfully() {
+        XCTAssertEqual(IngredientAmountFormatter.format(-0.5), "-0.5")
+        XCTAssertEqual(IngredientAmountFormatter.format(0), "0.0")
     }
 
     func testFormattedAmountsParseBackToTheSameValue() throws {

@@ -12,6 +12,11 @@ enum IngredientAmountFormatter {
     private static let tolerance = 1e-6
 
     static func format(_ amount: Double) -> String {
+        // The whole/fraction split below assumes a positive amount the parser would accept.
+        // The parser never stores anything else, but show one faithfully rather than as
+        // "-1½" (for -0.5) or "0" (for 1e-7).
+        guard amount.isFinite, amount >= tolerance else { return String(amount) }
+
         let whole = amount.rounded(.down)
         let fraction = amount - whole
         let wholeText = String(format: "%.0f", whole)

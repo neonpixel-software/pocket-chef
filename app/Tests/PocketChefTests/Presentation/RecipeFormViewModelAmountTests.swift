@@ -79,6 +79,18 @@ final class RecipeFormViewModelAmountTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(recipe.ingredients[0].amount), 1.0 / 3, accuracy: 1e-9)
     }
 
+    func testEditingOnlyTheNameKeepsAnAmountTheFieldShowsRounded() throws {
+        let line = IngredientLine(id: UUID(), rawText: "0.333 cup sugar", amount: 0.333, unit: "cup", ingredientName: "sugar")
+        let original = Recipe(id: UUID(), title: "Cake", ingredients: [line], steps: [], source: .typed, tags: [])
+        let viewModel = makeViewModel(mode: .edit(original))
+        XCTAssertEqual(viewModel.ingredients[0].amount, "0.33")
+
+        viewModel.ingredients[0].ingredientName = "brown sugar"
+        let recipe = try XCTUnwrap(viewModel.save())
+
+        XCTAssertEqual(recipe.ingredients[0].amount, 0.333)
+    }
+
     func testSaveParsesAmountsTypedAsVulgarOrCommaDecimals() throws {
         let viewModel = makeViewModel(mode: .create)
         viewModel.title = "Soup"

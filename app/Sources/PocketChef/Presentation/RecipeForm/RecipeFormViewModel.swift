@@ -39,9 +39,17 @@ struct IngredientLineDraft: Identifiable, Equatable {
     /// True while the fields still hold exactly what they were hydrated with.
     fileprivate var isUnchangedFromOriginal: Bool {
         guard let original else { return false }
-        return amount == (original.amount.map(IngredientAmountFormatter.format) ?? "")
+        return isAmountUnchangedFromOriginal
             && unit == (original.unit ?? "")
             && ingredientName == (original.ingredientName ?? "")
+    }
+
+    /// True while the Amount field still shows the loaded amount. The field shows it
+    /// rounded (0.333 as "0.33"), so buildRecipe() keeps the stored value rather than
+    /// re-parsing the display text when only the unit or name was edited.
+    fileprivate var isAmountUnchangedFromOriginal: Bool {
+        guard let original else { return false }
+        return amount == (original.amount.map(IngredientAmountFormatter.format) ?? "")
     }
 }
 
@@ -266,7 +274,9 @@ final class RecipeFormViewModel {
             let rawText = [amount, unit, name].filter { !$0.isEmpty }.joined(separator: " ")
             // Accepts what cooks type ("1 1/2", "1½", "2,5") as well as plain decimals. A
             // unit typed into the Amount field ("100g") isn't split out, so that stays nil.
-            let parsedAmount = IngredientAmountParser.parse(amount).flatMap { $0.unit == nil ? $0.value : nil }
+            let parsedAmount = draft.isAmountUnchangedFromOriginal
+                ? draft.original?.amount
+                : IngredientAmountParser.parse(amount).flatMap { $0.unit == nil ? $0.value : nil }
             return IngredientLine(
                 id: draft.id,
                 rawText: rawText,
