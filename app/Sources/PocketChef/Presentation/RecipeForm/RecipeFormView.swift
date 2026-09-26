@@ -1,12 +1,15 @@
 import SwiftUI
 
 struct RecipeFormView: View {
-    @Bindable private var viewModel: RecipeFormViewModel
+    /// Owned as @State: callers build the view model inside a `.sheet` closure, which runs
+    /// again whenever the presenting view re-renders. Holding it with @Bindable swapped in
+    /// that new view model, whose tags never load because `.task` doesn't re-run (#84).
+    @State private var viewModel: RecipeFormViewModel
     @Environment(\.dismiss) private var dismiss
     let onSave: (Recipe) -> Void
 
     init(viewModel: RecipeFormViewModel, onSave: @escaping (Recipe) -> Void) {
-        _viewModel = Bindable(viewModel)
+        _viewModel = State(initialValue: viewModel)
         self.onSave = onSave
     }
 
