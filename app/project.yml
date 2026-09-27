@@ -31,6 +31,7 @@ targets:
       PRODUCT_MODULE_NAME: PocketChef
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
       INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+      INFOPLIST_KEY_UILaunchScreen_Generation: YES
       INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
       TARGETED_DEVICE_FAMILY: "1,2"
     scheme:
