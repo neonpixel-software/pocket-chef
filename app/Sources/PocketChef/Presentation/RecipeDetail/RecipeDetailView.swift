@@ -135,6 +135,15 @@ struct RecipeDetailView: View {
             }
             ToolbarItem(placement: .destructiveAction) {
                 Button("Delete", role: .destructive) { viewModel.isPresentingDeleteConfirmation = true }
+                    // On the button so the popover anchors to it, not mid-screen (#106).
+                    .confirmationDialog(
+                        "Delete this recipe?",
+                        isPresented: $viewModel.isPresentingDeleteConfirmation,
+                        titleVisibility: .visible
+                    ) {
+                        Button("Delete", role: .destructive) { viewModel.delete() }
+                        Button("Cancel", role: .cancel) { /* no-op: the dialog dismisses on its own */ }
+                    }
             }
         }
         .sheet(isPresented: $viewModel.isPresentingEdit) {
@@ -142,14 +151,6 @@ struct RecipeDetailView: View {
                 viewModel.recipe = saved
                 onRecipeChanged()
             }
-        }
-        .confirmationDialog(
-            "Delete this recipe?",
-            isPresented: $viewModel.isPresentingDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) { viewModel.delete() }
-            Button("Cancel", role: .cancel) { /* no-op: the dialog dismisses on its own */ }
         }
         .onChange(of: viewModel.isDeleted) { _, isDeleted in
             if isDeleted {
