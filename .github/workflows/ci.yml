@@ -65,6 +65,17 @@ jobs:
           curl -fsSL --proto '=https' --tlsv1.2 https://github.com/realm/SwiftLint/releases/download/0.65.1/portable_swiftlint.zip -o swiftlint.zip
           unzip -o swiftlint.zip
           ./swiftlint Sources Tests --strict
+      - name: Build Release (iOS & macOS)
+        # The test steps only build Debug, which hides code that exists only under
+        # #if DEBUG (issue #95). Build Release too so archives can't break unnoticed.
+        # Runs before the tests so a Release-only break fails in minutes, not after them.
+        run: |
+          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
+            -configuration Release -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO build
+          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
+            -configuration Release -destination 'generic/platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO build
       - name: Build & test iOS
         run: |
           xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
@@ -77,16 +88,6 @@ jobs:
             -destination 'platform=macOS' \
             -enableCodeCoverage YES -resultBundlePath macos.xcresult \
             clean test
-      - name: Build Release (iOS & macOS)
-        # The test steps only build Debug, which hides code that exists only under
-        # #if DEBUG (issue #95). Build Release too so archives can't break unnoticed.
-        run: |
-          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
-            -configuration Release -destination 'generic/platform=iOS Simulator' \
-            CODE_SIGNING_ALLOWED=NO build
-          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
-            -configuration Release -destination 'generic/platform=macOS' \
-            CODE_SIGNING_ALLOWED=NO build
       - name: Convert coverage to SonarCloud's generic format
         run: |
           Scripts/xccov-to-sonarqube-generic.sh ios.xcresult > coverage-ios.xml
