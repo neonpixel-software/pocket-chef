@@ -74,25 +74,28 @@ struct RecipeListView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                }
-            }
-            .confirmationDialog("Add Recipe", isPresented: $isPresentingAddChooser, titleVisibility: .visible) {
-                Button("Type It") {
-                    if viewModel.isCaptureAvailable {
-                        isPresentingCapture = true
-                    } else {
-                        isPresentingCaptureUnavailableAlert = true
+                    // Attached to the button, not the whole view: the dialog presents as a popover
+                    // anchored to the view it's attached to (iPad, and iPhone on iOS 26), so on the
+                    // NavigationStack content it floated in the middle of the list (#106).
+                    .confirmationDialog("Add Recipe", isPresented: $isPresentingAddChooser, titleVisibility: .visible) {
+                        Button("Type It") {
+                            if viewModel.isCaptureAvailable {
+                                isPresentingCapture = true
+                            } else {
+                                isPresentingCaptureUnavailableAlert = true
+                            }
+                        }
+                        Button("Paste a Link") {
+                            if viewModel.isCaptureAvailable {
+                                isPresentingURLCapture = true
+                            } else {
+                                isPresentingCaptureUnavailableAlert = true
+                            }
+                        }
+                        Button("Enter Manually") { isPresentingNewRecipe = true }
+                        Button("Cancel", role: .cancel) { /* no-op: the dialog dismisses on its own */ }
                     }
                 }
-                Button("Paste a Link") {
-                    if viewModel.isCaptureAvailable {
-                        isPresentingURLCapture = true
-                    } else {
-                        isPresentingCaptureUnavailableAlert = true
-                    }
-                }
-                Button("Enter Manually") { isPresentingNewRecipe = true }
-                Button("Cancel", role: .cancel) { /* no-op: the dialog dismisses on its own */ }
             }
             .alert("AI Capture Unavailable", isPresented: $isPresentingCaptureUnavailableAlert) {
                 Button("OK") { isPresentingNewRecipe = true }
