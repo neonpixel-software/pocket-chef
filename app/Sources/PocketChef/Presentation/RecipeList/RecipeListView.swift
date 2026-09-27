@@ -200,6 +200,8 @@ private struct RecipeRow: View {
     }
 }
 
+// The preview doubles live in Data/DevSupport behind #if DEBUG, so the preview must too (#95).
+#if DEBUG
 #Preview {
     PCFontRegistrar.registerCustomFonts()
     return RecipeListView(viewModel: RecipeListViewModel(dependencies: .init(
@@ -217,3 +219,4 @@ private struct RecipeRow: View {
         )
     )))
 }
+#endif

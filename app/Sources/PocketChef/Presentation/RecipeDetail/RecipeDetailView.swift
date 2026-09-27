@@ -180,6 +180,8 @@ struct RecipeDetailView: View {
     }
 }
 
+// The preview doubles live in Data/DevSupport behind #if DEBUG, so the preview must too (#95).
+#if DEBUG
 #Preview {
     PCFontRegistrar.registerCustomFonts()
     return NavigationStack {
@@ -193,3 +195,4 @@ struct RecipeDetailView: View {
         ))
     }
 }
+#endif

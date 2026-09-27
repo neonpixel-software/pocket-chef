@@ -277,6 +277,8 @@ private struct RowControls: View {
     }
 }
 
+// The preview doubles live in Data/DevSupport behind #if DEBUG, so the preview must too (#95).
+#if DEBUG
 #Preview {
     PCFontRegistrar.registerCustomFonts()
     return RecipeFormView(
@@ -290,3 +292,4 @@ private struct RowControls: View {
         onSave: { _ in }
     )
 }
+#endif

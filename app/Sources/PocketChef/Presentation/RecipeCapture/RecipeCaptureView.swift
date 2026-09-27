@@ -65,6 +65,8 @@ struct RecipeCaptureView: View {
     }
 }
 
+// The preview doubles live in Data/DevSupport behind #if DEBUG, so the preview must too (#95).
+#if DEBUG
 #Preview {
     PCFontRegistrar.registerCustomFonts()
     return RecipeCaptureView(
@@ -74,3 +76,4 @@ struct RecipeCaptureView: View {
         onCaptured: { _ in }
     )
 }
+#endif
