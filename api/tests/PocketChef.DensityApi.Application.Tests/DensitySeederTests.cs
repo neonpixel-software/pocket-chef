@@ -17,7 +17,7 @@ public class DensitySeederTests
         var seeder = new DensitySeeder(repository);
         var before = DateTimeOffset.UtcNow;
 
-        var result = await seeder.SeedAsync([Row("flour", 125), Row("sugar", 200)], CancellationToken.None);
+        var result = await seeder.SeedAsync([Row("flour", 125), Row("sugar", 200)], dryRun: false, CancellationToken.None);
 
         Assert.Equal(["flour", "sugar"], result.Inserted.Select(entry => entry.IngredientName));
         Assert.Empty(result.Skipped);
@@ -36,7 +36,7 @@ public class DensitySeederTests
         var repository = new FakeDensityEntryRepository(curated);
         var seeder = new DensitySeeder(repository);
 
-        var result = await seeder.SeedAsync([Row("flour", 125)], CancellationToken.None);
+        var result = await seeder.SeedAsync([Row("flour", 125)], dryRun: false, CancellationToken.None);
 
         Assert.Empty(result.Inserted);
         var skipped = Assert.Single(result.Skipped);
@@ -51,9 +51,9 @@ public class DensitySeederTests
         var repository = new FakeDensityEntryRepository();
         var seeder = new DensitySeeder(repository);
         DensitySeedRow[] rows = [Row("flour", 125), Row("sugar", 200)];
-        await seeder.SeedAsync(rows, CancellationToken.None);
+        await seeder.SeedAsync(rows, dryRun: false, CancellationToken.None);
 
-        var second = await seeder.SeedAsync(rows, CancellationToken.None);
+        var second = await seeder.SeedAsync(rows, dryRun: false, CancellationToken.None);
 
         Assert.Empty(second.Inserted);
         Assert.Equal(2, second.Skipped.Count);
@@ -68,9 +68,9 @@ public class DensitySeederTests
         var existing = new DensityEntry(Guid.NewGuid(), "crème fraîche", 1.0, SomeLastModifiedUtc);
         var repository = new FakeDensityEntryRepository(existing);
         var seeder = new DensitySeeder(repository);
-        var decomposedAndPadded = " crème fraîche ";
+        var decomposedAndPadded = " cre\u0300me frai\u0302che ";
 
-        var result = await seeder.SeedAsync([Row(decomposedAndPadded, 240)], CancellationToken.None);
+        var result = await seeder.SeedAsync([Row(decomposedAndPadded, 240)], dryRun: false, CancellationToken.None);
 
         Assert.Empty(result.Inserted);
         Assert.Same(existing, Assert.Single(result.Skipped).Existing);
@@ -82,9 +82,24 @@ public class DensitySeederTests
         var repository = new FakeDensityEntryRepository();
         var seeder = new DensitySeeder(repository);
 
-        await seeder.SeedAsync([Row(" crème fraîche ", 240)], CancellationToken.None);
+        await seeder.SeedAsync([Row(" cre\u0300me frai\u0302che ", 240)], dryRun: false, CancellationToken.None);
 
         var stored = Assert.Single(await repository.GetAllAsync(CancellationToken.None));
         Assert.Equal("crème fraîche", stored.IngredientName);
+    }
+
+    [Fact]
+    public async Task SeedAsync_DryRunReportsWhatItWouldInsertWithoutWriting()
+    {
+        var existing = new DensityEntry(Guid.NewGuid(), "flour", 0.6, SomeLastModifiedUtc);
+        var repository = new FakeDensityEntryRepository(existing);
+        var seeder = new DensitySeeder(repository);
+
+        var result = await seeder.SeedAsync([Row("flour", 125), Row("sugar", 200)], dryRun: true, CancellationToken.None);
+
+        Assert.Equal("sugar", Assert.Single(result.Inserted).IngredientName);
+        Assert.Same(existing, Assert.Single(result.Skipped).Existing);
+        Assert.Null(repository.LastUpsertedEntry);
+        Assert.Same(existing, Assert.Single(await repository.GetAllAsync(CancellationToken.None)));
     }
 }

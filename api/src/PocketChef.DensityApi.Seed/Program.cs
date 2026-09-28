@@ -8,12 +8,36 @@ using PocketChef.DensityApi.Infrastructure;
 // One-off import of UsdaSeedData into the density table (PLAN.md Phase 9.1). Safe to re-run:
 // ingredients already in the table are reported and left alone (see DensitySeeder).
 //
-//   dotnet run --project src/PocketChef.DensityApi.Seed -- --connection "<connection string>"
+//   dotnet run --project src/PocketChef.DensityApi.Seed -- --connection "<connection string>" [--dry-run]
 //
 // Without --connection it reads ConnectionStrings__DensityApi from the environment, the same
-// variable the API host uses in production (docs/deploy.md §2).
+// variable the API host uses in production (docs/deploy.md §2). --dry-run reports what would be
+// inserted without writing anything.
 
-var connectionString = ReadConnectionString(args);
+string? connectionString = null;
+var dryRun = false;
+for (var i = 0; i < args.Length; i++)
+{
+    switch (args[i])
+    {
+        case "--connection" when i + 1 < args.Length:
+            connectionString = args[++i];
+            break;
+        case "--connection":
+            await Console.Error.WriteLineAsync("--connection needs a connection string after it.");
+            return 2;
+        case "--dry-run":
+            dryRun = true;
+            break;
+        default:
+            // Fail loudly rather than ignore it: an argument the tool doesn't expect usually
+            // means the command line didn't reach it as intended.
+            await Console.Error.WriteLineAsync($"Unexpected argument '{args[i]}'. Usage: --connection \"<connection string>\" [--dry-run]");
+            return 2;
+    }
+}
+
+connectionString ??= Environment.GetEnvironmentVariable("ConnectionStrings__DensityApi");
 if (connectionString is null)
 {
     await Console.Error.WriteLineAsync("Pass --connection \"<connection string>\" or set ConnectionStrings__DensityApi.");
@@ -36,11 +60,12 @@ if (pending.Count > 0)
 }
 
 var seeder = new DensitySeeder(scope.ServiceProvider.GetRequiredService<IDensityEntryRepository>());
-var result = await seeder.SeedAsync(UsdaSeedData.Rows, CancellationToken.None);
+var result = await seeder.SeedAsync(UsdaSeedData.Rows, dryRun, CancellationToken.None);
+var inserted = dryRun ? "would insert" : "inserted";
 
 foreach (var entry in result.Inserted)
 {
-    Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"inserted  {entry.IngredientName}: {entry.GramsPerMilliliter:0.####} g/ml"));
+    Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"{inserted}  {entry.IngredientName}: {entry.GramsPerMilliliter:0.####} g/ml"));
 }
 
 foreach (var (row, existing) in result.Skipped)
@@ -53,16 +78,10 @@ foreach (var (row, existing) in result.Skipped)
     Console.WriteLine($"exists    {existing.IngredientName} ({note})");
 }
 
-Console.WriteLine($"{result.Inserted.Count} inserted, {result.Skipped.Count} already present.");
-return 0;
-
-static string? ReadConnectionString(string[] args)
+Console.WriteLine($"{result.Inserted.Count} {inserted}, {result.Skipped.Count} already present.");
+if (dryRun)
 {
-    var index = Array.IndexOf(args, "--connection");
-    if (index >= 0 && index + 1 < args.Length)
-    {
-        return args[index + 1];
-    }
-
-    return Environment.GetEnvironmentVariable("ConnectionStrings__DensityApi");
+    Console.WriteLine("Dry run: nothing was written.");
 }
+
+return 0;

@@ -201,9 +201,12 @@ dotnet ef database update \
 
 **Seed the table once**, after the first migration (PLAN.md Phase 9.1). The seed
 tool only inserts ingredients that aren't in the table yet, so re-running it after
-hand curation changes nothing:
+hand curation changes nothing. Run it with `--dry-run` first to see what it would
+insert without writing anything:
 
 ```sh
+dotnet run --project src/PocketChef.DensityApi.Seed -- \
+  --connection "<production connection string>" --dry-run
 dotnet run --project src/PocketChef.DensityApi.Seed -- \
   --connection "<production connection string>"
 ```

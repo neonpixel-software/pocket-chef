@@ -37,11 +37,11 @@ public class DensityEntriesSeedTests : IAsyncLifetime
         await _container.DisposeAsync();
     }
 
-    private async Task<DensitySeedResult> SeedAsync()
+    private async Task<DensitySeedResult> SeedAsync(bool dryRun = false)
     {
         await using var context = new DensityApiDbContext(_options);
         var seeder = new DensitySeeder(new DensityEntryRepository(context));
-        return await seeder.SeedAsync(UsdaSeedData.Rows, CancellationToken.None);
+        return await seeder.SeedAsync(UsdaSeedData.Rows, dryRun, CancellationToken.None);
     }
 
     [Fact]
@@ -71,5 +71,15 @@ public class DensityEntriesSeedTests : IAsyncLifetime
         Assert.Equal(UsdaSeedData.Rows.Count, first.Inserted.Count);
         Assert.Empty(second.Inserted);
         Assert.Equal(UsdaSeedData.Rows.Count, second.Skipped.Count);
+    }
+
+    [Fact]
+    public async Task Seed_DryRun_WritesNothing()
+    {
+        var dryRun = await SeedAsync(dryRun: true);
+
+        Assert.Equal(UsdaSeedData.Rows.Count, dryRun.Inserted.Count);
+        await using var context = new DensityApiDbContext(_options);
+        Assert.Equal(0, await context.DensityEntries.CountAsync());
     }
 }

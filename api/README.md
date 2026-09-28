@@ -22,7 +22,7 @@ dotnet run --project src/PocketChef.DensityApi.Api
 `GET /health` confirms the host is up.
 
 To load the seed densities (safe to re-run; ingredients already in the table are
-left alone):
+left alone; add `--dry-run` to see what it would insert without writing):
 
 ```sh
 dotnet run --project src/PocketChef.DensityApi.Seed -- \

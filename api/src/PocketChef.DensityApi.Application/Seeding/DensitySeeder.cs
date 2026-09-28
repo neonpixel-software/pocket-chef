@@ -4,6 +4,7 @@ namespace PocketChef.DensityApi.Application.Seeding;
 
 public sealed record SkippedDensitySeedRow(DensitySeedRow Row, DensityEntry Existing);
 
+/// With a dry run, <see cref="Inserted"/> holds the entries that would have been inserted.
 public sealed record DensitySeedResult(IReadOnlyList<DensityEntry> Inserted, IReadOnlyList<SkippedDensitySeedRow> Skipped);
 
 /// Loads seed rows into the density table, inserting only ingredients it doesn't have yet.
@@ -12,6 +13,9 @@ public sealed record DensitySeedResult(IReadOnlyList<DensityEntry> Inserted, IRe
 /// seed: after the first run, values are curated by hand through the write endpoint, and a
 /// re-run must not overwrite that. Leaving existing rows alone also keeps their
 /// LastModifiedUtc, so a re-run doesn't make every client re-download the whole table.
+///
+/// A dry run does the same lookups but writes nothing, so the rows can be checked against a
+/// live table before the first real run.
 public sealed class DensitySeeder
 {
     private readonly IDensityEntryRepository _repository;
@@ -21,7 +25,7 @@ public sealed class DensitySeeder
         _repository = repository;
     }
 
-    public async Task<DensitySeedResult> SeedAsync(IEnumerable<DensitySeedRow> rows, CancellationToken cancellationToken)
+    public async Task<DensitySeedResult> SeedAsync(IEnumerable<DensitySeedRow> rows, bool dryRun, CancellationToken cancellationToken)
     {
         var inserted = new List<DensityEntry>();
         var skipped = new List<SkippedDensitySeedRow>();
@@ -39,7 +43,7 @@ public sealed class DensitySeeder
             }
 
             var entry = new DensityEntry(Guid.NewGuid(), name, row.GramsPerMilliliter, DateTimeOffset.UtcNow);
-            inserted.Add(await _repository.UpsertAsync(entry, cancellationToken));
+            inserted.Add(dryRun ? entry : await _repository.UpsertAsync(entry, cancellationToken));
         }
 
         return new DensitySeedResult(inserted, skipped);
