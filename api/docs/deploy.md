@@ -199,11 +199,23 @@ dotnet ef database update \
   --connection "<production connection string>"
 ```
 
+**Seed the table once**, after the first migration (PLAN.md Phase 9.1). The seed
+tool only inserts ingredients that aren't in the table yet, so re-running it after
+hand curation changes nothing. Run it with `--dry-run` first to see what it would
+insert without writing anything:
+
+```sh
+dotnet run --project src/PocketChef.DensityApi.Seed -- \
+  --connection "<production connection string>" --dry-run
+dotnet run --project src/PocketChef.DensityApi.Seed -- \
+  --connection "<production connection string>"
+```
+
 **Names in the table must stay canonical** (NFC + trimmed — enforced by the
 `DensityEntry` constructor, issue #55). The upsert lookup is byte-exact
 except for case, so a non-canonical row (a hand-edit, or a row written by
 pre-fix code) can never be found by a later upsert — re-POSTing the
 ingredient would insert a duplicate, not merge. If you ever spot such a
 row, normalize it in place (or delete it); no backfill exists because the
-API ships unseeded, and the only paths that bypass the constructor are
-manual SQL and that pre-fix window.
+seed tool builds its rows through the constructor too, and the only paths
+that bypass it are manual SQL and that pre-fix window.

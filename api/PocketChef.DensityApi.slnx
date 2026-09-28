@@ -4,6 +4,7 @@
     <Project Path="src/PocketChef.DensityApi.Application/PocketChef.DensityApi.Application.csproj" />
     <Project Path="src/PocketChef.DensityApi.Domain/PocketChef.DensityApi.Domain.csproj" />
     <Project Path="src/PocketChef.DensityApi.Infrastructure/PocketChef.DensityApi.Infrastructure.csproj" />
+    <Project Path="src/PocketChef.DensityApi.Seed/PocketChef.DensityApi.Seed.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PocketChef.DensityApi.Api.Tests/PocketChef.DensityApi.Api.Tests.csproj" />
