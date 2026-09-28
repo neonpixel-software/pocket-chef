@@ -16,7 +16,7 @@ using PocketChef.DensityApi.Infrastructure;
 var connectionString = ReadConnectionString(args);
 if (connectionString is null)
 {
-    Console.Error.WriteLine("Pass --connection \"<connection string>\" or set ConnectionStrings__DensityApi.");
+    await Console.Error.WriteLineAsync("Pass --connection \"<connection string>\" or set ConnectionStrings__DensityApi.");
     return 2;
 }
 
@@ -31,7 +31,7 @@ var context = scope.ServiceProvider.GetRequiredService<DensityApiDbContext>();
 var pending = (await context.Database.GetPendingMigrationsAsync()).ToList();
 if (pending.Count > 0)
 {
-    Console.Error.WriteLine($"The database has {pending.Count} pending migration(s) ({string.Join(", ", pending)}). Run `dotnet ef database update` first.");
+    await Console.Error.WriteLineAsync($"The database has {pending.Count} pending migration(s) ({string.Join(", ", pending)}). Run `dotnet ef database update` first.");
     return 1;
 }
 
@@ -45,7 +45,9 @@ foreach (var entry in result.Inserted)
 
 foreach (var (row, existing) in result.Skipped)
 {
-    var note = existing.GramsPerMilliliter.Equals(row.GramsPerMilliliter)
+    // Compared at the precision the note prints, not exactly: the stored value has been
+    // through a Postgres double round trip.
+    var note = Math.Abs(existing.GramsPerMilliliter - row.GramsPerMilliliter) < 0.00005
         ? "same value"
         : string.Create(CultureInfo.InvariantCulture, $"kept {existing.GramsPerMilliliter:0.####} g/ml, seed has {row.GramsPerMilliliter:0.####}");
     Console.WriteLine($"exists    {existing.IngredientName} ({note})");
