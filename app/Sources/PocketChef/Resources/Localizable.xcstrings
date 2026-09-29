@@ -1,1434 +1,1465 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "Couldn't Load Recipes": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudieron cargar las recetas"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@" : {
+
+    },
+    "+ New Tag" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ Neuer Tag"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible de charger les recettes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ Nueva etiqueta"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rezepte konnten nicht geladen werden"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ Nouvelle étiquette"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recepten konden niet worden geladen"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+ Nieuwe tag"
           }
         }
       }
     },
-    "No Recipes Yet": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aún no hay recetas"
+    "Add Equipment" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utensil hinzufügen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune recette pour l'instant"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir utensilio"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Noch keine Rezepte"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un ustensile"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nog geen recepten"
-          }
-        }
-      }
-    },
-    "No Recipes With This Tag": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay recetas con esta etiqueta"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune recette avec cette étiquette"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Rezepte mit diesem Tag"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geen recepten met deze tag"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benodigdheid toevoegen"
           }
         }
       }
     },
-    "Recipes": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recetas"
+    "Add Ingredient" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zutat hinzufügen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recettes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir ingrediente"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rezepte"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un ingrédient"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recepten"
-          }
-        }
-      }
-    },
-    "Add Recipe": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Añadir receta"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajouter une recette"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rezept hinzufügen"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recept toevoegen"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingrediënt toevoegen"
           }
         }
       }
     },
-    "Type It": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Escribirlo"
+    "Add Recipe" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rezept hinzufügen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le taper"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir receta"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eingeben"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une recette"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Typen"
-          }
-        }
-      }
-    },
-    "Paste a Link": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pegar un enlace"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coller un lien"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Link einfügen"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Link plakken"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recept toevoegen"
           }
         }
       }
     },
-    "Enter Manually": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Introducir manualmente"
+    "Add Step" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritt hinzufügen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Saisir manuellement"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir paso"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Manuell eingeben"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une étape"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Handmatig invoeren"
-          }
-        }
-      }
-    },
-    "Cancel": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancelar"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Annuler"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abbrechen"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Annuleren"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stap toevoegen"
           }
         }
       }
     },
-    "AI Capture Unavailable": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Captura por IA no disponible"
+    "AI capture isn't available on this device. You can still enter the recipe by hand." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die KI-Erfassung ist auf diesem Gerät nicht verfügbar. Du kannst das Rezept weiterhin manuell eingeben."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Capture par IA indisponible"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La captura por IA no está disponible en este dispositivo. Aún puedes introducir la receta manualmente."
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "KI-Erfassung nicht verfügbar"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La capture par IA n'est pas disponible sur cet appareil. Vous pouvez toujours saisir la recette manuellement."
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AI-vastlegging niet beschikbaar"
-          }
-        }
-      }
-    },
-    "OK": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI-vastlegging is niet beschikbaar op dit apparaat. Je kunt het recept nog steeds handmatig invoeren."
           }
         }
       }
     },
-    "AI capture isn't available on this device. You can still enter the recipe by hand.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La captura por IA no está disponible en este dispositivo. Aún puedes introducir la receta manualmente."
+    "AI Capture Unavailable" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KI-Erfassung nicht verfügbar"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La capture par IA n'est pas disponible sur cet appareil. Vous pouvez toujours saisir la recette manuellement."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Captura por IA no disponible"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die KI-Erfassung ist auf diesem Gerät nicht verfügbar. Du kannst das Rezept weiterhin manuell eingeben."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture par IA indisponible"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AI-vastlegging is niet beschikbaar op dit apparaat. Je kunt het recept nog steeds handmatig invoeren."
-          }
-        }
-      }
-    },
-    "All": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Todas"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toutes"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alle"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alle"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI-vastlegging niet beschikbaar"
           }
         }
       }
     },
-    "Delete": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eliminar"
+    "All" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Supprimer"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Löschen"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toutes"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verwijderen"
-          }
-        }
-      }
-    },
-    "Ingredients": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingredientes"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingrédients"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zutaten"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingrediënten"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle"
           }
         }
       }
     },
-    "Add Ingredient": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Añadir ingrediente"
+    "Amount" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menge"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajouter un ingrédient"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cantidad"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zutat hinzufügen"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quantité"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingrediënt toevoegen"
-          }
-        }
-      }
-    },
-    "Steps": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pasos"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Étapes"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Schritte"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stappen"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoeveelheid"
           }
         }
       }
     },
-    "Add Step": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Añadir paso"
+    "Breakfast" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frühstück"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajouter une étape"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desayuno"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Schritt hinzufügen"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Petit-déjeuner"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stap toevoegen"
-          }
-        }
-      }
-    },
-    "Equipment": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Utensilios"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ustensiles"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Utensilien"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Benodigdheden"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ontbijt"
           }
         }
       }
     },
-    "Add Equipment": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Añadir utensilio"
+    "Cancel" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajouter un ustensile"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Utensil hinzufügen"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Benodigdheid toevoegen"
-          }
-        }
-      }
-    },
-    "Tool or cookware": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Utensilio o recipiente"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ustensile ou récipient"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Utensil oder Kochgeschirr"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keukengerei of pan"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuleren"
           }
         }
       }
     },
-    "Tags": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Etiquetas"
+    "Capture" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfassen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Étiquettes"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capturar"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tags"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capturer"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tags"
-          }
-        }
-      }
-    },
-    "Tag name": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nombre de la etiqueta"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nom de l'étiquette"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tag-Name"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tagnaam"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vastleggen"
           }
         }
       }
     },
-    "+ New Tag": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "+ Nueva etiqueta"
+    "Couldn't extract a recipe from that text. Check it over and try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus diesem Text konnte kein Rezept extrahiert werden. Überprüfe ihn und versuche es erneut."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "+ Nouvelle étiquette"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo extraer una receta de ese texto. Revísalo e inténtalo de nuevo."
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "+ Neuer Tag"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d'extraire une recette de ce texte. Vérifiez-le et réessayez."
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "+ Nieuwe tag"
-          }
-        }
-      }
-    },
-    "Recipe": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Receta"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recette"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rezept"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recept"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er kon geen recept uit deze tekst worden gehaald. Controleer het en probeer het opnieuw."
           }
         }
       }
     },
-    "Save": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardar"
+    "Couldn't find a recipe on that page. Check it over and try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf dieser Seite wurde kein Rezept gefunden. Überprüfe sie und versuche es erneut."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enregistrer"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontró ninguna receta en esa página. Revísala e inténtalo de nuevo."
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Speichern"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune recette trouvée sur cette page. Vérifiez-la et réessayez."
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opslaan"
-          }
-        }
-      }
-    },
-    "Recipe title": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Título de la receta"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Titre de la recette"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rezepttitel"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recepttitel"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is geen recept gevonden op die pagina. Controleer het en probeer het opnieuw."
           }
         }
       }
     },
-    "Amount": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cantidad"
+    "Couldn't Load Recipes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rezepte konnten nicht geladen werden"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quantité"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron cargar las recetas"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Menge"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger les recettes"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hoeveelheid"
-          }
-        }
-      }
-    },
-    "Unit": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unidad"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unité"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Einheit"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eenheid"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recepten konden niet worden geladen"
           }
         }
       }
     },
-    "Ingredient name": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nombre del ingrediente"
+    "Couldn't load that page. Check the link and try again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite konnte nicht geladen werden. Überprüfe den Link und versuche es erneut."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nom de l'ingrédient"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo cargar esa página. Comprueba el enlace e inténtalo de nuevo."
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zutatenname"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger cette page. Vérifiez le lien et réessayez."
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ingrediëntnaam"
-          }
-        }
-      }
-    },
-    "Step description": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Descripción del paso"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Description de l'étape"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Schrittbeschreibung"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stapbeschrijving"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die pagina kon niet worden geladen. Controleer de link en probeer het opnieuw."
           }
         }
       }
     },
-    "Move up": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Subir"
+    "Delete" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Monter"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nach oben"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Omhoog verplaatsen"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijderen"
           }
         }
       }
     },
-    "Move down": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bajar"
+    "Delete this recipe?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Rezept löschen?"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Descendre"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar esta receta?"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nach unten"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer cette recette ?"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Omlaag verplaatsen"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit recept verwijderen?"
           }
         }
       }
     },
-    "No ingredients listed": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay ingredientes"
+    "Dessert" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachtisch"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun ingrédient répertorié"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postre"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Zutaten aufgeführt"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dessert"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geen ingrediënten vermeld"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toetje"
           }
         }
       }
     },
-    "No steps listed": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay pasos"
+    "Dinner" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abendessen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune étape répertoriée"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cena"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keine Schritte aufgeführt"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dîner"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geen stappen vermeld"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diner"
           }
         }
       }
     },
-    "Edit": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Editar"
+    "Edit" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeiten"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Modifier"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bearbeiten"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bewerken"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewerken"
           }
         }
       }
     },
-    "Delete this recipe?": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "¿Eliminar esta receta?"
+    "Enter Manually" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuell eingeben"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Supprimer cette recette ?"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introducir manualmente"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dieses Rezept löschen?"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisir manuellement"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dit recept verwijderen?"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handmatig invoeren"
           }
         }
       }
     },
-    "Paste or type a recipe below. AI pulls out the title, ingredients, and steps for you to review before saving.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pega o escribe una receta a continuación. La IA extrae el título, los ingredientes y los pasos para que los revises antes de guardar."
+    "Equipment" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utensilien"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collez ou saisissez une recette ci-dessous. L'IA en extrait le titre, les ingrédients et les étapes afin que vous les examiniez avant d'enregistrer."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utensilios"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Füge unten ein Rezept ein oder gib es ein. Die KI extrahiert Titel, Zutaten und Schritte, damit du sie vor dem Speichern überprüfen kannst."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustensiles"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Plak of typ hieronder een recept. AI haalt de titel, ingrediënten en stappen eruit, zodat je ze kunt controleren voordat je opslaat."
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benodigdheden"
           }
         }
       }
     },
-    "Capture": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Capturar"
+    "Filter by Tag" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Tag filtern"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Capturer"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrar por etiqueta"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Erfassen"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrer par étiquette"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vastleggen"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filteren op tag"
           }
         }
       }
     },
-    "Paste a recipe link below. AI pulls out the title, ingredients, and steps for you to review before saving.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pega el enlace de una receta a continuación. La IA extrae el título, los ingredientes y los pasos para que los revises antes de guardar."
+    "Ingredient name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zutatenname"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collez ci-dessous le lien d'une recette. L'IA en extrait le titre, les ingrédients et les étapes afin que vous les examiniez avant d'enregistrer."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre del ingrediente"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Füge unten den Link zu einem Rezept ein. Die KI extrahiert Titel, Zutaten und Schritte, damit du sie vor dem Speichern überprüfen kannst."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom de l'ingrédient"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Plak hieronder een receptlink. AI haalt de titel, ingrediënten en stappen eruit, zodat je ze kunt controleren voordat je opslaat."
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingrediëntnaam"
           }
         }
       }
     },
-    "Couldn't extract a recipe from that text. Check it over and try again.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo extraer una receta de ese texto. Revísalo e inténtalo de nuevo."
+    "Ingredients" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zutaten"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible d'extraire une recette de ce texte. Vérifiez-le et réessayez."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingredientes"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aus diesem Text konnte kein Rezept extrahiert werden. Überprüfe ihn und versuche es erneut."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingrédients"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Er kon geen recept uit deze tekst worden gehaald. Controleer het en probeer het opnieuw."
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingrediënten"
           }
         }
       }
     },
-    "Couldn't load that page. Check the link and try again.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo cargar esa página. Comprueba el enlace e inténtalo de nuevo."
+    "Lunch" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittagessen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible de charger cette page. Vérifiez le lien et réessayez."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Almuerzo"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diese Seite konnte nicht geladen werden. Überprüfe den Link und versuche es erneut."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjeuner"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die pagina kon niet worden geladen. Controleer de link en probeer het opnieuw."
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lunch"
           }
         }
       }
     },
-    "Couldn't find a recipe on that page. Check it over and try again.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se encontró ninguna receta en esa página. Revísala e inténtalo de nuevo."
+    "Move down" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach unten"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune recette trouvée sur cette page. Vérifiez-la et réessayez."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bajar"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Auf dieser Seite wurde kein Rezept gefunden. Überprüfe sie und versuche es erneut."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descendre"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Er is geen recept gevonden op die pagina. Controleer het en probeer het opnieuw."
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omlaag verplaatsen"
           }
         }
       }
     },
-    "Breakfast": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Desayuno"
+    "Move up" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach oben"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Petit-déjeuner"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subir"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Frühstück"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monter"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ontbijt"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omhoog verplaatsen"
           }
         }
       }
     },
-    "Lunch": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Almuerzo"
+    "No ingredients listed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Zutaten aufgeführt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Déjeuner"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ingredientes"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mittagessen"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun ingrédient répertorié"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lunch"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen ingrediënten vermeld"
           }
         }
       }
     },
-    "Dinner": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cena"
+    "No Recipes With This Tag" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Rezepte mit diesem Tag"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dîner"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay recetas con esta etiqueta"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abendessen"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune recette avec cette étiquette"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diner"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen recepten met deze tag"
           }
         }
       }
     },
-    "Dessert": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Postre"
+    "No Recipes Yet" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Rezepte"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dessert"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay recetas"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nachtisch"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune recette pour l'instant"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toetje"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog geen recepten"
           }
         }
       }
     },
-    "Snack": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Merienda"
+    "No steps listed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Schritte aufgeführt"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collation"
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay pasos"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Snack"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune étape répertoriée"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Snack"
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen stappen vermeld"
           }
         }
       }
     },
-    "This recipe couldn't be found. It may have already been deleted.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se pudo encontrar esta receta. Puede que ya se haya eliminado."
+    "OK" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cette recette est introuvable. Elle a peut-être déjà été supprimée."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dieses Rezept konnte nicht gefunden werden. Es wurde möglicherweise bereits gelöscht."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dit recept kon niet worden gevonden. Mogelijk is het al verwijderd."
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
     },
-    "That page is too large to read. Try a link to just the recipe.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Esa página es demasiado grande para leerla. Prueba con un enlace solo a la receta."
+    "Paste a Link" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link einfügen"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cette page est trop volumineuse pour être lue. Essayez un lien vers la recette seule."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegar un enlace"
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diese Seite ist zu groß zum Lesen. Versuche einen Link nur zum Rezept."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coller un lien"
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die pagina is te groot om te lezen. Probeer een link naar alleen het recept."
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link plakken"
           }
         }
       }
     },
-    "That site doesn't use a secure connection (https), so it can't be opened.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ese sitio no usa una conexión segura (https), por lo que no se puede abrir."
+    "Paste a recipe link below. AI pulls out the title, ingredients, and steps for you to review before saving." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge unten den Link zu einem Rezept ein. Die KI extrahiert Titel, Zutaten und Schritte, damit du sie vor dem Speichern überprüfen kannst."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ce site n'utilise pas de connexion sécurisée (https) et ne peut donc pas être ouvert."
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pega el enlace de una receta a continuación. La IA extrae el título, los ingredientes y los pasos para que los revises antes de guardar."
           }
         },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diese Website verwendet keine sichere Verbindung (https) und kann daher nicht geöffnet werden."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collez ci-dessous le lien d'une recette. L'IA en extrait le titre, les ingrédients et les étapes afin que vous les examiniez avant d'enregistrer."
           }
         },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die site gebruikt geen beveiligde verbinding (https) en kan daarom niet worden geopend."
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plak hieronder een receptlink. AI haalt de titel, ingrediënten en stappen eruit, zodat je ze kunt controleren voordat je opslaat."
+          }
+        }
+      }
+    },
+    "Paste or type a recipe below. AI pulls out the title, ingredients, and steps for you to review before saving." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge unten ein Rezept ein oder gib es ein. Die KI extrahiert Titel, Zutaten und Schritte, damit du sie vor dem Speichern überprüfen kannst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pega o escribe una receta a continuación. La IA extrae el título, los ingredientes y los pasos para que los revises antes de guardar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collez ou saisissez une recette ci-dessous. L'IA en extrait le titre, les ingrédients et les étapes afin que vous les examiniez avant d'enregistrer."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plak of typ hieronder een recept. AI haalt de titel, ingrediënten en stappen eruit, zodat je ze kunt controleren voordat je opslaat."
+          }
+        }
+      }
+    },
+    "Recipe" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rezept"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recette"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recept"
+          }
+        }
+      }
+    },
+    "Recipe title" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rezepttitel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Título de la receta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titre de la recette"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recepttitel"
+          }
+        }
+      }
+    },
+    "Recipes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rezepte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recetas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recettes"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recepten"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opslaan"
+          }
+        }
+      }
+    },
+    "Snack" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snack"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merienda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collation"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snack"
+          }
+        }
+      }
+    },
+    "Step description" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrittbeschreibung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descripción del paso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description de l'étape"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stapbeschrijving"
+          }
+        }
+      }
+    },
+    "Steps" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schritte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étapes"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stappen"
+          }
+        }
+      }
+    },
+    "Tag name" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag-Name"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de la etiqueta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom de l'étiquette"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagnaam"
+          }
+        }
+      }
+    },
+    "Tags" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etiquetas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étiquettes"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        }
+      }
+    },
+    "That page is too large to read. Try a link to just the recipe." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Seite ist zu groß zum Lesen. Versuche einen Link nur zum Rezept."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esa página es demasiado grande para leerla. Prueba con un enlace solo a la receta."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette page est trop volumineuse pour être lue. Essayez un lien vers la recette seule."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die pagina is te groot om te lezen. Probeer een link naar alleen het recept."
+          }
+        }
+      }
+    },
+    "That site doesn't use a secure connection (https), so it can't be opened." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Website verwendet keine sichere Verbindung (https) und kann daher nicht geöffnet werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ese sitio no usa una conexión segura (https), por lo que no se puede abrir."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce site n'utilise pas de connexion sécurisée (https) et ne peut donc pas être ouvert."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die site gebruikt geen beveiligde verbinding (https) en kan daarom niet worden geopend."
+          }
+        }
+      }
+    },
+    "This recipe couldn't be found. It may have already been deleted." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Rezept konnte nicht gefunden werden. Es wurde möglicherweise bereits gelöscht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo encontrar esta receta. Puede que ya se haya eliminado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette recette est introuvable. Elle a peut-être déjà été supprimée."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit recept kon niet worden gevonden. Mogelijk is het al verwijderd."
+          }
+        }
+      }
+    },
+    "Tool or cookware" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utensil oder Kochgeschirr"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utensilio o recipiente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustensile ou récipient"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keukengerei of pan"
+          }
+        }
+      }
+    },
+    "Type It" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingeben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribirlo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le taper"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typen"
+          }
+        }
+      }
+    },
+    "Unit" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einheit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unité"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eenheid"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
