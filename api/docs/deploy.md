@@ -317,12 +317,14 @@ The limit is configurable (`RateLimiting:Read:PermitLimit` and
 
 What went wrong on the first setup, by the workflow step or symptom it
 showed up as. After a fix on the VPS, use **Re-run failed jobs** on the
-workflow run: it reuses the build output that already passed.
+workflow run: it reuses the build output that already passed. That output is
+kept for one day, so for an older run start the workflow again instead.
 
 **Tunnel (§8): `Permission denied (publickey)`.** ssh only offered its
 default keys. If your admin key has another name, pass it with `-i`, or use
 the `Host` alias from your `~/.ssh/config`:
-`ssh -N -L 15432:localhost:5432 <alias>`.
+`ssh -N -L 15432:localhost:5432 <alias>`. The alias must set `Port` and
+`User` as well as `IdentityFile`, since this form passes neither.
 
 **Upload release: `mkdir: Permission denied`.** `<deploy-path>` isn't owned
 by the deploy user, or the `VPS_DEPLOY_PATH` secret points somewhere else.
