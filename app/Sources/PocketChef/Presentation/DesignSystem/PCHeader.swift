@@ -49,9 +49,11 @@ struct PCHeader: View {
     }
 }
 
-/// White-on-pink alone is only 3.3:1, so the title gets an ink outline that keeps the glyph edges
-/// legible against the pink and the white dot texture. SwiftUI has no text stroke, so the outline
-/// is ink copies of the text drawn at eight offsets behind the fill.
+/// White on the base pink is 3.3:1 (AA for large text), but the white dot texture lightens it to
+/// about 2.9:1, so the title gets an ink outline that keeps the glyph edges legible over the dots.
+/// SwiftUI has no text stroke, so the outline is ink copies of the text drawn behind the fill at
+/// evenly spaced angles on a circle of radius `width`, which keeps the stroke even on the
+/// curved and slanted strokes of Edo SZ.
 private struct OutlinedText: View {
     let text: String
     let font: Font
@@ -59,11 +61,12 @@ private struct OutlinedText: View {
     let outline: Color
     let width: CGFloat
 
-    private static let directions: [CGPoint] = [
-        CGPoint(x: -1, y: -1), CGPoint(x: 0, y: -1), CGPoint(x: 1, y: -1),
-        CGPoint(x: -1, y: 0), CGPoint(x: 1, y: 0),
-        CGPoint(x: -1, y: 1), CGPoint(x: 0, y: 1), CGPoint(x: 1, y: 1),
-    ]
+    /// With 16 copies the outline stays within 2% of `width` of a true circular stroke.
+    private static let copyCount = 16
+    private static let directions: [CGPoint] = (0..<copyCount).map { step in
+        let angle = Double(step) * 2 * .pi / Double(copyCount)
+        return CGPoint(x: cos(angle), y: sin(angle))
+    }
 
     var body: some View {
         Text(text)
