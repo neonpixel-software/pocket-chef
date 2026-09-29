@@ -13,15 +13,14 @@ struct PCHeader: View {
     private static let dotDiameter: CGFloat = 3
     private static let dotOpacity: Double = 0.14
     private static let titleSize: CGFloat = 34
+    private static let titleOutlineWidth: CGFloat = 1.5
     private static let horizontalPadding: CGFloat = 20
     private static let bottomPadding: CGFloat = 22
 
     let title: String
 
     var body: some View {
-        Text(title)
-            .font(PCFont.display(Self.titleSize))
-            .foregroundStyle(PCColor.onPink)
+        OutlinedText(text: title, font: PCFont.display(Self.titleSize), fill: .white, outline: PCColor.ink, width: Self.titleOutlineWidth)
             .padding(.horizontal, Self.horizontalPadding)
             .padding(.bottom, Self.bottomPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
@@ -46,6 +45,44 @@ struct PCHeader: View {
                     }
                 }
                 .ignoresSafeArea(edges: .top)
+            }
+    }
+}
+
+/// White on the base pink is 3.3:1 (AA for large text), but the white dot texture lightens it to
+/// about 2.9:1, so the title gets an ink outline that keeps the glyph edges legible over the dots.
+/// SwiftUI has no text stroke, so the outline is ink copies of the text drawn behind the fill at
+/// evenly spaced angles on a circle of radius `width`, which keeps the stroke even on the
+/// curved and slanted strokes of Edo SZ.
+private struct OutlinedText: View {
+    let text: String
+    let font: Font
+    let fill: Color
+    let outline: Color
+    let width: CGFloat
+
+    /// With 16 copies the outline stays within 2% of `width` of a true circular stroke.
+    private static let copyCount = 16
+    private static let directions: [CGPoint] = (0..<copyCount).map { step in
+        let angle = Double(step) * 2 * .pi / Double(copyCount)
+        return CGPoint(x: cos(angle), y: sin(angle))
+    }
+
+    var body: some View {
+        Text(text)
+            .font(font)
+            .foregroundStyle(fill)
+            .background {
+                ZStack {
+                    ForEach(Self.directions.indices, id: \.self) { index in
+                        let direction = Self.directions[index]
+                        Text(text)
+                            .font(font)
+                            .foregroundStyle(outline)
+                            .offset(x: direction.x * width, y: direction.y * width)
+                    }
+                }
+                .accessibilityHidden(true)
             }
     }
 }
