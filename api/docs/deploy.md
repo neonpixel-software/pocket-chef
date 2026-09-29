@@ -313,6 +313,50 @@ write endpoint isn't limited: only the write key's holder can use it.
 The limit is configurable (`RateLimiting:Read:PermitLimit` and
 `WindowSeconds`, 60/60 by default) so tests can use a small number.
 
+## 11. Troubleshooting
+
+What went wrong on the first setup, by the workflow step or symptom it
+showed up as. After a fix on the VPS, use **Re-run failed jobs** on the
+workflow run: it reuses the build output that already passed.
+
+**Tunnel (§8): `Permission denied (publickey)`.** ssh only offered its
+default keys. If your admin key has another name, pass it with `-i`, or use
+the `Host` alias from your `~/.ssh/config`:
+`ssh -N -L 15432:localhost:5432 <alias>`.
+
+**Upload release: `mkdir: Permission denied`.** `<deploy-path>` isn't owned
+by the deploy user, or the `VPS_DEPLOY_PATH` secret points somewhere else.
+Check with `ls -ld <deploy-path> <deploy-path>/releases` and
+`sudo -u <deploy-user> mkdir -p <deploy-path>/releases/test`, then rerun the
+`chown` in §4.
+
+**Restart service: `sudo: A terminal is required to authenticate`.** No
+sudoers rule matched, so sudo asked for a password. `sudo -l -U <deploy-user>`
+must list `/bin/systemctl restart <service-name>.service`. If it doesn't, check
+that the file in `/etc/sudoers.d/` is mode 440, has no `.` in its name (sudo
+skips those), and passes `sudo visudo -c`. If it does, compare it with the
+secrets: `VPS_SERVICE_NAME` is the name without `.service`, which the
+workflow adds. `sudo -u <deploy-user> sudo -n systemctl restart
+<service-name>.service` runs the exact command without prompting.
+
+**Smoke test: `/health` returns 404.** Something other than the API
+answered. If nginx's error log says `directory index of
+"<deploy-path>/current/" is forbidden`, the site has a `root`/`try_files`
+block from a template instead of the `proxy_pass` in §6: nginx is serving
+the release folder as static files. Replace it with §6's `location /` in
+every `server` block for the hostname (certbot's 443 block is in the same
+file), and check that no other file in `sites-enabled` claims the hostname.
+If the response is the website's, `proxy_pass` points at its port.
+
+**Smoke test: `/health` returns 502.** nginx is forwarding, but the API isn't
+listening on that port. `systemctl status <service-name>` and
+`journalctl -u <service-name> -n 50` say why. `Failed to determine
+credentials for user '': Unknown user` means `User=` is empty in the unit,
+which happens when the unit is written through a heredoc with a shell
+variable that wasn't set; check `systemctl cat <service-name>` for any other
+empty value, fix it, then `daemon-reload` and restart. If the service is
+running, compare `ss -ltnp | grep dotnet` with the `proxy_pass` port.
+
 ## Checklist
 
 - [ ] Deploy user created, sudo only for restarting the service (§1)
