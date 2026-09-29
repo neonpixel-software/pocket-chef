@@ -28,9 +28,10 @@ public static class ServiceCollectionExtensions
             };
 
             // Partitioned per client (X-Forwarded-For, since nginx sits in front — see
-            // deploy.md §1 — falling back to the connection's remote IP) rather than one
-            // global bucket: otherwise a single noisy client exhausts the budget for
-            // every other caller of this endpoint, authenticated or not.
+            // deploy.md §6, whose config overwrites any client-sent value — falling back to
+            // the connection's remote IP) rather than one global bucket: otherwise a single
+            // noisy client exhausts the budget for every other caller of this endpoint,
+            // authenticated or not.
             options.AddPolicy(RateLimitPolicies.Read, httpContext =>
             {
                 var clientKey = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
