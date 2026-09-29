@@ -13,15 +13,14 @@ struct PCHeader: View {
     private static let dotDiameter: CGFloat = 3
     private static let dotOpacity: Double = 0.14
     private static let titleSize: CGFloat = 34
+    private static let titleOutlineWidth: CGFloat = 1.5
     private static let horizontalPadding: CGFloat = 20
     private static let bottomPadding: CGFloat = 22
 
     let title: String
 
     var body: some View {
-        Text(title)
-            .font(PCFont.display(Self.titleSize))
-            .foregroundStyle(PCColor.onPink)
+        OutlinedText(text: title, font: PCFont.display(Self.titleSize), fill: .white, outline: PCColor.ink, width: Self.titleOutlineWidth)
             .padding(.horizontal, Self.horizontalPadding)
             .padding(.bottom, Self.bottomPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
@@ -46,6 +45,41 @@ struct PCHeader: View {
                     }
                 }
                 .ignoresSafeArea(edges: .top)
+            }
+    }
+}
+
+/// White-on-pink alone is only 3.3:1, so the title gets an ink outline that keeps the glyph edges
+/// legible against the pink and the white dot texture. SwiftUI has no text stroke, so the outline
+/// is ink copies of the text drawn at eight offsets behind the fill.
+private struct OutlinedText: View {
+    let text: String
+    let font: Font
+    let fill: Color
+    let outline: Color
+    let width: CGFloat
+
+    private static let directions: [CGPoint] = [
+        CGPoint(x: -1, y: -1), CGPoint(x: 0, y: -1), CGPoint(x: 1, y: -1),
+        CGPoint(x: -1, y: 0), CGPoint(x: 1, y: 0),
+        CGPoint(x: -1, y: 1), CGPoint(x: 0, y: 1), CGPoint(x: 1, y: 1),
+    ]
+
+    var body: some View {
+        Text(text)
+            .font(font)
+            .foregroundStyle(fill)
+            .background {
+                ZStack {
+                    ForEach(Self.directions.indices, id: \.self) { index in
+                        let direction = Self.directions[index]
+                        Text(text)
+                            .font(font)
+                            .foregroundStyle(outline)
+                            .offset(x: direction.x * width, y: direction.y * width)
+                    }
+                }
+                .accessibilityHidden(true)
             }
     }
 }

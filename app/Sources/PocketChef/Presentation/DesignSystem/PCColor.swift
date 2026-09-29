@@ -16,6 +16,7 @@ enum PCColor {
     static let surface = Color(light: .white, dark: darkSurface)
     /// Primary text color, always high-contrast against `background`/`surface`.
     static let textPrimary = Color(light: ink, dark: cream)
-    /// Text color for content placed directly on a pink fill (buttons, badges, header titles).
+    /// Text color for content placed directly on a pink fill (buttons, badges).
+    /// `PCHeader` titles are the exception: white with an ink outline.
     static let onPink = ink
 }
