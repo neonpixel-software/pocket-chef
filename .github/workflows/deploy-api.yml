@@ -100,7 +100,9 @@ jobs:
 
       # Writes the new symlink under a temporary name and renames it over "current", so the
       # service never sees a missing or half-written link. Keeps the 5 newest releases for
-      # rollback (deploy.md §7); never removes the one "current" points at.
+      # rollback (deploy.md §7). Release ids are UTC timestamps, so they sort by name rather
+      # than by mtime (which a clock step on either machine could reorder), and the release
+      # just deployed is excluded by name so it can never be pruned.
       - name: Switch current release and prune old ones
         env:
           RELEASE_ID: ${{ steps.release.outputs.id }}
@@ -108,7 +110,7 @@ jobs:
           ssh vps "cd '$VPS_DEPLOY_PATH' && \
             ln -sfn 'releases/$RELEASE_ID' current.tmp && \
             mv -Tf current.tmp current && \
-            ls -1dt releases/*/ | tail -n +6 | xargs -r rm -rf"
+            ls -1dr releases/*/ | tail -n +6 | grep -vFx 'releases/$RELEASE_ID/' | xargs -r rm -rf"
 
       # The sudoers grant (deploy.md §1) matches this exact command, .service suffix included.
       - name: Restart service
@@ -116,11 +118,14 @@ jobs:
 
       # systemctl restart returns once the process has started, not once Kestrel listens,
       # so /health is retried. The second check is the 9.2 acceptance test: a request with
-      # no key must be rejected. It uses the write endpoint so it spends none of the read
-      # endpoint's rate-limit budget.
+      # no key must be rejected (on the write endpoint, so it spends no read budget). The
+      # third is the only one that touches the database: /health is static and the 401
+      # fails in auth before the handler runs, so without it a deploy ahead of an unapplied
+      # migration would pass here and then fail every real read.
       - name: Smoke test
         env:
           API_HOSTNAME: ${{ secrets.API_HOSTNAME }}
+          API_READ_KEY: ${{ secrets.API_READ_KEY }}
         run: |
           for i in $(seq 1 12); do
             status=$(curl -s -o /dev/null -w "%{http_code}" "https://$API_HOSTNAME/health")
@@ -142,3 +147,10 @@ jobs:
             exit 1
           fi
           echo "POST /density-entries without a key returned 401"
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "X-Api-Key: $API_READ_KEY" "https://$API_HOSTNAME/density-entries")
+          if [ "$status" != "200" ]; then
+            echo "GET /density-entries with the read key returned $status, expected 200"
+            exit 1
+          fi
+          echo "GET /density-entries with the read key returned 200"

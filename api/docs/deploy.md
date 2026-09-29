@@ -60,12 +60,19 @@ In the pocket-chef repo's Settings → Secrets and variables → Actions, add:
 - `VPS_DEPLOY_KEY`: the contents of `density_api_deploy_key` (the private key).
   Delete the local file afterwards; it only needs to live in the secret.
 - `VPS_KNOWN_HOSTS`: the full `ssh-keyscan` output. The workflow checks the
-  host key against it, so a spoofed server is refused.
+  host key against it, so a spoofed server is refused. ssh looks the key up
+  by the exact value of `VPS_HOST`, so scan that same hostname or IP: scanning
+  the IP while `VPS_HOST` holds the DNS name (or the reverse) fails the first
+  deploy with a host-key error.
 - `VPS_HOST`, `VPS_SSH_PORT`, `VPS_USER`, `VPS_DEPLOY_PATH`,
   `VPS_SERVICE_NAME`, `API_HOSTNAME`: see the placeholder list above.
+- `API_READ_KEY`: the production read key from §4. The smoke test reads
+  `/density-entries` with it, the one check that proves the deployed code
+  works against the production schema. The key ships in the app anyway
+  (Phase 10), so it's no more exposed here.
 
-The production API keys and database password are not GitHub secrets. They
-live only in `<env-file>` on the VPS (§4).
+The write key and database password are not GitHub secrets. They live only
+in `<env-file>` on the VPS (§4).
 
 ## 3. Runtime and Postgres
 
@@ -146,7 +153,7 @@ RestartSec=5
 KillSignal=SIGINT
 SyslogIdentifier=<service-name>
 Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=ASPNETCORE_URLS=http://localhost:<port>
+Environment=ASPNETCORE_URLS=http://127.0.0.1:<port>
 EnvironmentFile=<env-file>
 
 [Install]
@@ -172,7 +179,7 @@ server {
     server_name <api-hostname>;
 
     location / {
-        proxy_pass http://localhost:<port>;
+        proxy_pass http://127.0.0.1:<port>;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
@@ -202,8 +209,8 @@ In GitHub: Actions → **Deploy density API** → Run workflow, on `main`. It
 builds and tests `api/`, publishes it, uploads it to a new
 `<deploy-path>/releases/<UTC timestamp>/`, points `current` at it, restarts
 the service, keeps the 5 newest releases, and then checks that
-`https://<api-hostname>/health` returns 200 and that a write without a key
-gets 401. Run on any other branch, it builds and tests but doesn't deploy.
+`https://<api-hostname>/health` returns 200, that a write without a key
+gets 401, and that a read with the read key gets 200. Run on any other branch, it builds and tests but doesn't deploy.
 
 **If the change adds a migration, apply it (§8) before running the
 workflow.** The new code expects the new schema. Migrations are never run
@@ -305,7 +312,7 @@ The limit is configurable (`RateLimiting:Read:PermitLimit` and
 ## Checklist
 
 - [ ] Deploy user created, sudo only for restarting the service (§1)
-- [ ] Deploy key installed, all 8 GitHub secrets set (§2)
+- [ ] Deploy key installed, all 9 GitHub secrets set (§2)
 - [ ] ASP.NET Core 10 runtime installed; Postgres installed with the
       `densityapi` role and database (§3)
 - [ ] `<deploy-path>/releases` owned by the deploy user; `<env-file>` written,
