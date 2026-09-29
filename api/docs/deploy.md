@@ -76,6 +76,10 @@ in `<env-file>` on the VPS (§4).
 
 ## 3. Runtime and Postgres
 
+The workflow uploads releases with `rsync`, which has to be on the VPS as
+well as the runner. Most Ubuntu server installs include it; `which rsync`
+confirms, and `sudo apt-get install -y rsync` adds it if not.
+
 The ASP.NET Core runtime is already there if the website is on this VPS
 (`dotnet --list-runtimes` shows `Microsoft.AspNetCore.App 10.0.x`). If not,
 install `aspnetcore-runtime-10.0` the way the website's `DEPLOYMENT.md` does.
@@ -188,7 +192,7 @@ server {
 ```
 
 `X-Forwarded-For` is set to `$remote_addr`, replacing anything the client
-sent. The rate limiter (§9) counts requests per address using the first
+sent. The rate limiter (§10) counts requests per address using the first
 value of that header. nginx's usual `$proxy_add_x_forwarded_for` appends to
 the client's header instead, so a client could send a different fake address
 on every request and never be limited.
@@ -313,7 +317,7 @@ The limit is configurable (`RateLimiting:Read:PermitLimit` and
 
 - [ ] Deploy user created, sudo only for restarting the service (§1)
 - [ ] Deploy key installed, all 9 GitHub secrets set (§2)
-- [ ] ASP.NET Core 10 runtime installed; Postgres installed with the
+- [ ] rsync and the ASP.NET Core 10 runtime installed; Postgres installed with the
       `densityapi` role and database (§3)
 - [ ] `<deploy-path>/releases` owned by the deploy user; `<env-file>` written,
       root-owned, mode 600 (§4)
