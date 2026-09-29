@@ -11,7 +11,7 @@ using PocketChef.DensityApi.Infrastructure;
 //   dotnet run --project src/PocketChef.DensityApi.Seed -- --connection "<connection string>" [--dry-run]
 //
 // Without --connection it reads ConnectionStrings__DensityApi from the environment, the same
-// variable the API host uses in production (docs/deploy.md §2). --dry-run reports what would be
+// variable the API host uses in production (docs/deploy.md §4). --dry-run reports what would be
 // inserted without writing anything.
 
 string? connectionString = null;
@@ -49,7 +49,7 @@ await using var services = new ServiceCollection()
     .BuildServiceProvider();
 await using var scope = services.CreateAsyncScope();
 
-// Migrations are a deliberate manual step (docs/deploy.md §5), so don't run them here, but
+// Migrations are a deliberate manual step (docs/deploy.md §8), so don't run them here, but
 // don't seed a schema that's behind the model either.
 var context = scope.ServiceProvider.GetRequiredService<DensityApiDbContext>();
 var pending = (await context.Database.GetPendingMigrationsAsync()).ToList();

@@ -1,0 +1,144 @@
+name: Deploy density API
+
+# Deploys api/ to the VPS. The one-time VPS setup this expects, and the secrets it reads,
+# are in api/docs/deploy.md. The repo is public, so every host, path and port comes from a
+# secret and never appears in this file.
+#
+# Started by hand (Actions → Deploy density API → Run workflow), never on push: a change
+# that adds an EF migration must have that migration applied to production (from a Mac,
+# through an SSH tunnel — see deploy.md) before the new code starts, or the API fails
+# until someone does. Running it by hand keeps that order in the operator's control.
+#
+# Action pinning follows the policy at the top of ci.yml.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+      - name: Test
+        # Testcontainers needs Docker, which ubuntu-latest has preinstalled (see ci.yml).
+        run: dotnet test --no-build --configuration Release
+      - name: Publish
+        # Framework-dependent: the VPS has the ASP.NET Core runtime, not the SDK.
+        run: dotnet publish src/PocketChef.DensityApi.Api --no-restore --configuration Release --output ../out
+      - name: Upload publish output
+        uses: actions/upload-artifact@v7
+        with:
+          name: density-api
+          path: out/
+          retention-days: 1
+
+  deploy:
+    needs: build-test-publish
+    # Run workflow lets you pick any branch; only main goes to production.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
+      VPS_DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH }}
+      VPS_SERVICE_NAME: ${{ secrets.VPS_SERVICE_NAME }}
+    steps:
+      - name: Download publish output
+        uses: actions/download-artifact@v8
+        with:
+          name: density-api
+          path: out/
+
+      # VPS_KNOWN_HOSTS is the host key pinned once with ssh-keyscan (deploy.md §2), so
+      # StrictHostKeyChecking stays on. Secrets go through env: rather than being expanded
+      # into the script (SonarCloud githubactions:S7636).
+      - name: Set up SSH
+        env:
+          VPS_DEPLOY_KEY: ${{ secrets.VPS_DEPLOY_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$VPS_DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host vps
+            HostName $VPS_HOST
+            User $VPS_USER
+            Port $VPS_SSH_PORT
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking yes
+            BatchMode yes
+          EOF
+          ssh vps "echo connected"
+
+      - name: Compute release id
+        id: release
+        run: echo "id=$(date -u +%Y-%m-%dT%H-%M-%S)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.id }}
+        run: |
+          ssh vps "mkdir -p '$VPS_DEPLOY_PATH/releases/$RELEASE_ID'"
+          rsync -az -e ssh out/ "vps:$VPS_DEPLOY_PATH/releases/$RELEASE_ID/"
+
+      # Writes the new symlink under a temporary name and renames it over "current", so the
+      # service never sees a missing or half-written link. Keeps the 5 newest releases for
+      # rollback (deploy.md §7); never removes the one "current" points at.
+      - name: Switch current release and prune old ones
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.id }}
+        run: |
+          ssh vps "cd '$VPS_DEPLOY_PATH' && \
+            ln -sfn 'releases/$RELEASE_ID' current.tmp && \
+            mv -Tf current.tmp current && \
+            ls -1dt releases/*/ | tail -n +6 | xargs -r rm -rf"
+
+      # The sudoers grant (deploy.md §1) matches this exact command, .service suffix included.
+      - name: Restart service
+        run: ssh vps "sudo systemctl restart '$VPS_SERVICE_NAME.service'"
+
+      # systemctl restart returns once the process has started, not once Kestrel listens,
+      # so /health is retried. The second check is the 9.2 acceptance test: a request with
+      # no key must be rejected. It uses the write endpoint so it spends none of the read
+      # endpoint's rate-limit budget.
+      - name: Smoke test
+        env:
+          API_HOSTNAME: ${{ secrets.API_HOSTNAME }}
+        run: |
+          for i in $(seq 1 12); do
+            status=$(curl -s -o /dev/null -w "%{http_code}" "https://$API_HOSTNAME/health")
+            if [ "$status" = "200" ]; then
+              echo "/health returned 200 after $i attempt(s)"
+              break
+            fi
+            if [ "$i" = "12" ]; then
+              echo "/health did not return 200 after 12 attempts (last: $status)"
+              exit 1
+            fi
+            echo "Attempt $i: /health returned $status, retrying in 5s..."
+            sleep 5
+          done
+          status=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            -H "Content-Type: application/json" -d '{}' "https://$API_HOSTNAME/density-entries")
+          if [ "$status" != "401" ]; then
+            echo "POST /density-entries without a key returned $status, expected 401"
+            exit 1
+          fi
+          echo "POST /density-entries without a key returned 401"

@@ -55,14 +55,14 @@ dotnet run --project src/PocketChef.DensityApi.Api
 dotnet test                 # unit + Testcontainers-backed integration tests
 ```
 
-See [`api/README.md`](api/README.md) for full details (one-time `dotnet-ef` install, the Testcontainers/Podman socket setup), and [`api/docs/deploy.md`](api/docs/deploy.md) for the production deployment runbook (TLS, key storage, backups, rate limiting, process supervision) — documented, but not yet executed against the real VPS.
+See [`api/README.md`](api/README.md) for full details (one-time `dotnet-ef` install, the Testcontainers/Podman socket setup), and [`api/docs/deploy.md`](api/docs/deploy.md) for the production deployment runbook: the VPS setup, the manually started deploy workflow (`.github/workflows/deploy-api.yml`), migrations and seeding over an SSH tunnel, and backups. It hasn't been run against the real VPS yet.
 
 ## Documentation
 
 - [`PLAN.md`](PLAN.md) — architecture, data model, and the phase-by-phase plan with current status
 - [`app/docs/plans/`](app/docs/plans/) — Swift app design docs (entry form, tagging, capture, localization)
 - [`api/docs/plans/`](api/docs/plans/) — density API design docs
-- [`api/docs/deploy.md`](api/docs/deploy.md) — operational deployment runbook (documented, not yet executed against the real VPS — Phase 9.2)
+- [`api/docs/deploy.md`](api/docs/deploy.md) — deployment runbook for the density API (not yet run against the real VPS; Phase 9.2)
 
 Development proceeds in vertical slices (see `PLAN.md`); the project is not yet at its full v1 feature set. Still on the roadmap: the settings screen with the local/iCloud sync toggle (Phase 4), verification of the on-device AI capture on real devices (Phases 5.1/6.1/7.3), the production deployment of the density API (Phase 9.2), the client's density cache (Phase 10), and unit conversion — the volume/weight toggle on each recipe (Phase 11).
 

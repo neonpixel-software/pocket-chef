@@ -1,221 +1,319 @@
 # Deploying the density API
 
-Runbook for Phase 9.2 ("Deploy to Ubuntu VPS"). Written in response to
-issue #47, which found the plan's acceptance criterion ("reachable over
-HTTPS") had no documented path to get there. Unlike the design docs under
-`docs/plans/`, this is operational reference — expected to be followed
-(and updated) on every real deploy, not a point-in-time design record.
+Runbook for Phase 9.2 ("Deploy to Ubuntu VPS"): the one-time VPS setup, the
+first deploy, and what to do on later deploys. It started with issue #47
+(TLS, key storage, backups, rate limiting, process supervision) and was
+reworked to match how `neonpixel-website` already deploys to the same VPS:
+a framework-dependent publish, uploaded by GitHub Actions
+(`.github/workflows/deploy-api.yml`) into `releases/<id>/`, a `current`
+symlink, a systemd service on localhost, and nginx + certbot in front.
+Postgres comes from Ubuntu's own package. Nothing on the VPS uses containers,
+and the VPS never has the .NET SDK or a checkout of this repo: migrations and
+the seed run from a Mac through an SSH tunnel (§8).
 
-The container always serves plain HTTP on port 8080
-(`ENV ASPNETCORE_URLS=http://+:8080` in `Dockerfile`); everything below is
-about what sits in front of and around that container on the VPS.
+The container setup in `api/Dockerfile` and `api/compose.yml` is for local
+development only.
 
-## 1. TLS termination
+This repo is public, so the real host, paths and port never go in a committed
+file. They appear below as placeholders, and the ones the workflow needs are
+GitHub Actions secrets:
 
-The VPS already runs nginx for other services, so this reuses it rather
-than introducing a second reverse proxy — no Caddy, no second cert-manager
-to operate.
+- `<vps-host>`: the VPS's hostname or IP (secret `VPS_HOST`)
+- `<ssh-port>`: its SSH port (secret `VPS_SSH_PORT`)
+- `<admin-user>`: your own SSH account on the VPS, with sudo
+- `<deploy-user>`: the account GitHub Actions deploys as (secret `VPS_USER`)
+- `<deploy-path>`: where releases live (secret `VPS_DEPLOY_PATH`)
+- `<service-name>`: the systemd unit's name without `.service` (secret `VPS_SERVICE_NAME`)
+- `<env-file>`: the file holding the production keys and connection string
+- `<port>`: the localhost port the API listens on. Pick one nothing else uses;
+  the website already uses 5000.
+- `<api-hostname>`: the public hostname (secret `API_HOSTNAME`)
+- `<backup-dir>`: where nightly database dumps go
 
-- Add a server block proxying the public hostname to the container on
-  `127.0.0.1:8080` (bind the container's published port to loopback only —
-  nginx is the only thing that should reach it directly):
+## 1. Deploy user
 
-  ```nginx
-  server {
-      listen 80;
-      server_name density-api.pocketchef.example;  # replace with the real hostname
-
-      location / {
-          proxy_pass http://127.0.0.1:8080;
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-      }
-  }
-  ```
-
-- Issue and enroll the cert with `certbot --nginx -d density-api.pocketchef.example`.
-  Certbot rewrites the block above to add the `listen 443 ssl` directives
-  and the redirect from 80 → 443, and installs its own systemd timer for
-  renewal — nothing further to configure.
-- Confirm renewal works without intervention: `certbot renew --dry-run`.
-
-## 2. Key storage
-
-`ApiKeyOptions` (`Authentication/ApiKeyOptions.cs`) binds from an
-`ApiKeys` config section with two required properties, `ReadApiKey` and
-`WriteApiKey`. `Program.cs` throws at startup if that section is missing —
-there's no way to run without both configured. Locally these come from
-`appsettings.Development.json`; production `appsettings.json` deliberately
-has no `ApiKeys` section and never should, since it's the one config file
-that ships inside the built image.
-
-In production, supply both keys — plus the DB connection string, same
-reasoning — as environment variables, using ASP.NET Core's standard
-double-underscore convention for nested config:
-
-```
-ConnectionStrings__DensityApi=Host=...;Port=5432;Database=densityapi;Username=...;Password=...
-ApiKeys__ReadApiKey=<the key baked into the app binary>
-ApiKeys__WriteApiKey=<Nick's private key>
-```
-
-Store these in a root-only env file outside the repo, e.g.
-`/etc/pocket-chef-density-api/api.env` (`chmod 600`, owned by root), and
-reference it from whatever runs the container (see §5). Never commit
-these values, never bake them into the image, never put them in a file
-under `api/`.
-
-## 3. Postgres backups
-
-Nothing existed here before this doc — also the reason PLAN.md's risk
-table didn't list data loss as a risk at all (fixed alongside this).
-
-The density table is small, hand-curated reference data with no
-continuous user writes (writes only happen when Nick curates via the
-write endpoint) — a nightly logical dump is enough. No WAL archiving or
-point-in-time recovery; the ratio of operational complexity to what it'd
-actually protect against doesn't justify it at this scale, and if the
-worst happens, the data can also be re-seeded from Phase 9.1's source
-data as a fallback.
-
-A systemd timer running nightly, dumping from *inside* the Postgres
-container via `compose exec` rather than from the host — sidesteps both
-the host-vs-container port question (local dev publishes Postgres on
-5433, not 5432; production's published port may differ again) and
-authentication (the official Postgres image trusts local Unix-socket
-connections by default, so a dump run this way needs no password at
-all — confirmed locally: `podman compose exec -T postgres pg_dump -U
-densityapi densityapi` succeeds with no `-h`/`-p`/password of any kind):
+A separate user from the website's, so each app's deploy key can only touch
+its own releases.
 
 ```sh
-cd /opt/pocket-chef-density-api
-podman compose exec -T postgres pg_dump -U densityapi densityapi \
-  > /var/backups/pocket-chef-density-api/densityapi-$(date +%F).dump
-find /var/backups/pocket-chef-density-api -name '*.dump' -mtime +14 -delete
+sudo adduser --disabled-password --gecos "" <deploy-user>
+echo "<deploy-user> ALL=(ALL) NOPASSWD: /bin/systemctl restart <service-name>.service" \
+  | sudo tee /etc/sudoers.d/<deploy-user>-restart
+sudo chmod 440 /etc/sudoers.d/<deploy-user>-restart
 ```
 
-Keep 14 days locally; copying dumps off-box is worth doing if the VPS
-already has an off-box backup story for its other services — reuse that
-rather than build a bespoke one here.
+sudo matches the command literally, which is why the workflow restarts
+`<service-name>.service` with the suffix.
 
-## 4. Rate limiting
+## 2. Deploy key and GitHub secrets
 
-`GET /density-entries` is gated by the read API key, but that key ships
-inside the app binary — anyone can extract it. Client impact of the API
-being unavailable is low (density values are cached locally on-device
-once fetched), but nothing previously bounded how much load a scraper
-using the extracted key could put on the VPS.
+On the Mac:
 
-Added in this same change: a fixed-window rate limiter
-(`RateLimiting/RateLimitPolicies.cs`,
-`RateLimiting/ServiceCollectionExtensions.cs`), applied only to the read
-endpoint via `.RequireRateLimiting(RateLimitPolicies.Read)` — the write
-endpoint stays unlimited, since it's already gated behind a key only Nick
-holds and is low-volume by design. Uses ASP.NET Core's built-in
-`Microsoft.AspNetCore.RateLimiting` (part of the shared framework via
-`Microsoft.NET.Sdk.Web` — no new package), 60 requests/minute per client,
-`QueueLimit: 0` (reject immediately over the limit rather than queueing —
-simplest behavior for a read-only endpoint), returns 429 with a
-`Retry-After` header. Covered by `DensityEntriesRateLimitTests`.
+```sh
+ssh-keygen -t ed25519 -f ./density_api_deploy_key -N "" -C "pocket-chef-density-api-deploy"
+ssh-copy-id -p <ssh-port> -i ./density_api_deploy_key.pub <deploy-user>@<vps-host>
+ssh-keyscan -p <ssh-port> <vps-host>
+```
 
-**Partitioned per client, not global** — the limiter runs before the API
-key filter (confirmed by the ordering below), so it trips on *any*
-request to the read endpoint, authenticated or not; it is not narrowly
-"protection against a scraper using the extracted key," it's a budget
-that applies to every caller. Partitioning by client IP (read from
-`X-Forwarded-For`, which the nginx config in §1 forwards, falling back to
-the connection's remote IP) means one noisy client's budget doesn't
-starve everyone else sharing the same VPS-facing endpoint.
+In the pocket-chef repo's Settings → Secrets and variables → Actions, add:
 
-Nothing to configure on the VPS for this — it's in-process. The limit is
-configuration-driven (`RateLimiting:Read:PermitLimit`/`WindowSeconds`,
-defaulting to 60/60 if unset), same pattern as `ApiKeys` and
-`ConnectionStrings` — not because production needs to tune it, but so
-tests can override it to a small number instead of needing 61 real
-requests to trip a 60/minute window.
+- `VPS_DEPLOY_KEY`: the contents of `density_api_deploy_key` (the private key).
+  Delete the local file afterwards; it only needs to live in the secret.
+- `VPS_KNOWN_HOSTS`: the full `ssh-keyscan` output. The workflow checks the
+  host key against it, so a spoofed server is refused.
+- `VPS_HOST`, `VPS_SSH_PORT`, `VPS_USER`, `VPS_DEPLOY_PATH`,
+  `VPS_SERVICE_NAME`, `API_HOSTNAME`: see the placeholder list above.
 
-## 5. Process supervision
+The production API keys and database password are not GitHub secrets. They
+live only in `<env-file>` on the VPS (§4).
 
-A systemd unit runs `podman compose up` for the stack, mirroring the
-local-dev `compose.yml` pattern but extended with the API service itself
-and pointed at the production env file from §2:
+## 3. Runtime and Postgres
+
+The ASP.NET Core runtime is already there if the website is on this VPS
+(`dotnet --list-runtimes` shows `Microsoft.AspNetCore.App 10.0.x`). If not,
+install `aspnetcore-runtime-10.0` the way the website's `DEPLOYMENT.md` does.
+
+Postgres:
+
+```sh
+sudo apt-get install -y postgresql
+sudo -u postgres createuser --pwprompt densityapi
+sudo -u postgres createdb --owner densityapi densityapi
+```
+
+Use a generated password without shell or quoting characters, e.g.
+`openssl rand -hex 32`. The `densityapi` role owns the database, which is
+enough for the first migration to create the `citext` extension (a trusted
+extension, so no superuser is needed).
+
+Ubuntu's Postgres listens on localhost only, and its default `pg_hba.conf`
+accepts password logins from localhost, so nothing else needs configuring.
+Leave it that way: the SSH tunnel in §8 is how the Mac reaches it.
+
+Updates come with `apt upgrade`. A new Ubuntu release may bring a new
+Postgres major version; `pg_upgradecluster` moves the data across.
+
+## 4. Directories and the env file
+
+```sh
+sudo mkdir -p <deploy-path>/releases
+sudo chown -R <deploy-user>:<deploy-user> <deploy-path>
+```
+
+The ownership matters: the workflow creates releases and switches the symlink
+as `<deploy-user>` without sudo, and fails with `Permission denied` if
+`<deploy-path>` belongs to root.
+
+`<env-file>` goes outside `<deploy-path>`, owned by root with mode 600.
+systemd reads it as root before starting the service, so the service user
+never needs to read it, and a deploy can't touch it:
+
+```sh
+sudo install -m 600 -o root -g root /dev/null <env-file>
+sudoedit <env-file>
+```
+
+```
+ConnectionStrings__DensityApi=Host=localhost;Port=5432;Database=densityapi;Username=densityapi;Password=<db password>
+ApiKeys__ReadApiKey=<read key>
+ApiKeys__WriteApiKey=<write key>
+```
+
+Generate both keys with `openssl rand -hex 32`. The read key will ship inside
+the app (Phase 10), so treat it as public. Keep the write key private: it's
+the only way to change density data.
+
+`Program.cs` refuses to start without the connection string and both keys.
+The committed `appsettings.json` has none of them and never should.
+
+## 5. systemd unit
+
+`/etc/systemd/system/<service-name>.service`:
 
 ```ini
-# /etc/systemd/system/pocket-chef-density-api.service
 [Unit]
 Description=Pocket Chef density API
-After=network-online.target
-Wants=network-online.target
+After=network.target postgresql.service
+Wants=postgresql.service
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/pocket-chef-density-api
-EnvironmentFile=/etc/pocket-chef-density-api/api.env
-ExecStart=/usr/bin/podman compose up
-ExecStop=/usr/bin/podman compose down
-Restart=always
+User=<deploy-user>
+WorkingDirectory=<deploy-path>/current
+ExecStart=/usr/bin/dotnet <deploy-path>/current/PocketChef.DensityApi.Api.dll
+Restart=on-failure
 RestartSec=5
+KillSignal=SIGINT
+SyslogIdentifier=<service-name>
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://localhost:<port>
+EnvironmentFile=<env-file>
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-`/opt/pocket-chef-density-api/compose.yml` on the VPS is a copy of the
-repo's local-dev `api/compose.yml` with the `api:` service below added
-to it directly (not a Compose `extends:`/`include:` reference back into
-the repo checkout — one self-contained file on the VPS is simpler to
-reason about than keeping a deploy directory in sync with a moving repo
-path). Publishes `127.0.0.1:8080:8080` (per §1) and adds a
-`healthcheck:` wired to the existing `/health` endpoint:
-
-```yaml
-services:
-  api:
-    image: <built/pushed image>
-    ports:
-      - "127.0.0.1:8080:8080"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-    depends_on:
-      - postgres
+```sh
+sudo systemctl daemon-reload
+sudo systemctl enable <service-name>.service
 ```
 
-**Migrations are not run on boot.** Given the plan's own stance — density
-data is "seeded once... curated by hand... no admin UI needed yet" — an
-automatic migration running unattended against production data on every
-restart is the wrong default: a bad migration would apply itself before
-anyone reviews it. Migrations stay a deliberate manual step, run once
-before restarting the service:
+Don't start it yet: `<deploy-path>/current` only exists after the first
+deploy. Logs: `journalctl -u <service-name>`.
+
+## 6. nginx and HTTPS
+
+Point `<api-hostname>`'s DNS at the VPS first.
+`/etc/nginx/sites-available/<api-hostname>`:
+
+```nginx
+server {
+    listen 80;
+    server_name <api-hostname>;
+
+    location / {
+        proxy_pass http://localhost:<port>;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+`X-Forwarded-For` is set to `$remote_addr`, replacing anything the client
+sent. The rate limiter (§9) counts requests per address using the first
+value of that header. nginx's usual `$proxy_add_x_forwarded_for` appends to
+the client's header instead, so a client could send a different fake address
+on every request and never be limited.
 
 ```sh
+sudo ln -s /etc/nginx/sites-available/<api-hostname> /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d <api-hostname>
+sudo certbot renew --dry-run
+```
+
+certbot adds the HTTPS server block and the redirect from port 80, and
+renews the certificate automatically.
+
+## 7. Deploying
+
+In GitHub: Actions → **Deploy density API** → Run workflow, on `main`. It
+builds and tests `api/`, publishes it, uploads it to a new
+`<deploy-path>/releases/<UTC timestamp>/`, points `current` at it, restarts
+the service, keeps the 5 newest releases, and then checks that
+`https://<api-hostname>/health` returns 200 and that a write without a key
+gets 401. Run on any other branch, it builds and tests but doesn't deploy.
+
+**If the change adds a migration, apply it (§8) before running the
+workflow.** The new code expects the new schema. Migrations are never run
+automatically, so a bad one can't apply itself to production unreviewed.
+
+Rollback: SSH in as `<admin-user>`, point `current` at an older release and
+restart:
+
+```sh
+cd <deploy-path>
+ls releases
+sudo -u <deploy-user> ln -sfn releases/<older-id> current
+sudo systemctl restart <service-name>.service
+```
+
+If the newer release came with a migration, the older code may not work
+with the migrated schema, so check before rolling back.
+
+## 8. Migrations and seeding from the Mac
+
+Open a tunnel to the VPS's Postgres in one terminal and leave it running:
+
+```sh
+ssh -N -L 15432:localhost:5432 -p <ssh-port> <admin-user>@<vps-host>
+```
+
+In another, from `api/`, with the production connection string pointed at
+the tunnel:
+
+```sh
+export PROD_DB="Host=localhost;Port=15432;Database=densityapi;Username=densityapi;Password=<db password>"
+
 dotnet ef database update \
   --project src/PocketChef.DensityApi.Infrastructure \
   --startup-project src/PocketChef.DensityApi.Api \
-  --connection "<production connection string>"
+  --connection "$PROD_DB"
 ```
 
-**Seed the table once**, after the first migration (PLAN.md Phase 9.1). The seed
-tool only inserts ingredients that aren't in the table yet, so re-running it after
-hand curation changes nothing. Run it with `--dry-run` first to see what it would
-insert without writing anything:
+**Seed the table once**, after the first migration (PLAN.md Phase 9.1). The
+seed tool only inserts ingredients that aren't in the table yet, so
+re-running it after hand curation changes nothing. `--dry-run` shows what it
+would insert without writing:
 
 ```sh
-dotnet run --project src/PocketChef.DensityApi.Seed -- \
-  --connection "<production connection string>" --dry-run
-dotnet run --project src/PocketChef.DensityApi.Seed -- \
-  --connection "<production connection string>"
+dotnet run --project src/PocketChef.DensityApi.Seed -- --connection "$PROD_DB" --dry-run
+dotnet run --project src/PocketChef.DensityApi.Seed -- --connection "$PROD_DB"
 ```
 
-**Names in the table must stay canonical** (NFC + trimmed — enforced by the
+The seed tool refuses to run while migrations are pending.
+
+**Names in the table must stay canonical** (NFC + trimmed, enforced by the
 `DensityEntry` constructor, issue #55). The upsert lookup is byte-exact
-except for case, so a non-canonical row (a hand-edit, or a row written by
-pre-fix code) can never be found by a later upsert — re-POSTing the
-ingredient would insert a duplicate, not merge. If you ever spot such a
-row, normalize it in place (or delete it); no backfill exists because the
-seed tool builds its rows through the constructor too, and the only paths
-that bypass it are manual SQL and that pre-fix window.
+except for case, so a non-canonical row (from a hand edit in SQL, say) is
+never found by a later upsert: re-POSTing that ingredient inserts a
+duplicate instead of updating it. If you spot one, fix it in place or delete
+it. The seed tool builds its rows through the constructor, so it can't
+produce one.
+
+## 9. Backups
+
+The density table is small, hand-curated reference data with writes only
+when someone curates it, so a nightly dump is enough. If it's ever lost, the
+seed data (§8) rebuilds most of it.
+
+```sh
+sudo install -d -m 700 -o postgres -g postgres <backup-dir>
+```
+
+`/etc/cron.d/<service-name>-backup`:
+
+```
+30 3 * * * postgres pg_dump -Fc densityapi > <backup-dir>/densityapi-$(date +\%F).dump && find <backup-dir> -name '*.dump' -mtime +14 -delete
+```
+
+This runs as the `postgres` user, which logs in through the local socket
+without a password, and keeps 14 days of dumps. `%` has to be escaped in
+cron files. If the VPS already copies backups off the machine for the
+website, add `<backup-dir>` to it.
+
+Restore into the (existing, empty) database:
+
+```sh
+sudo -u postgres pg_restore --clean --if-exists -d densityapi <backup-dir>/densityapi-<date>.dump
+```
+
+## 10. Rate limiting
+
+Nothing to configure on the VPS: it's in the app. `GET /density-entries`
+allows 60 requests per minute per client address and returns 429 with a
+`Retry-After` header past that (`RateLimiting/`, covered by
+`DensityEntriesRateLimitTests`). It exists because the read key ships inside
+the app and can be extracted. The limit applies to every caller of the read
+endpoint, with or without a key, since it runs before the key check. The
+write endpoint isn't limited: only the write key's holder can use it.
+
+The limit is configurable (`RateLimiting:Read:PermitLimit` and
+`WindowSeconds`, 60/60 by default) so tests can use a small number.
+
+## Checklist
+
+- [ ] Deploy user created, sudo only for restarting the service (§1)
+- [ ] Deploy key installed, all 8 GitHub secrets set (§2)
+- [ ] ASP.NET Core 10 runtime installed; Postgres installed with the
+      `densityapi` role and database (§3)
+- [ ] `<deploy-path>/releases` owned by the deploy user; `<env-file>` written,
+      root-owned, mode 600 (§4)
+- [ ] systemd unit installed and enabled, not started (§5)
+- [ ] DNS points at the VPS; nginx site enabled; certbot certificate issued (§6)
+- [ ] Migrations applied and the table seeded from the Mac (§8)
+- [ ] Deploy workflow run on `main`, smoke test passed (§7)
+- [ ] From outside the VPS: `GET https://<api-hostname>/density-entries` with
+      the read key returns the seeded entries (PLAN.md 9.2 acceptance)
+- [ ] Backup cron installed and the first dump written (§9)
