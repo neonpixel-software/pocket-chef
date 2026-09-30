@@ -1,0 +1,12 @@
+// Shared by the iOS and macOS app targets (project.yml configFiles).
+
+// macOS: App Sandbox with outgoing network (URL capture, the density API, CloudKit).
+// The Mac App Store requires the sandbox. iOS is always sandboxed and needs no entitlements
+// until iCloud is turned on in Signing.xcconfig.
+CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = Config/PocketChef-macOS.entitlements
+
+// Optional and gitignored: the signing team and the iCloud entitlements. The repo is public,
+// so the team ID stays out of it. Without this file the app builds without iCloud
+// (the storage setting is disabled), which is how CI builds it.
+// Copy Signing.xcconfig.example to Signing.xcconfig to enable iCloud sync locally.
+#include? "Signing.xcconfig"

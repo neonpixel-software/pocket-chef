@@ -51,6 +51,11 @@ final class RecipeListViewModel {
     func loadTags() {
         do {
             allTags = try dependencies.fetchTagsUseCase.execute().sortedPresetsFirst()
+            // After a storage switch or a tag merge the selected tag can be gone, which would
+            // leave the list filtered by a chip that no longer exists.
+            if let selectedTagID, !allTags.contains(where: { $0.id == selectedTagID }) {
+                self.selectedTagID = nil
+            }
         } catch {
             errorMessage = error.localizedDescription
         }

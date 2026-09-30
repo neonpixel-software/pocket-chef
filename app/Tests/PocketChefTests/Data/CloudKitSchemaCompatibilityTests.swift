@@ -7,21 +7,15 @@ import XCTest
 /// without an inverse all cause a CloudKit-backed ModelContainer to fail to load.
 ///
 /// This only guards schema compatibility (does the container load), not actual
-/// CloudKit sync — sync needs entitlements, a real container, and network, none
-/// of which are wired up until Phase 4.
+/// CloudKit sync, which needs the entitlements from Signing.xcconfig, a real
+/// container and network (verified on devices in Phase 4.1).
 final class CloudKitSchemaCompatibilityTests: XCTestCase {
     func testCloudKitBackedContainerLoadsWithoutError() throws {
-        let schema = Schema([
-            RecipeModel.self,
-            IngredientLineModel.self,
-            TagModel.self,
-            DensityEntryModel.self,
-        ])
         let configuration = ModelConfiguration(
             isStoredInMemoryOnly: true,
-            cloudKitDatabase: .private("iCloud.com.neonpixel.pocketchef")
+            cloudKitDatabase: .private(RecipeStore.cloudKitContainerIdentifier)
         )
 
-        XCTAssertNoThrow(try ModelContainer(for: schema, configurations: configuration))
+        XCTAssertNoThrow(try ModelContainer(for: RecipeStore.schema, configurations: configuration))
     }
 }

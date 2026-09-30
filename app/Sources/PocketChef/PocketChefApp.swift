@@ -1,53 +1,73 @@
-import SwiftData
 import SwiftUI
 
 @main
 struct PocketChefApp: App {
-    private let modelContainer: ModelContainer
+    private let persistence: PersistenceController
     private let recipeRepository: RecipeRepository
     private let tagRepository: TagRepository
     private let captureService: RecipeCaptureService
     private let webPageFetcher: WebPageFetcher
     private let captureRecipeUseCase: CaptureRecipeUseCase
+    private let settingsViewModel: SettingsViewModel
 
     init() {
         PCFontRegistrar.registerCustomFonts()
 
+        #if DEBUG
+        let seedsSampleData = true
+        #else
+        let seedsSampleData = false
+        #endif
+
         do {
-            modelContainer = try ModelContainer(for: RecipeModel.self, IngredientLineModel.self, TagModel.self, DensityEntryModel.self)
+            persistence = try PersistenceController(
+                isICloudEnabledInBuild: BuildConfiguration.isICloudEnabled,
+                seedsSampleData: seedsSampleData,
+                makeContainer: RecipeStore.makeContainer(for:)
+            )
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
-        recipeRepository = SwiftDataRecipeRepository(modelContext: modelContainer.mainContext)
-        tagRepository = SwiftDataTagRepository(modelContext: modelContainer.mainContext)
+        let contextProvider = persistence.contextProvider
+        recipeRepository = SwiftDataRecipeRepository(modelContext: contextProvider.context)
+        tagRepository = SwiftDataTagRepository(modelContext: contextProvider.context)
         captureService = FoundationModelsRecipeCaptureService()
         webPageFetcher = URLSessionWebPageFetcher()
         captureRecipeUseCase = DefaultCaptureRecipeUseCase(captureService: captureService)
-
-        modelContainer.mainContext.seedPresetTagsIfNeeded()
-
-        #if DEBUG
-        modelContainer.mainContext.seedSampleDataIfNeeded()
-        #endif
+        settingsViewModel = SettingsViewModel(
+            changeStorageModeUseCase: DefaultChangeStorageModeUseCase(
+                switcher: persistence,
+                accountStatusProvider: CloudKitAccountStatusProvider(isEnabledInBuild: BuildConfiguration.isICloudEnabled)
+            ),
+            isICloudAvailableInBuild: BuildConfiguration.isICloudEnabled
+        )
     }
 
     var body: some Scene {
         WindowGroup {
-            RecipeListView(viewModel: RecipeListViewModel(dependencies: .init(
-                fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: recipeRepository),
-                createRecipeUseCase: DefaultCreateRecipeUseCase(repository: recipeRepository),
-                updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: recipeRepository),
-                deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: recipeRepository),
-                fetchTagsUseCase: DefaultFetchTagsUseCase(repository: tagRepository),
-                findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository),
-                captureRecipeUseCase: captureRecipeUseCase,
-                checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: captureService),
-                captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
-                    webPageFetcher: webPageFetcher,
-                    captureRecipeUseCase: captureRecipeUseCase
-                )
-            )))
+            RecipeListView(
+                viewModel: RecipeListViewModel(dependencies: .init(
+                    fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: recipeRepository),
+                    createRecipeUseCase: DefaultCreateRecipeUseCase(repository: recipeRepository),
+                    updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: recipeRepository),
+                    deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: recipeRepository),
+                    fetchTagsUseCase: DefaultFetchTagsUseCase(repository: tagRepository),
+                    findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository),
+                    captureRecipeUseCase: captureRecipeUseCase,
+                    checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: captureService),
+                    captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
+                        webPageFetcher: webPageFetcher,
+                        captureRecipeUseCase: captureRecipeUseCase
+                    )
+                )),
+                settingsViewModel: settingsViewModel
+            )
         }
-        .modelContainer(modelContainer)
+
+        #if os(macOS)
+        Settings {
+            SettingsView(viewModel: settingsViewModel)
+        }
+        #endif
     }
 }

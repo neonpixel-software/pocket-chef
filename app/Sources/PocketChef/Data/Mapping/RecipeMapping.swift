@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 extension RecipeModel {
     func toDomain() -> Recipe {
@@ -46,5 +47,29 @@ extension Recipe {
     /// order of to-many relationships (RecipeModel.toDomain() sorts by position).
     func ingredientModels() -> [IngredientLineModel] {
         ingredients.enumerated().map { index, line in line.toModel(position: index) }
+    }
+}
+
+extension RecipeModel {
+    /// Replaces every field except tags with `recipe`'s. Tags are left to the caller,
+    /// because they're a shared relationship that must resolve to rows already in `context`.
+    func overwrite(with recipe: Recipe, in context: ModelContext) {
+        title = recipe.title
+        steps = recipe.steps
+        equipment = recipe.equipment
+        switch recipe.source {
+        case .typed:
+            isTypedSource = true
+            sourceURL = nil
+        case let .url(url):
+            isTypedSource = false
+            sourceURL = url
+        }
+
+        // The .cascade delete rule only fires on parent deletion, not on reassigning
+        // the relationship array, so old children must be deleted explicitly here or
+        // they leak as orphaned rows.
+        (ingredients ?? []).forEach { context.delete($0) }
+        ingredients = recipe.ingredientModels()
     }
 }

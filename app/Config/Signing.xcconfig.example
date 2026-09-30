@@ -1,0 +1,13 @@
+// Copy to Signing.xcconfig (gitignored), fill in your team ID, then run `xcodegen generate`.
+// Find the team ID under Membership details on developer.apple.com/account.
+// Xcode must be signed in to that team (Settings > Apple Accounts).
+
+DEVELOPMENT_TEAM = ABCDE12345
+CODE_SIGN_STYLE = Automatic
+
+// iCloud (CloudKit) container iCloud.com.neonpixel.pocketchef plus push for sync.
+CODE_SIGN_ENTITLEMENTS[sdk=iphone*] = Config/PocketChef-iOS-iCloud.entitlements
+CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = Config/PocketChef-macOS-iCloud.entitlements
+
+// Tells the code the entitlement is there (BuildConfiguration.isICloudEnabled).
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) ICLOUD_ENABLED
