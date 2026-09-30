@@ -73,6 +73,8 @@ Development proceeds in vertical slices (see `PLAN.md`); the project is not yet 
 
 GitHub Actions runs on every PR targeting `main` and every push to `main`: Swift build + test + coverage (iOS and macOS), .NET build + test, linting (SwiftLint/SwiftFormat, `dotnet format`), and a SonarCloud analysis with quality gate for the whole repo (the badges above). The project targets 90%+ test coverage on both sides.
 
+Xcode Cloud builds the app for TestFlight. Since the Xcode project is generated and gitignored, [`app/ci_scripts/ci_post_clone.sh`](app/ci_scripts/ci_post_clone.sh) runs `xcodegen generate` and resolves the Swift packages after each clone. For iCloud-enabled builds, set a secret `DEVELOPMENT_TEAM` environment variable in the Xcode Cloud workflow; the script writes it into `Signing.xcconfig`.
+
 ## License
 
 MIT — one [`LICENSE`](LICENSE) at the repo root covering the whole repository (`app/` + `api/`). See the [Licensing section of PLAN.md](PLAN.md#licensing) for the reasoning behind the choice.
