@@ -55,7 +55,9 @@ whose names match ignoring case and surrounding whitespace:
   copy and losing both.
 - It moves the losers' recipes onto the winner, then deletes the losers.
 
-It runs when the iCloud store opens, after a switch up, and on every
+It runs when the iCloud store opens, on every switch up (before the merge,
+so recipes are linked to the row every device keeps, even when the reused
+container imported duplicates while in Local mode), and on every
 `NSPersistentStoreRemoteChange` notification (a CloudKit import). It saves
 only when it found duplicates, so it can't loop. DEBUG sample recipes are
 seeded into the Local store only, so debug devices don't push copies of the
@@ -109,6 +111,20 @@ samples). No release has shipped, so no user data is affected.
   but local edits go to the Local store and never upload.
 - **Production schema.** Before the first CloudKit-enabled release, deploy
   the development schema to production (PLAN.md 4.1 note, Phase 12).
+- **An open detail screen can overwrite a newer remote edit.** The detail
+  view model holds a `Recipe` value and doesn't reload on
+  `recipeStoreDidChange`. If an import changes that recipe while its detail
+  screen is open, saving there overwrites the remote version (last write
+  wins, by id). This comes with the value-based detail screen and only
+  matters now that recipes sync. Fix by reloading the detail's recipe on
+  `recipeStoreDidChange` if it shows up in practice.
+- **The switch runs on the main thread.** The copy (fetch, map, save in both
+  stores) runs on the main context. That's fine for a personal recipe
+  collection; for large libraries, move the copy to a background context.
+- **Switching up means the local version wins.** A recipe that exists in both
+  stores (same id) takes the local version, even if the iCloud copy is newer.
+  That only happens after switching up, back and up again on one device, and
+  the local copy is what the user was just looking at.
 
 ## Findings from the device check (2026-09-30)
 

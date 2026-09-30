@@ -78,6 +78,11 @@ final class PersistenceController: StorageModeSwitcher {
         let target = try container(for: mode).mainContext
         switch mode {
         case .iCloud:
+            // A reused container may have imported duplicate tags while in Local mode (remote
+            // changes are ignored then). Merging first makes the merge link recipes to the row
+            // every device keeps; otherwise another device's dedup can delete the row a recipe
+            // was just linked to, and the recipe loses the tag here.
+            try target.deduplicateTags()
             try RecipeStoreCopier.merge(from: source, into: target)
         case .local:
             try RecipeStoreCopier.replace(contentsOf: target, with: source)
@@ -90,7 +95,8 @@ final class PersistenceController: StorageModeSwitcher {
     }
 
     /// A CloudKit import landed: merge any preset tags another device seeded, then let
-    /// screens reload. Imports into the iCloud container while in Local mode are ignored.
+    /// screens reload. Imports into the iCloud container while in Local mode are ignored here;
+    /// switchTo(.iCloud) merges their duplicates before copying.
     func handleRemoteChange() {
         guard currentMode == .iCloud else { return }
         deduplicateTags(in: contextProvider.context)

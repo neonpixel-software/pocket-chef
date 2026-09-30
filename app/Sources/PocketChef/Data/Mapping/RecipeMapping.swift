@@ -9,10 +9,21 @@ extension RecipeModel {
             ingredients: (ingredients ?? []).sorted { $0.position < $1.position }.map { $0.toDomain() },
             equipment: equipment,
             steps: steps,
-            // isTypedSource/sourceURL are only ever set together via toModel(), so this pairing always holds.
-            source: isTypedSource ? .typed : .url(sourceURL!),
+            source: source,
             tags: (tags ?? []).map { $0.toDomain() }
         )
+    }
+}
+
+extension RecipeModel {
+    /// isTypedSource and sourceURL are set together by toModel(), but rows can also arrive
+    /// through CloudKit (other devices, other app versions), so a URL-sourced row without a URL
+    /// is treated as typed rather than crashing the list or a storage switch.
+    private var source: RecipeSource {
+        if !isTypedSource, let sourceURL {
+            return .url(sourceURL)
+        }
+        return .typed
     }
 }
 
