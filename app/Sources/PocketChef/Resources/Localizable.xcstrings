@@ -1428,6 +1428,34 @@
           }
         }
       }
+    },
+    "Filter by Tag": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtrar por etiqueta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filtrer par étiquette"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach Tag filtern"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filteren op tag"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

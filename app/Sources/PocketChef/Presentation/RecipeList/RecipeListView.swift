@@ -21,7 +21,11 @@ struct RecipeListView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 if !viewModel.allTags.isEmpty {
-                    tagFilterRow
+                    TagFilterRow(
+                        tags: viewModel.allTags,
+                        selectedTagID: viewModel.selectedTagID,
+                        onSelect: { viewModel.selectTag($0) }
+                    )
                 }
 
                 Group {
@@ -142,24 +146,6 @@ struct RecipeListView: View {
             viewModel.load()
             viewModel.loadTags()
         }
-    }
-
-    private var tagFilterRow: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                TagChip(title: String(localized: "All"), isSelected: viewModel.selectedTagID == nil) {
-                    viewModel.selectTag(nil)
-                }
-                ForEach(viewModel.allTags) { tag in
-                    TagChip(title: tag.localizedDisplayName(), isSelected: viewModel.selectedTagID == tag.id) {
-                        viewModel.selectTag(tag.id)
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-        }
-        .background(PCColor.background)
     }
 }
 
