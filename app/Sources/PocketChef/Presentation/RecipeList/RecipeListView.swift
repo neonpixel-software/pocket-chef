@@ -13,8 +13,13 @@ struct RecipeListView: View {
     @State private var pendingURLCaptureReview: Recipe?
     @State private var reviewingCapturedRecipe: Recipe?
 
-    init(viewModel: RecipeListViewModel) {
+    @State private var isPresentingSettings = false
+    /// Shown from a toolbar button on iOS/iPadOS; macOS has its own Settings window (⌘,).
+    private let settingsViewModel: SettingsViewModel?
+
+    init(viewModel: RecipeListViewModel, settingsViewModel: SettingsViewModel? = nil) {
         _viewModel = State(initialValue: viewModel)
+        self.settingsViewModel = settingsViewModel
     }
 
     var body: some View {
@@ -72,6 +77,18 @@ struct RecipeListView: View {
             }
             .navigationTitle("")
             .toolbar {
+                #if os(iOS)
+                if settingsViewModel != nil {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            isPresentingSettings = true
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                        .accessibilityLabel("Settings")
+                    }
+                }
+                #endif
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         isPresentingAddChooser = true
@@ -146,6 +163,18 @@ struct RecipeListView: View {
             viewModel.load()
             viewModel.loadTags()
         }
+        // A storage switch or an iCloud import changed the recipes underneath this screen.
+        .onReceive(NotificationCenter.default.publisher(for: .recipeStoreDidChange)) { _ in
+            viewModel.load()
+            viewModel.loadTags()
+        }
+        #if os(iOS)
+        .sheet(isPresented: $isPresentingSettings) {
+            if let settingsViewModel {
+                SettingsView(viewModel: settingsViewModel)
+            }
+        }
+        #endif
     }
 }
 

@@ -15,6 +15,7 @@ A NeonPixel app for macOS, iPadOS, and iOS. Gather recipes with zero friction: t
 - **Zero-friction capture** — two clearly presented options on the add-recipe screen: *Type it* (free text) or *Paste a link* (URL). Apple Intelligence structures or extracts the recipe entirely on-device — no server round-trip. Devices without Apple Intelligence fall back straight to a blank structured form.
 - **Review before save** — every capture path lands on an editable review screen. Nothing saves unreviewed.
 - **Tags** — preset tags (breakfast, lunch, dinner, dessert, snack) plus unlimited custom tags, multiple per recipe, with tag filtering on the list.
+- **Local or iCloud** — recipes stay on the device by default; a Settings switch syncs them to the user's other devices through their private iCloud database, and switching back keeps a local copy.
 
 ## Privacy
 
@@ -42,6 +43,8 @@ xcodegen generate
 
 Then open `app/PocketChef.xcodeproj` and use the `PocketChef-iOS` / `PocketChef-macOS` schemes (build, test, coverage). Deployment targets are iOS 26 / macOS 26; the UI is localized into English, Spanish, French, German, and Dutch.
 
+iCloud sync needs a signing team, which stays out of this public repo: copy `app/Config/Signing.xcconfig.example` to `app/Config/Signing.xcconfig` (gitignored), fill in your team ID, and run `xcodegen generate` again. Without it the app builds without the iCloud entitlement and the storage setting is disabled; that's how CI builds it.
+
 ### Density API (`api/`)
 
 Local development uses [Podman](https://podman.io) for the PostgreSQL container. From the `api/` directory:
@@ -64,7 +67,7 @@ See [`api/README.md`](api/README.md) for full details (one-time `dotnet-ef` inst
 - [`api/docs/plans/`](api/docs/plans/) — density API design docs
 - [`api/docs/deploy.md`](api/docs/deploy.md) — deployment runbook for the density API
 
-Development proceeds in vertical slices (see `PLAN.md`); the project is not yet at its full v1 feature set. Still on the roadmap: the settings screen with the local/iCloud sync toggle (Phase 4), verification of the on-device AI capture on real devices (Phases 5.1/6.1/7.3), the client's density cache (Phase 10), and unit conversion — the volume/weight toggle on each recipe (Phase 11).
+Development proceeds in vertical slices (see `PLAN.md`); the project is not yet at its full v1 feature set. Still on the roadmap: checking live iCloud sync to the Mac on a TestFlight build (Phase 4.1, see `PLAN.md`), verification of the on-device AI capture on real devices (Phases 5.1/6.1/7.3), the client's density cache (Phase 10), and unit conversion — the volume/weight toggle on each recipe (Phase 11).
 
 ## CI & quality
 

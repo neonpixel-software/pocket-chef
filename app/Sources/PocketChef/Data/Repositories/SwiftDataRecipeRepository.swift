@@ -2,10 +2,15 @@ import Foundation
 import SwiftData
 
 final class SwiftDataRecipeRepository: RecipeRepository {
-    private let modelContext: ModelContext
+    /// Resolved on every call rather than stored, so a storage switch (PersistenceController)
+    /// retargets the repository without rebuilding it.
+    private let currentModelContext: () -> ModelContext
+    private var modelContext: ModelContext {
+        currentModelContext()
+    }
 
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    init(modelContext: @escaping @autoclosure () -> ModelContext) {
+        currentModelContext = modelContext
     }
 
     func fetchAll() throws -> [Recipe] {
@@ -27,23 +32,7 @@ final class SwiftDataRecipeRepository: RecipeRepository {
             throw RecipeRepositoryError.recipeNotFound
         }
 
-        model.title = recipe.title
-        model.steps = recipe.steps
-        model.equipment = recipe.equipment
-        switch recipe.source {
-        case .typed:
-            model.isTypedSource = true
-            model.sourceURL = nil
-        case let .url(url):
-            model.isTypedSource = false
-            model.sourceURL = url
-        }
-
-        // The .cascade delete rule only fires on parent deletion, not on reassigning
-        // the relationship array, so old children must be deleted explicitly here or
-        // they leak as orphaned rows.
-        (model.ingredients ?? []).forEach { modelContext.delete($0) }
-        model.ingredients = recipe.ingredientModels()
+        model.overwrite(with: recipe, in: modelContext)
 
         // Tags are a shared (non-owned) relationship: resolve to the existing,
         // already-persisted TagModel rows by id rather than remapping via

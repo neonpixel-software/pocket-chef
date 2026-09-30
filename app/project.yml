@@ -27,9 +27,15 @@ targets:
     platform: iOS
     sources:
       - Sources/PocketChef
+    configFiles:
+      Debug: Config/PocketChef.xcconfig
+      Release: Config/PocketChef.xcconfig
     settings:
       PRODUCT_MODULE_NAME: PocketChef
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
+      # Merged with the generated Info.plist: UIBackgroundModes has no INFOPLIST_KEY_ setting.
+      # CloudKit sync wakes the app with silent pushes (remote-notification).
+      INFOPLIST_FILE: Config/Info-iOS.plist
       INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
       INFOPLIST_KEY_UILaunchScreen_Generation: YES
       INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
@@ -58,6 +64,9 @@ targets:
     platform: macOS
     sources:
       - Sources/PocketChef
+    configFiles:
+      Debug: Config/PocketChef.xcconfig
+      Release: Config/PocketChef.xcconfig
     settings:
       PRODUCT_MODULE_NAME: PocketChef
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef

@@ -2,10 +2,15 @@ import Foundation
 import SwiftData
 
 final class SwiftDataTagRepository: TagRepository {
-    private let modelContext: ModelContext
+    /// Resolved on every call rather than stored, so a storage switch (PersistenceController)
+    /// retargets the repository without rebuilding it.
+    private let currentModelContext: () -> ModelContext
+    private var modelContext: ModelContext {
+        currentModelContext()
+    }
 
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
+    init(modelContext: @escaping @autoclosure () -> ModelContext) {
+        currentModelContext = modelContext
     }
 
     func fetchAll() throws -> [Tag] {

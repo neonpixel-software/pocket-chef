@@ -64,3 +64,6 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 *.profraw
+
+## Local signing team, kept out of the public repo (see app/Config/Signing.xcconfig.example)
+app/Config/Signing.xcconfig

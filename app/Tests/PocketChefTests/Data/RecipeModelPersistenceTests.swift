@@ -59,4 +59,19 @@ final class RecipeModelPersistenceTests: XCTestCase {
         XCTAssertFalse(fetched.isTypedSource)
         XCTAssertEqual(fetched.sourceURL, url)
     }
+
+    /// A row that arrives through CloudKit without its URL (another device or app version)
+    /// must map to a typed recipe instead of crashing the list or a storage switch.
+    func testURLSourcedRowWithoutAURLMapsToTyped() {
+        let model = RecipeModel(title: "Soup", steps: [], isTypedSource: false, sourceURL: nil)
+
+        XCTAssertEqual(model.toDomain().source, .typed)
+    }
+
+    func testURLSourcedRowMapsToItsURL() throws {
+        let url = try XCTUnwrap(URL(string: "https://example.com/soup"))
+        let model = RecipeModel(title: "Soup", steps: [], isTypedSource: false, sourceURL: url)
+
+        XCTAssertEqual(model.toDomain().source, .url(url))
+    }
 }

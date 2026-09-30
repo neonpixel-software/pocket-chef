@@ -204,6 +204,26 @@ final class RecipeListViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.filteredRecipes, [pancakes, soup])
     }
 
+    func testLoadTagsClearsASelectedTagThatNoLongerExists() {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let viewModel = makeViewModel(fetchTagsResult: .success([breakfast]))
+        viewModel.selectTag(UUID())
+
+        viewModel.loadTags()
+
+        XCTAssertNil(viewModel.selectedTagID)
+    }
+
+    func testLoadTagsKeepsASelectedTagThatStillExists() {
+        let breakfast = Tag(id: UUID(), name: "Breakfast", isPreset: true)
+        let viewModel = makeViewModel(fetchTagsResult: .success([breakfast]))
+        viewModel.selectTag(breakfast.id)
+
+        viewModel.loadTags()
+
+        XCTAssertEqual(viewModel.selectedTagID, breakfast.id)
+    }
+
     // MARK: capture
 
     func testIsCaptureAvailableReflectsUseCase() {
