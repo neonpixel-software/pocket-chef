@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 @main
@@ -9,6 +10,9 @@ struct PocketChefApp: App {
     private let webPageFetcher: WebPageFetcher
     private let captureRecipeUseCase: CaptureRecipeUseCase
     private let settingsViewModel: SettingsViewModel
+    /// The local-only density cache (Phase 10). Nil when the store couldn't open; the app
+    /// works without it, since only unit conversion needs densities.
+    private let densityContainer: ModelContainer?
 
     init() {
         PCFontRegistrar.registerCustomFonts()
@@ -41,6 +45,29 @@ struct PocketChefApp: App {
             ),
             isICloudAvailableInBuild: BuildConfiguration.isICloudEnabled
         )
+
+        do {
+            densityContainer = try DensityStore.makeContainer()
+        } catch {
+            print("Failed to open the density cache: \(error)")
+            densityContainer = nil
+        }
+        if let densityContainer,
+           let configuration = DensityAPIConfiguration(infoDictionary: Bundle.main.infoDictionary) {
+            let refreshDensityCacheUseCase = DefaultRefreshDensityCacheUseCase(
+                remoteSource: URLSessionDensityEntryRemoteSource(configuration: configuration),
+                cacheRepository: SwiftDataDensityCacheRepository(modelContext: densityContainer.mainContext)
+            )
+            // Fills the cache on first launch; a failure is retried at the next launch.
+            // Periodic and manual refresh come in Phase 10.2.
+            Task {
+                do {
+                    try await refreshDensityCacheUseCase.executeIfCacheEmpty()
+                } catch {
+                    print("Filling the density cache failed: \(error)")
+                }
+            }
+        }
     }
 
     var body: some Scene {

@@ -2,12 +2,12 @@ import Foundation
 
 extension DensityEntryModel {
     func toDomain() -> DensityEntry {
-        DensityEntry(id: id, ingredientName: ingredientName, gramsPerMilliliter: gramsPerMilliliter)
+        DensityEntry(ingredientName: ingredientName, gramsPerMilliliter: gramsPerMilliliter, lastModified: lastModified)
     }
 }
 
 extension DensityEntry {
     func toModel() -> DensityEntryModel {
-        DensityEntryModel(id: id, ingredientName: ingredientName, gramsPerMilliliter: gramsPerMilliliter)
+        DensityEntryModel(ingredientName: ingredientName, gramsPerMilliliter: gramsPerMilliliter, lastModified: lastModified)
     }
 }
