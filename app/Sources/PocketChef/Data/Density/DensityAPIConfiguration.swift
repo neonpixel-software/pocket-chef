@@ -15,9 +15,10 @@ struct DensityAPIConfiguration: Equatable {
         let host = host.trimmingCharacters(in: .whitespaces)
         let readKey = readKey.trimmingCharacters(in: .whitespaces)
         guard !host.isEmpty, !readKey.isEmpty else { return nil }
-        var components = URLComponents()
-        components.scheme = "https"
-        components.host = host
+        // Parsed as an authority, so a port works too (`localhost:7032`, the local API).
+        guard var components = URLComponents(string: "https://\(host)"),
+              components.host?.isEmpty == false,
+              components.path.isEmpty, components.user == nil else { return nil }
         components.path = "/density-entries"
         guard let url = components.url else { return nil }
         entriesURL = url

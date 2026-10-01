@@ -9,6 +9,18 @@ final class DensityAPIConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration?.readKey, "key")
     }
 
+    func testAcceptsAHostWithAPort() {
+        let configuration = DensityAPIConfiguration(host: "localhost:7032", readKey: "key")
+
+        XCTAssertEqual(configuration?.entriesURL.absoluteString, "https://localhost:7032/density-entries")
+    }
+
+    func testRejectsAHostThatIsNotJustAHost() {
+        XCTAssertNil(DensityAPIConfiguration(host: "density.example.com/api", readKey: "key"))
+        XCTAssertNil(DensityAPIConfiguration(host: "user@density.example.com", readKey: "key"))
+        XCTAssertNil(DensityAPIConfiguration(host: ":7032", readKey: "key"))
+    }
+
     func testReadsTheInfoPlistKeys() {
         let configuration = DensityAPIConfiguration(infoDictionary: [
             "DensityAPIHost": "density.example.com",
