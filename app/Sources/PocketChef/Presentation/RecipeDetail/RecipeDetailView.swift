@@ -9,6 +9,10 @@ struct RecipeDetailView: View {
     /// If that changes (search, sync), refresh `viewModel.recipe` from the repository here.
     @State private var viewModel: RecipeDetailViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.convertIngredientsToWeight) private var convertIngredientsToWeight
+    /// The as-written/weight choice, remembered across recipes and launches.
+    @AppStorage("showsIngredientWeights") private var showsWeights = false
+    @State private var weights: [UUID: IngredientWeight] = [:]
 
     /// Invoked whenever this recipe is edited or deleted, so the list that pushed this
     /// screen can refresh — NavigationStack's `.onAppear` on pop-back isn't reliably
@@ -39,6 +43,14 @@ struct RecipeDetailView: View {
                 }
 
                 section(title: String(localized: "Ingredients"), accent: PCColor.teal) {
+                    if !recipe.ingredients.isEmpty {
+                        Picker("Measurements", selection: $showsWeights) {
+                            Text("As Written").tag(false)
+                            Text("Weight").tag(true)
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+                    }
                     Group {
                         if recipe.ingredients.isEmpty {
                             Text("No ingredients listed")
@@ -52,9 +64,7 @@ struct RecipeDetailView: View {
                                         Circle()
                                             .fill(PCColor.teal)
                                             .frame(width: 8, height: 8)
-                                        Text(ingredient.rawText)
-                                            .font(PCFont.body(15))
-                                            .foregroundStyle(PCColor.textPrimary)
+                                        ingredientText(ingredient)
                                         Spacer()
                                     }
                                     .padding(.vertical, 12)
@@ -159,6 +169,33 @@ struct RecipeDetailView: View {
             }
         }
         .tint(PCColor.pink)
+        .onChange(of: showsWeights, initial: true) { updateWeights() }
+        .onChange(of: recipe.ingredients) { updateWeights() }
+    }
+
+    /// The line as written, or in weight mode its weight in grams with the original below it.
+    /// Lines that can't be weighed stay as written (Phase 11.2 adds a note to those).
+    @ViewBuilder
+    private func ingredientText(_ ingredient: IngredientLine) -> some View {
+        if showsWeights, case let .grams(grams)? = weights[ingredient.id] {
+            let weight = IngredientWeightFormatter.format(grams: grams)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: ingredient.ingredientName.map { "\(weight) \($0)" } ?? weight)
+                    .font(PCFont.body(15))
+                    .foregroundStyle(PCColor.textPrimary)
+                Text(ingredient.rawText)
+                    .font(PCFont.body(13))
+                    .foregroundStyle(PCColor.textPrimary.opacity(0.55))
+            }
+        } else {
+            Text(ingredient.rawText)
+                .font(PCFont.body(15))
+                .foregroundStyle(PCColor.textPrimary)
+        }
+    }
+
+    private func updateWeights() {
+        weights = showsWeights ? convertIngredientsToWeight?.execute(recipe.ingredients) ?? [:] : [:]
     }
 
     private func section(

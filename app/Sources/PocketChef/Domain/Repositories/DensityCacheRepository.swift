@@ -20,5 +20,7 @@ protocol DensityCacheRepository {
     func apply(_ entries: [DensityEntry]) throws -> DensityCacheChanges
     /// Matches names the way the API does (see `DensityEntry.lookupKey(for:)`).
     func entry(forIngredientNamed name: String) throws -> DensityEntry?
+    /// Every cached entry, for matching that's looser than the lookup key (Phase 11).
+    func allEntries() throws -> [DensityEntry]
     func isEmpty() throws -> Bool
 }

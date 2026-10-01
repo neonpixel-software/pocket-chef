@@ -15,6 +15,8 @@ struct PocketChefApp: App {
     private let densityContainer: ModelContainer?
     /// Nil without the store or the density API configuration (DensityAPI.xcconfig).
     private let refreshDensityCacheUseCase: RefreshDensityCacheUseCase?
+    /// Nil only when the density store couldn't open.
+    private let convertIngredientsToWeightUseCase: ConvertIngredientsToWeightUseCase?
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
@@ -46,6 +48,9 @@ struct PocketChefApp: App {
         } catch {
             print("Failed to open the density cache: \(error)")
             densityContainer = nil
+        }
+        convertIngredientsToWeightUseCase = densityContainer.map {
+            DefaultConvertIngredientsToWeightUseCase(cacheRepository: SwiftDataDensityCacheRepository(modelContext: $0.mainContext))
         }
         if let densityContainer,
            let configuration = DensityAPIConfiguration(infoDictionary: Bundle.main.infoDictionary) {
@@ -87,6 +92,7 @@ struct PocketChefApp: App {
                 )),
                 settingsViewModel: settingsViewModel
             )
+            .environment(\.convertIngredientsToWeight, convertIngredientsToWeightUseCase)
             // The periodic check (Phase 10.2): on launch and whenever the app comes back,
             // refresh densities if the last refresh is more than a day old.
             .onChange(of: scenePhase, initial: true) { _, phase in

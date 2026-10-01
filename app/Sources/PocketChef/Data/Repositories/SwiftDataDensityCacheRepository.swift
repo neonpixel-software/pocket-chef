@@ -49,6 +49,10 @@ final class SwiftDataDensityCacheRepository: DensityCacheRepository {
         return try modelContext.fetch(descriptor).first?.toDomain()
     }
 
+    func allEntries() throws -> [DensityEntry] {
+        try modelContext.fetch(FetchDescriptor<DensityEntryModel>(sortBy: [SortDescriptor(\.lookupKey)])).map { $0.toDomain() }
+    }
+
     func isEmpty() throws -> Bool {
         try modelContext.fetchCount(FetchDescriptor<DensityEntryModel>()) == 0
     }
