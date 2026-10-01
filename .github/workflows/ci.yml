@@ -37,7 +37,10 @@ jobs:
   build:
     needs: changes
     if: needs.changes.outputs.app == 'true'
-    runs-on: macos-26
+    # Xcode 27, matching Xcode Cloud and local builds. The default macos-26 image only has
+    # Xcode 26, whose SDK lacks Xcode 27 APIs (issue #119). xcode-27 is a GitHub preview
+    # image: move to its GA label once there is one.
+    runs-on: xcode-27
     defaults:
       run:
         working-directory: app

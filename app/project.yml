@@ -19,7 +19,7 @@ settings:
 packages:
   ViewInspector:
     url: https://github.com/nalexn/ViewInspector
-    exactVersion: 0.10.3
+    exactVersion: 0.10.5
 
 targets:
   PocketChef-iOS:
