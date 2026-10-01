@@ -65,6 +65,13 @@ App: `PocketChefApp` calls `executeIfStale()` when the scene phase becomes
   nothing changed means no save), staleness (never refreshed, under and over
   24 hours, empty cache), the single-flight guard, failures not recording a
   refresh, the Settings view model states, and string catalog coverage.
-- Acceptance against production needs a write. The options are to add one
-  real entry with the write key and press Refresh Now in the simulator, or
-  to run the API locally. Which one is the user's call.
+- Acceptance, run against the API locally so production isn't written to
+  (user decision, 2026-10-01): Postgres via `podman compose`, the API's `https`
+  launch profile, and the .NET dev certificate trusted in the simulator
+  (`simctl keychain add-root-cert`). The app was built with
+  `DENSITY_API_HOST=localhost:7032 DENSITY_API_READ_KEY=local-dev-read-key`
+  on the command line, so it needs no ATS exception and leaves the real
+  xcconfig untouched. Results: a fresh install cached the 72 seeds. An entry
+  POSTed with the local write key didn't arrive on a relaunch within the day.
+  Refresh Now brought it in (73 rows, "Ingredient densities updated."). The
+  test entry was then deleted from the local database.
