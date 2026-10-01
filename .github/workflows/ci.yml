@@ -47,6 +47,16 @@ jobs:
         run: brew install xcodegen
       - name: Generate Xcode project
         run: xcodegen generate
+      - name: Verify the committed Package.resolved
+        # Xcode Cloud builds from ci_scripts/Package.resolved (see ci_post_clone.sh), a
+        # hand-synced copy of project.yml's packages. Resolve fresh for both schemes and
+        # fail on any difference, so a stale copy breaks here instead of in Xcode Cloud.
+        run: |
+          for scheme in PocketChef-iOS PocketChef-macOS; do
+            xcodebuild -resolvePackageDependencies -project PocketChef.xcodeproj -scheme "$scheme"
+          done
+          diff ci_scripts/Package.resolved \
+            PocketChef.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
       - name: Verify formatting
         # Enforces the style contract in app/.swiftformat; fails without changing anything.
         # Pinned to the version the config was validated against — a newer SwiftFormat

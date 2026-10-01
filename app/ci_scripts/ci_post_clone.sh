@@ -18,8 +18,8 @@ brew install xcodegen
 xcodegen generate
 
 # Xcode Cloud disables automatic package resolution and needs a Package.resolved, which
-# lives inside the gitignored project, so restore the committed copy (update it when
-# project.yml's packages change).
+# lives inside the gitignored project, so restore the committed copy. When project.yml's
+# packages change, copy the regenerated file back here; GitHub CI fails until you do.
 resolved=PocketChef.xcodeproj/project.xcworkspace/xcshareddata/swiftpm
 mkdir -p "$resolved"
 cp ci_scripts/Package.resolved "$resolved/Package.resolved"
