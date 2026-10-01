@@ -31,41 +31,65 @@ final class SwiftDataDensityCacheRepositoryTests: XCTestCase {
         XCTAssertNil(try repository.entry(forIngredientNamed: "flour"))
     }
 
-    func testReplaceAllStoresTheEntries() throws {
+    func testApplyToAnEmptyCacheAddsEveryEntry() throws {
         let (repository, _) = try makeRepository()
 
-        try repository.replaceAll(with: [entry("flour", 0.53), entry("honey", 1.42)])
+        let changes = try repository.apply([entry("flour", 0.53), entry("honey", 1.42)])
 
+        XCTAssertEqual(changes, DensityCacheChanges(added: 2))
         XCTAssertFalse(try repository.isEmpty())
         XCTAssertEqual(try repository.entry(forIngredientNamed: "flour"), entry("flour", 0.53))
         XCTAssertEqual(try repository.entry(forIngredientNamed: "honey"), entry("honey", 1.42))
     }
 
-    func testReplaceAllRemovesEntriesMissingFromTheNewSet() throws {
+    func testApplyRemovesEntriesTheServerNoLongerHas() throws {
         let (repository, context) = try makeRepository()
-        try repository.replaceAll(with: [entry("flour", 0.53), entry("honey", 1.42)])
+        _ = try repository.apply([entry("flour", 0.53), entry("honey", 1.42)])
 
-        try repository.replaceAll(with: [entry("honey", 1.40)])
+        let changes = try repository.apply([entry("honey", 1.42)])
 
+        XCTAssertEqual(changes, DensityCacheChanges(removed: 1))
         XCTAssertNil(try repository.entry(forIngredientNamed: "flour"))
-        XCTAssertEqual(try repository.entry(forIngredientNamed: "honey")?.gramsPerMilliliter, 1.40)
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<DensityEntryModel>()), 1)
     }
 
-    func testReplaceAllWithTheSameEntriesTwiceKeepsOneRowEach() throws {
+    func testApplyUpdatesAnEntryChangedOnTheServer() throws {
+        let (repository, _) = try makeRepository()
+        _ = try repository.apply([entry("flour", 0.53), entry("honey", 1.42)])
+        let newerHoney = DensityEntry(ingredientName: "Honey", gramsPerMilliliter: 1.40, lastModified: date.addingTimeInterval(60))
+
+        let changes = try repository.apply([entry("flour", 0.53), newerHoney])
+
+        XCTAssertEqual(changes, DensityCacheChanges(updated: 1))
+        XCTAssertEqual(try repository.entry(forIngredientNamed: "honey"), newerHoney)
+    }
+
+    func testApplyAddsAnEntryNewOnTheServer() throws {
+        let (repository, _) = try makeRepository()
+        _ = try repository.apply([entry("flour", 0.53)])
+
+        let changes = try repository.apply([entry("flour", 0.53), entry("maple syrup", 1.33)])
+
+        XCTAssertEqual(changes, DensityCacheChanges(added: 1))
+        XCTAssertEqual(try repository.entry(forIngredientNamed: "Maple Syrup")?.gramsPerMilliliter, 1.33)
+    }
+
+    func testApplyingTheSameEntriesAgainChangesNothing() throws {
         let (repository, context) = try makeRepository()
         let entries = [entry("flour", 0.53), entry("honey", 1.42)]
+        _ = try repository.apply(entries)
 
-        try repository.replaceAll(with: entries)
-        try repository.replaceAll(with: entries)
+        let changes = try repository.apply(entries)
 
+        XCTAssertTrue(changes.isEmpty)
+        XCTAssertFalse(context.hasChanges)
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<DensityEntryModel>()), 2)
     }
 
-    func testReplaceAllKeepsOneEntryWhenTwoNamesShareALookupKey() throws {
+    func testApplyKeepsOneEntryWhenTwoNamesShareALookupKey() throws {
         let (repository, context) = try makeRepository()
 
-        try repository.replaceAll(with: [entry("caf\u{E9}", 1.0), entry("cafe\u{301}", 1.1)])
+        _ = try repository.apply([entry("caf\u{E9}", 1.0), entry("cafe\u{301}", 1.1)])
 
         XCTAssertEqual(try context.fetchCount(FetchDescriptor<DensityEntryModel>()), 1)
         XCTAssertEqual(try repository.entry(forIngredientNamed: "Caf\u{E9}")?.gramsPerMilliliter, 1.1)
@@ -73,14 +97,14 @@ final class SwiftDataDensityCacheRepositoryTests: XCTestCase {
 
     func testLookupMatchesCaseWhitespaceAndUnicodeForm() throws {
         let (repository, _) = try makeRepository()
-        try repository.replaceAll(with: [entry("cr\u{E8}me fra\u{EE}che", 1.0)])
+        _ = try repository.apply([entry("cr\u{E8}me fra\u{EE}che", 1.0)])
 
         XCTAssertNotNil(try repository.entry(forIngredientNamed: "  Cre\u{300}me Frai\u{302}che "))
     }
 
     func testLookupKeepsTheServerSpelling() throws {
         let (repository, _) = try makeRepository()
-        try repository.replaceAll(with: [entry("All-Purpose Flour", 0.53)])
+        _ = try repository.apply([entry("All-Purpose Flour", 0.53)])
 
         XCTAssertEqual(try repository.entry(forIngredientNamed: "all-purpose flour")?.ingredientName, "All-Purpose Flour")
     }

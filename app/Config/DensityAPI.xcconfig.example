@@ -3,7 +3,8 @@
 // Without this file the app builds without the density API: it never fetches and unit
 // conversion has no densities. That's how GitHub CI builds it.
 
-// Host only, no scheme or path: `//` starts a comment in an xcconfig. The app adds https://.
+// Host only (a port is fine, e.g. localhost:7032), no scheme or path: `//` starts a comment in
+// an xcconfig. The app adds https://.
 DENSITY_API_HOST = density.example.com
 // The read-tier key (ApiKeys__ReadApiKey on the server, API_READ_KEY in the deploy secrets).
 // Never the write key: this one ships inside the app. If the key contains `//`, write it as

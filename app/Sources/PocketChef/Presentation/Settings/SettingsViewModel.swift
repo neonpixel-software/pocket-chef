@@ -10,12 +10,53 @@ final class SettingsViewModel {
     /// False in a build without the iCloud entitlement (CI, a clone without Signing.xcconfig).
     let isICloudAvailableInBuild: Bool
 
-    private let changeStorageModeUseCase: ChangeStorageModeUseCase
+    private(set) var lastDensityRefresh: Date?
+    private(set) var isRefreshingDensities = false
+    private(set) var densityStatus: DensityRefreshStatus?
 
-    init(changeStorageModeUseCase: ChangeStorageModeUseCase, isICloudAvailableInBuild: Bool) {
+    private let changeStorageModeUseCase: ChangeStorageModeUseCase
+    /// Nil in a build without the density API configuration (DensityAPI.xcconfig).
+    private let refreshDensityCacheUseCase: RefreshDensityCacheUseCase?
+
+    init(
+        changeStorageModeUseCase: ChangeStorageModeUseCase,
+        isICloudAvailableInBuild: Bool,
+        refreshDensityCacheUseCase: RefreshDensityCacheUseCase? = nil
+    ) {
         self.changeStorageModeUseCase = changeStorageModeUseCase
         self.isICloudAvailableInBuild = isICloudAvailableInBuild
+        self.refreshDensityCacheUseCase = refreshDensityCacheUseCase
         storageMode = changeStorageModeUseCase.currentMode
+        lastDensityRefresh = refreshDensityCacheUseCase?.lastRefresh
+    }
+
+    var isDensityAPIAvailableInBuild: Bool {
+        refreshDensityCacheUseCase != nil
+    }
+
+    var canRefreshDensities: Bool {
+        isDensityAPIAvailableInBuild && !isRefreshingDensities
+    }
+
+    /// Picks up a refresh that ran in the background since the screen was built.
+    func reloadDensityStatus() {
+        lastDensityRefresh = refreshDensityCacheUseCase?.lastRefresh
+    }
+
+    func refreshDensities() async {
+        guard let refreshDensityCacheUseCase, !isRefreshingDensities else { return }
+
+        isRefreshingDensities = true
+        defer { isRefreshingDensities = false }
+
+        do {
+            let changes = try await refreshDensityCacheUseCase.execute()
+            densityStatus = changes.isEmpty ? .upToDate : .updated
+        } catch {
+            print("Refreshing ingredient densities failed: \(error)")
+            densityStatus = .failed(DensityRefreshFailure(error))
+        }
+        lastDensityRefresh = refreshDensityCacheUseCase.lastRefresh
     }
 
     var canChangeStorage: Bool {
@@ -52,6 +93,67 @@ final class SettingsViewModel {
             String(localized: "iCloud sync isn't available in this build.")
         case .available, .couldNotDetermine:
             String(localized: "Couldn't reach iCloud. Check your connection and try again.")
+        }
+    }
+}
+
+/// The outcome of the last "Refresh Now" in Settings.
+enum DensityRefreshStatus: Equatable {
+    case upToDate
+    case updated
+    case failed(DensityRefreshFailure)
+
+    var isFailure: Bool {
+        if case .failed = self { return true }
+        return false
+    }
+
+    var message: String {
+        switch self {
+        case .upToDate:
+            String(localized: "Ingredient densities are up to date.")
+        case .updated:
+            String(localized: "Ingredient densities updated.")
+        case let .failed(failure):
+            failure.message
+        }
+    }
+}
+
+/// Why a refresh failed, in terms the user can act on.
+enum DensityRefreshFailure: Equatable {
+    /// The request never got an answer: offline, DNS, TLS, timeout.
+    case connection
+    /// The API turned the read key down (401/403). Only a new app version can fix that.
+    case rejected
+    /// The API answered, but not with entries: a server error, rate limiting, a bad body.
+    case serviceUnavailable
+    /// The download worked but the cache couldn't be saved.
+    case couldNotSave
+
+    init(_ error: Error) {
+        switch error {
+        case DensityEntryFetchError.requestFailed:
+            self = .connection
+        case let DensityEntryFetchError.httpStatus(status) where status == 401 || status == 403:
+            self = .rejected
+        case DensityEntryFetchError.httpStatus, DensityEntryFetchError.invalidResponse:
+            self = .serviceUnavailable
+        default:
+            self = .couldNotSave
+        }
+    }
+
+    var message: String {
+        switch self {
+        case .connection:
+            String(localized: "Couldn't refresh ingredient densities. Check your connection and try again.")
+        case .rejected:
+            String(localized: "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again.")
+        case .serviceUnavailable:
+            String(localized: "The ingredient density service isn't responding properly right now. Try again later.")
+        case .couldNotSave:
+            String(localized: "Couldn't save ingredient densities on this device. Try again.")
         }
     }
 }

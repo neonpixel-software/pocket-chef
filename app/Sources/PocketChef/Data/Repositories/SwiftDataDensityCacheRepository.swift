@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 final class SwiftDataDensityCacheRepository: DensityCacheRepository {
     private let modelContext: ModelContext
 
@@ -8,18 +9,37 @@ final class SwiftDataDensityCacheRepository: DensityCacheRepository {
         self.modelContext = modelContext
     }
 
-    func replaceAll(with entries: [DensityEntry]) throws {
-        try modelContext.delete(model: DensityEntryModel.self)
+    func apply(_ entries: [DensityEntry]) throws -> DensityCacheChanges {
         // The server's names are unique ignoring case, but two could still share a lookup key
         // (e.g. differing only in Unicode form). Keep the last one rather than fail the save.
-        var byKey: [String: DensityEntry] = [:]
+        var incoming: [String: DensityEntry] = [:]
         for entry in entries {
-            byKey[entry.id] = entry
+            incoming[entry.id] = entry
         }
-        for entry in byKey.values {
+
+        var changes = DensityCacheChanges()
+        for model in try modelContext.fetch(FetchDescriptor<DensityEntryModel>()) {
+            guard let entry = incoming.removeValue(forKey: model.lookupKey) else {
+                modelContext.delete(model)
+                changes.removed += 1
+                continue
+            }
+            if model.toDomain() != entry {
+                model.ingredientName = entry.ingredientName
+                model.gramsPerMilliliter = entry.gramsPerMilliliter
+                model.lastModified = entry.lastModified
+                changes.updated += 1
+            }
+        }
+        for entry in incoming.values {
             modelContext.insert(entry.toModel())
+            changes.added += 1
         }
-        try modelContext.save()
+
+        if !changes.isEmpty {
+            try modelContext.save()
+        }
+        return changes
     }
 
     func entry(forIngredientNamed name: String) throws -> DensityEntry? {

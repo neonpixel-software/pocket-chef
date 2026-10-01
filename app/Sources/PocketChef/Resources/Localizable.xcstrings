@@ -1848,6 +1848,342 @@
           }
         }
       }
+    },
+    "Ingredient Densities": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Densidades de ingredientes"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Densités des ingrédients"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zutatendichten"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingrediëntdichtheden"
+          }
+        }
+      }
+    },
+    "Refresh Now": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualizar ahora"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualiser maintenant"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt aktualisieren"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu vernieuwen"
+          }
+        }
+      }
+    },
+    "Last updated %@": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Última actualización: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dernière mise à jour : %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuletzt aktualisiert: %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laatst bijgewerkt: %@"
+          }
+        }
+      }
+    },
+    "Not downloaded yet": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún no se han descargado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas encore téléchargées"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch nicht heruntergeladen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog niet gedownload"
+          }
+        }
+      }
+    },
+    "Ingredient densities are up to date.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las densidades de ingredientes están actualizadas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les densités des ingrédients sont à jour."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Zutatendichten sind auf dem neuesten Stand."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De ingrediëntdichtheden zijn up-to-date."
+          }
+        }
+      }
+    },
+    "Ingredient densities updated.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Densidades de ingredientes actualizadas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Densités des ingrédients mises à jour."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zutatendichten aktualisiert."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingrediëntdichtheden bijgewerkt."
+          }
+        }
+      }
+    },
+    "Couldn't refresh ingredient densities. Check your connection and try again.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudieron actualizar las densidades de ingredientes. Comprueba la conexión e inténtalo de nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'actualiser les densités des ingrédients. Vérifiez votre connexion et réessayez."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Zutatendichten konnten nicht aktualisiert werden. Überprüfe deine Verbindung und versuche es erneut."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan de ingrediëntdichtheden niet vernieuwen. Controleer je verbinding en probeer het opnieuw."
+          }
+        }
+      }
+    },
+    "Pocket Chef uses ingredient densities to convert between volume and weight. It checks for updates once a day.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pocket Chef usa las densidades de los ingredientes para convertir entre volumen y peso. Busca actualizaciones una vez al día."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pocket Chef utilise les densités des ingrédients pour convertir entre volume et poids. Il recherche des mises à jour une fois par jour."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pocket Chef nutzt Zutatendichten, um zwischen Volumen und Gewicht umzurechnen. Es sucht einmal täglich nach Aktualisierungen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pocket Chef gebruikt ingrediëntdichtheden om tussen volume en gewicht om te rekenen. Het controleert één keer per dag op updates."
+          }
+        }
+      }
+    },
+    "Ingredient densities aren't available in this build.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las densidades de ingredientes no están disponibles en esta versión."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les densités des ingrédients ne sont pas disponibles dans cette version."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zutatendichten sind in diesem Build nicht verfügbar."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingrediëntdichtheden zijn niet beschikbaar in deze build."
+          }
+        }
+      }
+    },
+    "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El servicio de densidades de ingredientes no aceptó esta versión de Pocket Chef. Actualiza la app e inténtalo de nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le service des densités des ingrédients n'a pas accepté cette version de Pocket Chef. Mettez l'app à jour et réessayez."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Dienst für Zutatendichten hat diese Version von Pocket Chef nicht akzeptiert. Aktualisiere die App und versuche es erneut."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De dienst voor ingrediëntdichtheden heeft deze versie van Pocket Chef niet geaccepteerd. Werk de app bij en probeer het opnieuw."
+          }
+        }
+      }
+    },
+    "The ingredient density service isn't responding properly right now. Try again later.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El servicio de densidades de ingredientes no responde correctamente en este momento. Inténtalo más tarde."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le service des densités des ingrédients ne répond pas correctement pour le moment. Réessayez plus tard."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Dienst für Zutatendichten antwortet gerade nicht richtig. Versuche es später erneut."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De dienst voor ingrediëntdichtheden reageert momenteel niet goed. Probeer het later opnieuw."
+          }
+        }
+      }
+    },
+    "Couldn't save ingredient densities on this device. Try again.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudieron guardar las densidades de ingredientes en este dispositivo. Inténtalo de nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'enregistrer les densités des ingrédients sur cet appareil. Réessayez."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Zutatendichten konnten auf diesem Gerät nicht gespeichert werden. Versuche es erneut."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan de ingrediëntdichtheden niet op dit apparaat opslaan. Probeer het opnieuw."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
