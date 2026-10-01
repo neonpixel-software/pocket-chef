@@ -84,17 +84,57 @@ final class SettingsViewModelDensityTests: XCTestCase {
     func testAFailedRefreshExplainsAndKeepsTheOldDate() async {
         let useCase = FakeRefreshDensityCacheUseCase()
         useCase.lastRefresh = Date(timeIntervalSince1970: 5)
-        useCase.result = .failure(URLError(.notConnectedToInternet))
+        useCase.result = .failure(DensityEntryFetchError.requestFailed(underlying: URLError(.notConnectedToInternet)))
         let viewModel = makeViewModel(useCase)
 
         await viewModel.refreshDensities()
 
-        XCTAssertEqual(viewModel.densityStatus, .failed)
+        XCTAssertEqual(viewModel.densityStatus, .failed(.connection))
         XCTAssertEqual(
             viewModel.densityStatus?.message,
             "Couldn't refresh ingredient densities. Check your connection and try again."
         )
         XCTAssertEqual(viewModel.lastDensityRefresh, Date(timeIntervalSince1970: 5))
+    }
+
+    private struct FailureCase {
+        let error: Error
+        let failure: DensityRefreshFailure
+        let message: String
+    }
+
+    func testEachFailureGetsItsOwnExplanation() async {
+        let connection = "Couldn't refresh ingredient densities. Check your connection and try again."
+        let rejected = "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again."
+        let unavailable = "The ingredient density service isn't responding properly right now. Try again later."
+        let cases = [
+            FailureCase(error: DensityEntryFetchError.requestFailed(underlying: URLError(.timedOut)), failure: .connection, message: connection),
+            FailureCase(error: DensityEntryFetchError.httpStatus(401), failure: .rejected, message: rejected),
+            FailureCase(error: DensityEntryFetchError.httpStatus(403), failure: .rejected, message: rejected),
+            FailureCase(error: DensityEntryFetchError.httpStatus(503), failure: .serviceUnavailable, message: unavailable),
+            FailureCase(error: DensityEntryFetchError.httpStatus(429), failure: .serviceUnavailable, message: unavailable),
+            FailureCase(
+                error: DensityEntryFetchError.invalidResponse(underlying: URLError(.cannotParseResponse)),
+                failure: .serviceUnavailable,
+                message: unavailable
+            ),
+            FailureCase(
+                error: CocoaError(.fileWriteUnknown),
+                failure: .couldNotSave,
+                message: "Couldn't save ingredient densities on this device. Try again."
+            ),
+        ]
+        for testCase in cases {
+            let useCase = FakeRefreshDensityCacheUseCase()
+            useCase.result = .failure(testCase.error)
+            let viewModel = makeViewModel(useCase)
+
+            await viewModel.refreshDensities()
+
+            XCTAssertEqual(viewModel.densityStatus, .failed(testCase.failure), "\(testCase.error)")
+            XCTAssertEqual(viewModel.densityStatus?.message, testCase.message, "\(testCase.error)")
+            XCTAssertEqual(viewModel.densityStatus?.isFailure, true)
+        }
     }
 
     func testReloadPicksUpABackgroundRefresh() {

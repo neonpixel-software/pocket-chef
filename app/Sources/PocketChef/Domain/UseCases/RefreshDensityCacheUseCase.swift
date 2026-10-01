@@ -46,7 +46,8 @@ final class DefaultRefreshDensityCacheUseCase: RefreshDensityCacheUseCase {
         if let inFlight {
             return try await inFlight.value
         }
-        let task = Task { [remoteSource, cacheRepository, refreshLog, now] in
+        // Main-actor isolated, like the cache and log it writes: only the download leaves it.
+        let task = Task { @MainActor [remoteSource, cacheRepository, refreshLog, now] in
             let entries = try await remoteSource.fetchAll()
             let changes = try cacheRepository.apply(entries)
             refreshLog.recordRefresh(at: now())

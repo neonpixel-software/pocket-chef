@@ -65,7 +65,7 @@ struct SettingsView: View {
     private var densitySection: some View {
         Section {
             if let lastRefresh = viewModel.lastDensityRefresh {
-                Text("Last updated \(lastRefresh, format: .relative(presentation: .named))")
+                Text(Self.lastUpdatedText(lastRefresh))
             } else {
                 Text("Not downloaded yet")
             }
@@ -84,13 +84,18 @@ struct SettingsView: View {
 
             if let status = viewModel.densityStatus {
                 Text(status.message)
-                    .foregroundStyle(status == .failed ? .red : .secondary)
+                    .foregroundStyle(status.isFailure ? .red : .secondary)
             }
         } header: {
             Text("Ingredient Densities")
         } footer: {
             Text(densityFooterText)
         }
+    }
+
+    /// Resolves to the catalog key "Last updated %@"; LocalizedSettingsStringsTests checks that.
+    static func lastUpdatedText(_ date: Date) -> LocalizedStringKey {
+        "Last updated \(date, format: .relative(presentation: .named))"
     }
 
     private var densityFooterText: LocalizedStringKey {

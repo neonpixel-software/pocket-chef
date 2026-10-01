@@ -2100,6 +2100,90 @@
           }
         }
       }
+    },
+    "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El servicio de densidades de ingredientes no aceptó esta versión de Pocket Chef. Actualiza la app e inténtalo de nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le service des densités des ingrédients n'a pas accepté cette version de Pocket Chef. Mettez l'app à jour et réessayez."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Dienst für Zutatendichten hat diese Version von Pocket Chef nicht akzeptiert. Aktualisiere die App und versuche es erneut."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De dienst voor ingrediëntdichtheden heeft deze versie van Pocket Chef niet geaccepteerd. Werk de app bij en probeer het opnieuw."
+          }
+        }
+      }
+    },
+    "The ingredient density service isn't responding properly right now. Try again later.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El servicio de densidades de ingredientes no responde correctamente en este momento. Inténtalo más tarde."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le service des densités des ingrédients ne répond pas correctement pour le moment. Réessayez plus tard."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Dienst für Zutatendichten antwortet gerade nicht richtig. Versuche es später erneut."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De dienst voor ingrediëntdichtheden reageert momenteel niet goed. Probeer het later opnieuw."
+          }
+        }
+      }
+    },
+    "Couldn't save ingredient densities on this device. Try again.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudieron guardar las densidades de ingredientes en este dispositivo. Inténtalo de nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'enregistrer les densités des ingrédients sur cet appareil. Réessayez."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Zutatendichten konnten auf diesem Gerät nicht gespeichert werden. Versuche es erneut."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan de ingrediëntdichtheden niet op dit apparaat opslaan. Probeer het opnieuw."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

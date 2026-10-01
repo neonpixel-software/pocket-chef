@@ -9,6 +9,14 @@ final class DensityAPIConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration?.readKey, "key")
     }
 
+    /// Info.plist values from an xcconfig could carry stray spaces; they must not drop the API.
+    func testIgnoresSurroundingWhitespace() {
+        let configuration = DensityAPIConfiguration(host: " density.example.com ", readKey: " key ")
+
+        XCTAssertEqual(configuration?.entriesURL.absoluteString, "https://density.example.com/density-entries")
+        XCTAssertEqual(configuration?.readKey, "key")
+    }
+
     func testAcceptsAHostWithAPort() {
         let configuration = DensityAPIConfiguration(host: "localhost:7032", readKey: "key")
 

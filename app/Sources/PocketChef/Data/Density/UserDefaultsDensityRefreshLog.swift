@@ -1,6 +1,7 @@
 import Foundation
 
 /// Keeps the last refresh time in `UserDefaults`: per device, never synced.
+@MainActor
 final class UserDefaultsDensityRefreshLog: DensityRefreshLog {
     static let lastRefreshKey = "densityCacheLastRefresh"
 

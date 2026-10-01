@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 final class SwiftDataDensityCacheRepository: DensityCacheRepository {
     private let modelContext: ModelContext
 

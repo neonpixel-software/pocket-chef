@@ -54,7 +54,7 @@ final class SettingsViewModel {
             densityStatus = changes.isEmpty ? .upToDate : .updated
         } catch {
             print("Refreshing ingredient densities failed: \(error)")
-            densityStatus = .failed
+            densityStatus = .failed(DensityRefreshFailure(error))
         }
         lastDensityRefresh = refreshDensityCacheUseCase.lastRefresh
     }
@@ -101,7 +101,12 @@ final class SettingsViewModel {
 enum DensityRefreshStatus: Equatable {
     case upToDate
     case updated
-    case failed
+    case failed(DensityRefreshFailure)
+
+    var isFailure: Bool {
+        if case .failed = self { return true }
+        return false
+    }
 
     var message: String {
         switch self {
@@ -109,8 +114,46 @@ enum DensityRefreshStatus: Equatable {
             String(localized: "Ingredient densities are up to date.")
         case .updated:
             String(localized: "Ingredient densities updated.")
-        case .failed:
+        case let .failed(failure):
+            failure.message
+        }
+    }
+}
+
+/// Why a refresh failed, in terms the user can act on.
+enum DensityRefreshFailure: Equatable {
+    /// The request never got an answer: offline, DNS, TLS, timeout.
+    case connection
+    /// The API turned the read key down (401/403). Only a new app version can fix that.
+    case rejected
+    /// The API answered, but not with entries: a server error, rate limiting, a bad body.
+    case serviceUnavailable
+    /// The download worked but the cache couldn't be saved.
+    case couldNotSave
+
+    init(_ error: Error) {
+        switch error {
+        case DensityEntryFetchError.requestFailed:
+            self = .connection
+        case let DensityEntryFetchError.httpStatus(status) where status == 401 || status == 403:
+            self = .rejected
+        case DensityEntryFetchError.httpStatus, DensityEntryFetchError.invalidResponse:
+            self = .serviceUnavailable
+        default:
+            self = .couldNotSave
+        }
+    }
+
+    var message: String {
+        switch self {
+        case .connection:
             String(localized: "Couldn't refresh ingredient densities. Check your connection and try again.")
+        case .rejected:
+            String(localized: "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again.")
+        case .serviceUnavailable:
+            String(localized: "The ingredient density service isn't responding properly right now. Try again later.")
+        case .couldNotSave:
+            String(localized: "Couldn't save ingredient densities on this device. Try again.")
         }
     }
 }

@@ -27,6 +27,8 @@ private final class FakeDensityCacheRepository: DensityCacheRepository {
     var entries: [DensityEntry] = []
 
     func apply(_ entries: [DensityEntry]) throws -> DensityCacheChanges {
+        // The real repository writes the main context, so it must never run off the main actor.
+        MainActor.assertIsolated()
         let changes = DensityCacheChanges(added: entries.count(where: { !self.entries.contains($0) }))
         self.entries = entries
         return changes
@@ -45,6 +47,7 @@ private final class FakeDensityRefreshLog: DensityRefreshLog {
     var lastRefresh: Date?
 
     func recordRefresh(at date: Date) {
+        MainActor.assertIsolated()
         lastRefresh = date
     }
 }

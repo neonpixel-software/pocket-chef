@@ -11,7 +11,9 @@ struct DensityCacheChanges: Equatable {
     }
 }
 
-/// The on-device copy of the density entries, so lookups work offline.
+/// The on-device copy of the density entries, so lookups work offline. Main-actor isolated
+/// because the SwiftData implementation uses the container's `mainContext`.
+@MainActor
 protocol DensityCacheRepository {
     /// Makes the cache match `entries`, the server's full table: inserts new entries, updates
     /// changed ones and deletes the ones the server no longer has.

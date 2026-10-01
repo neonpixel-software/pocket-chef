@@ -1,26 +1,21 @@
 @testable import PocketChef
 import XCTest
 
+@MainActor
 final class UserDefaultsDensityRefreshLogTests: XCTestCase {
-    private var suiteName = ""
-    private var defaults: UserDefaults!
-
-    override func setUp() {
-        super.setUp()
-        suiteName = "UserDefaultsDensityRefreshLogTests-\(UUID().uuidString)"
-        defaults = UserDefaults(suiteName: suiteName)
-    }
-
-    override func tearDown() {
-        defaults.removePersistentDomain(forName: suiteName)
-        super.tearDown()
+    /// A throwaway defaults domain, removed when the test ends.
+    private func makeDefaults() -> UserDefaults {
+        let suiteName = "UserDefaultsDensityRefreshLogTests-\(UUID().uuidString)"
+        addTeardownBlock { UserDefaults().removePersistentDomain(forName: suiteName) }
+        return UserDefaults(suiteName: suiteName)!
     }
 
     func testHasNoRefreshUntilOneIsRecorded() {
-        XCTAssertNil(UserDefaultsDensityRefreshLog(defaults: defaults).lastRefresh)
+        XCTAssertNil(UserDefaultsDensityRefreshLog(defaults: makeDefaults()).lastRefresh)
     }
 
     func testRemembersTheRecordedRefreshAcrossInstances() {
+        let defaults = makeDefaults()
         let date = Date(timeIntervalSince1970: 1_790_000_000)
 
         UserDefaultsDensityRefreshLog(defaults: defaults).recordRefresh(at: date)
