@@ -24,18 +24,10 @@ final class FoundationModelsRecipeCaptureService: RecipeCaptureService {
         do {
             // Greedy sampling: with the default sampling the model sometimes writes garbled
             // quantities ("1±³" for "1 1/2") that no parser can recover (issue #76).
-            // Xcode 27 (Swift 6.4) deprecates `sampling:` for `samplingMode:`, which GitHub CI's
-            // Xcode 26 SDK doesn't have, so pick by toolchain. Drop the #else when CI moves to
-            // Xcode 27 (#119).
-            #if compiler(>=6.4)
-            let options = GenerationOptions(samplingMode: .greedy)
-            #else
-            let options = GenerationOptions(sampling: .greedy)
-            #endif
             let result = try await session.respond(
                 to: text,
                 generating: CapturedRecipeSchema.self,
-                options: options
+                options: GenerationOptions(samplingMode: .greedy)
             )
             return result.content.toDomain(source: text)
         } catch {
