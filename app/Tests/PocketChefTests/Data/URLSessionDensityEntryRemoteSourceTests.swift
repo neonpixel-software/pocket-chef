@@ -78,13 +78,15 @@ final class URLSessionDensityEntryRemoteSourceTests: XCTestCase {
         XCTAssertEqual(entries[1].lastModified.timeIntervalSince1970, 1_790_598_896)
     }
 
+    /// Postgres keeps microseconds and .NET trims trailing zeros, so 0–7 digits all occur.
     func testDecodingAcceptsEveryFractionalSecondLengthDotNetWrites() throws {
         for fraction in ["", ".1", ".123", ".123456", ".1234567"] {
             let json = #"[{"ingredientName":"a","gramsPerMilliliter":1,"lastModifiedUtc":"2026-09-28T12:34:56\#(fraction)+00:00"}]"#
+            let expected = 1_790_598_896 + (Double("0" + fraction) ?? 0)
 
             let entries = try URLSessionDensityEntryRemoteSource.decodeEntries(from: Data(json.utf8))
 
-            XCTAssertEqual(entries.first?.lastModified.timeIntervalSince1970 ?? 0, 1_790_598_896, accuracy: 1, "fraction \(fraction)")
+            XCTAssertEqual(entries.first?.lastModified.timeIntervalSince1970 ?? 0, expected, accuracy: 0.000_01, "fraction \(fraction)")
         }
     }
 

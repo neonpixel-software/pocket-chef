@@ -19,8 +19,10 @@ enum DensityStore {
     }
 
     static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {
-        // An explicit url, unlike the default configuration, doesn't create the directory.
-        try FileManager.default.createDirectory(at: URL.applicationSupportDirectory, withIntermediateDirectories: true)
+        if !inMemory {
+            // An explicit url, unlike the default configuration, doesn't create the directory.
+            try FileManager.default.createDirectory(at: URL.applicationSupportDirectory, withIntermediateDirectories: true)
+        }
         return try ModelContainer(for: schema, configurations: configuration(inMemory: inMemory))
     }
 }
