@@ -18,6 +18,16 @@ final class LocalizedSettingsStringsTests: XCTestCase {
         "iCloud is temporarily unavailable. Try again in a moment.",
         "Couldn't reach iCloud. Check your connection and try again.",
         "Couldn't change where recipes are stored. Try again.",
+        // Phase 10.2: ingredient densities.
+        "Ingredient Densities",
+        "Refresh Now",
+        "Last updated %@",
+        "Not downloaded yet",
+        "Ingredient densities are up to date.",
+        "Ingredient densities updated.",
+        "Couldn't refresh ingredient densities. Check your connection and try again.",
+        "Pocket Chef uses ingredient densities to convert between volume and weight. It checks for updates once a day.",
+        "Ingredient densities aren't available in this build.",
     ]
 
     /// A missing entry falls back to the English key, and every key here differs from its

@@ -55,8 +55,49 @@ struct SettingsView: View {
             } footer: {
                 Text(footerText)
             }
+
+            densitySection
         }
         .formStyle(.grouped)
+        .task { viewModel.reloadDensityStatus() }
+    }
+
+    private var densitySection: some View {
+        Section {
+            if let lastRefresh = viewModel.lastDensityRefresh {
+                Text("Last updated \(lastRefresh, format: .relative(presentation: .named))")
+            } else {
+                Text("Not downloaded yet")
+            }
+
+            HStack(spacing: 8) {
+                Button("Refresh Now") {
+                    Task { await viewModel.refreshDensities() }
+                }
+                .disabled(!viewModel.canRefreshDensities)
+
+                if viewModel.isRefreshingDensities {
+                    ProgressView()
+                        .controlSize(.small)
+                }
+            }
+
+            if let status = viewModel.densityStatus {
+                Text(status.message)
+                    .foregroundStyle(status == .failed ? .red : .secondary)
+            }
+        } header: {
+            Text("Ingredient Densities")
+        } footer: {
+            Text(densityFooterText)
+        }
+    }
+
+    private var densityFooterText: LocalizedStringKey {
+        if !viewModel.isDensityAPIAvailableInBuild {
+            return "Ingredient densities aren't available in this build."
+        }
+        return "Pocket Chef uses ingredient densities to convert between volume and weight. It checks for updates once a day."
     }
 
     private var footerText: LocalizedStringKey {

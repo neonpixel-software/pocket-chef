@@ -7,7 +7,7 @@ final class LookUpDensityUseCaseTests: XCTestCase {
         let container = try DensityStore.makeContainer(inMemory: true)
         let cache = SwiftDataDensityCacheRepository(modelContext: container.mainContext)
         let butter = DensityEntry(ingredientName: "butter", gramsPerMilliliter: 0.96, lastModified: Date(timeIntervalSince1970: 1_790_000_000))
-        try cache.replaceAll(with: [butter])
+        _ = try cache.apply([butter])
 
         let entry = try DefaultLookUpDensityUseCase(cacheRepository: cache).execute(ingredientName: " Butter")
 

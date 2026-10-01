@@ -13,6 +13,9 @@ struct PocketChefApp: App {
     /// The local-only density cache (Phase 10). Nil when the store couldn't open; the app
     /// works without it, since only unit conversion needs densities.
     private let densityContainer: ModelContainer?
+    /// Nil without the store or the density API configuration (DensityAPI.xcconfig).
+    private let refreshDensityCacheUseCase: RefreshDensityCacheUseCase?
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         PCFontRegistrar.registerCustomFonts()
@@ -38,14 +41,6 @@ struct PocketChefApp: App {
         captureService = FoundationModelsRecipeCaptureService()
         webPageFetcher = URLSessionWebPageFetcher()
         captureRecipeUseCase = DefaultCaptureRecipeUseCase(captureService: captureService)
-        settingsViewModel = SettingsViewModel(
-            changeStorageModeUseCase: DefaultChangeStorageModeUseCase(
-                switcher: persistence,
-                accountStatusProvider: CloudKitAccountStatusProvider(isEnabledInBuild: BuildConfiguration.isICloudEnabled)
-            ),
-            isICloudAvailableInBuild: BuildConfiguration.isICloudEnabled
-        )
-
         do {
             densityContainer = try DensityStore.makeContainer()
         } catch {
@@ -54,20 +49,23 @@ struct PocketChefApp: App {
         }
         if let densityContainer,
            let configuration = DensityAPIConfiguration(infoDictionary: Bundle.main.infoDictionary) {
-            let refreshDensityCacheUseCase = DefaultRefreshDensityCacheUseCase(
+            refreshDensityCacheUseCase = DefaultRefreshDensityCacheUseCase(
                 remoteSource: URLSessionDensityEntryRemoteSource(configuration: configuration),
-                cacheRepository: SwiftDataDensityCacheRepository(modelContext: densityContainer.mainContext)
+                cacheRepository: SwiftDataDensityCacheRepository(modelContext: densityContainer.mainContext),
+                refreshLog: UserDefaultsDensityRefreshLog()
             )
-            // Fills the cache on first launch; a failure is retried at the next launch.
-            // Periodic and manual refresh come in Phase 10.2.
-            Task {
-                do {
-                    try await refreshDensityCacheUseCase.executeIfCacheEmpty()
-                } catch {
-                    print("Filling the density cache failed: \(error)")
-                }
-            }
+        } else {
+            refreshDensityCacheUseCase = nil
         }
+
+        settingsViewModel = SettingsViewModel(
+            changeStorageModeUseCase: DefaultChangeStorageModeUseCase(
+                switcher: persistence,
+                accountStatusProvider: CloudKitAccountStatusProvider(isEnabledInBuild: BuildConfiguration.isICloudEnabled)
+            ),
+            isICloudAvailableInBuild: BuildConfiguration.isICloudEnabled,
+            refreshDensityCacheUseCase: refreshDensityCacheUseCase
+        )
     }
 
     var body: some Scene {
@@ -89,6 +87,18 @@ struct PocketChefApp: App {
                 )),
                 settingsViewModel: settingsViewModel
             )
+            // The periodic check (Phase 10.2): on launch and whenever the app comes back,
+            // refresh densities if the last refresh is more than a day old.
+            .onChange(of: scenePhase, initial: true) { _, phase in
+                guard phase == .active, let refreshDensityCacheUseCase else { return }
+                Task {
+                    do {
+                        try await refreshDensityCacheUseCase.executeIfStale()
+                    } catch {
+                        print("Refreshing ingredient densities failed: \(error)")
+                    }
+                }
+            }
         }
 
         #if os(macOS)

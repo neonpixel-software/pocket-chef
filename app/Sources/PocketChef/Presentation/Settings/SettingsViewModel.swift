@@ -10,12 +10,53 @@ final class SettingsViewModel {
     /// False in a build without the iCloud entitlement (CI, a clone without Signing.xcconfig).
     let isICloudAvailableInBuild: Bool
 
-    private let changeStorageModeUseCase: ChangeStorageModeUseCase
+    private(set) var lastDensityRefresh: Date?
+    private(set) var isRefreshingDensities = false
+    private(set) var densityStatus: DensityRefreshStatus?
 
-    init(changeStorageModeUseCase: ChangeStorageModeUseCase, isICloudAvailableInBuild: Bool) {
+    private let changeStorageModeUseCase: ChangeStorageModeUseCase
+    /// Nil in a build without the density API configuration (DensityAPI.xcconfig).
+    private let refreshDensityCacheUseCase: RefreshDensityCacheUseCase?
+
+    init(
+        changeStorageModeUseCase: ChangeStorageModeUseCase,
+        isICloudAvailableInBuild: Bool,
+        refreshDensityCacheUseCase: RefreshDensityCacheUseCase? = nil
+    ) {
         self.changeStorageModeUseCase = changeStorageModeUseCase
         self.isICloudAvailableInBuild = isICloudAvailableInBuild
+        self.refreshDensityCacheUseCase = refreshDensityCacheUseCase
         storageMode = changeStorageModeUseCase.currentMode
+        lastDensityRefresh = refreshDensityCacheUseCase?.lastRefresh
+    }
+
+    var isDensityAPIAvailableInBuild: Bool {
+        refreshDensityCacheUseCase != nil
+    }
+
+    var canRefreshDensities: Bool {
+        isDensityAPIAvailableInBuild && !isRefreshingDensities
+    }
+
+    /// Picks up a refresh that ran in the background since the screen was built.
+    func reloadDensityStatus() {
+        lastDensityRefresh = refreshDensityCacheUseCase?.lastRefresh
+    }
+
+    func refreshDensities() async {
+        guard let refreshDensityCacheUseCase, !isRefreshingDensities else { return }
+
+        isRefreshingDensities = true
+        defer { isRefreshingDensities = false }
+
+        do {
+            let changes = try await refreshDensityCacheUseCase.execute()
+            densityStatus = changes.isEmpty ? .upToDate : .updated
+        } catch {
+            print("Refreshing ingredient densities failed: \(error)")
+            densityStatus = .failed
+        }
+        lastDensityRefresh = refreshDensityCacheUseCase.lastRefresh
     }
 
     var canChangeStorage: Bool {
@@ -52,6 +93,24 @@ final class SettingsViewModel {
             String(localized: "iCloud sync isn't available in this build.")
         case .available, .couldNotDetermine:
             String(localized: "Couldn't reach iCloud. Check your connection and try again.")
+        }
+    }
+}
+
+/// The outcome of the last "Refresh Now" in Settings.
+enum DensityRefreshStatus: Equatable {
+    case upToDate
+    case updated
+    case failed
+
+    var message: String {
+        switch self {
+        case .upToDate:
+            String(localized: "Ingredient densities are up to date.")
+        case .updated:
+            String(localized: "Ingredient densities updated.")
+        case .failed:
+            String(localized: "Couldn't refresh ingredient densities. Check your connection and try again.")
         }
     }
 }
