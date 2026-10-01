@@ -10,3 +10,8 @@ CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = Config/PocketChef-macOS.entitlements
 // (the storage setting is disabled), which is how CI builds it.
 // Copy Signing.xcconfig.example to Signing.xcconfig to enable iCloud sync locally.
 #include? "Signing.xcconfig"
+
+// Optional and gitignored: the density API's host and read key, which the Info.plists pass to
+// the app (DensityAPIConfiguration). Without this file the app never fetches densities.
+// Copy DensityAPI.xcconfig.example to DensityAPI.xcconfig to use the API locally.
+#include? "DensityAPI.xcconfig"

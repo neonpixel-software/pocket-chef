@@ -14,6 +14,13 @@ if [ -n "${DEVELOPMENT_TEAM:-}" ]; then
     Config/Signing.xcconfig.example > Config/Signing.xcconfig
 fi
 
+# Optional: the density API's host and read key (see Config/DensityAPI.xcconfig.example), from
+# secret environment variables in the workflow. Without them the app never fetches densities.
+if [ -n "${DENSITY_API_HOST:-}" ] && [ -n "${DENSITY_API_READ_KEY:-}" ]; then
+  printf 'DENSITY_API_HOST = %s\nDENSITY_API_READ_KEY = %s\n' "$DENSITY_API_HOST" "$DENSITY_API_READ_KEY" \
+    > Config/DensityAPI.xcconfig
+fi
+
 brew install xcodegen
 xcodegen generate
 

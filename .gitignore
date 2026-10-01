@@ -67,3 +67,6 @@ fastlane/test_output
 
 ## Local signing team, kept out of the public repo (see app/Config/Signing.xcconfig.example)
 app/Config/Signing.xcconfig
+
+## Local density API host and read key, kept out of the public repo (see app/Config/DensityAPI.xcconfig.example)
+app/Config/DensityAPI.xcconfig

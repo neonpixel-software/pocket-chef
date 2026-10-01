@@ -41,7 +41,7 @@ final class RecipeStoreTests: XCTestCase {
             )
             let context = ModelContext(oldContainer)
             context.insert(RecipeModel(title: "Pancakes", steps: ["Fry"], isTypedSource: true))
-            context.insert(DensityEntryModel(ingredientName: "flour", gramsPerMilliliter: 0.53))
+            context.insert(DensityEntryModel(ingredientName: "flour", gramsPerMilliliter: 0.53, lastModified: .now))
             try context.save()
         }
 
