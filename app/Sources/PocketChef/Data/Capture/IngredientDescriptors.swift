@@ -90,6 +90,76 @@ enum IngredientDescriptors {
         return nil
     }
 
+    /// Units of time in the languages the app ships in. The model sometimes turns a step's
+    /// duration into an ingredient ("une heure" named "heure", issue #76), and no food is named
+    /// after one.
+    private static let timeUnits: Set<String> = Set([
+        "second", "sec", "minute", "min", "hour", "hr", "h", // English
+        "segundo", "minuto", "hora", // Spanish
+        "seconde", "heure", // French
+        "sekunde", "stunde", "std", // German
+        "minuut", "uur", "uren", // Dutch
+    ].map(folded))
+
+    static func isTimeUnit(_ text: String) -> Bool {
+        let unit = folded(text)
+        if timeUnits.contains(unit) {
+            return true
+        }
+        // Plurals: "minutes", "heures", "Stunden", "minutos", "minuten".
+        return ["es", "s", "n"].contains { suffix in
+            unit.hasSuffix(suffix) && timeUnits.contains(String(unit.dropLast(suffix.count)))
+        }
+    }
+
+    /// `text` as it's spelled in `source`, where it's written ignoring case and accents but with
+    /// at most one letter different, or nil. The model occasionally misspells a word it copies
+    /// ("Olivenäl" for "Olivenöl", issue #76), and the exact check in `appears` would then drop a
+    /// real ingredient. Only texts of five or more characters qualify, so a short invented word
+    /// ("eau") can't pass as a typo of a different one, and a differing digit never counts as a
+    /// typo ("4 eggs" isn't "3 eggs").
+    static func sourceSpelling(of text: String, in source: String) -> String? {
+        let needle = Array(text.trimmingCharacters(in: .whitespacesAndNewlines))
+        guard needle.count >= 5 else { return nil }
+        let foldedNeedle = needle.map { folded(String($0)) }
+        let original = Array(source)
+        let haystack = original.map { folded(String($0)) }
+        guard haystack.count >= needle.count else { return nil }
+        func isWordCharacter(_ index: Int) -> Bool {
+            original[index].isLetter || original[index].isNumber
+        }
+        for start in 0...haystack.count - needle.count {
+            let end = start + needle.count
+            // Whole words only, like `appears`.
+            if start > 0 && isWordCharacter(start - 1) || end < haystack.count && isWordCharacter(end) {
+                continue
+            }
+            if isTypo(foldedNeedle, needle, of: haystack[start..<end], original[start..<end]) {
+                return String(original[start..<end])
+            }
+        }
+        return nil
+    }
+
+    /// Whether `candidate` matches the source window, or differs from it in one letter only.
+    private static func isTypo(
+        _ candidate: [String],
+        _ candidateCharacters: [Character],
+        of window: ArraySlice<String>,
+        _ windowCharacters: ArraySlice<Character>
+    ) -> Bool {
+        var mismatches = 0
+        for (offset, (folded, sourceFolded)) in zip(candidate, window).enumerated() where folded != sourceFolded {
+            mismatches += 1
+            let letters = candidateCharacters[offset].isLetter
+                && windowCharacters[windowCharacters.startIndex + offset].isLetter
+            if mismatches > 1 || !letters {
+                return false
+            }
+        }
+        return true
+    }
+
     /// Whether the ingredient line or its name occurs in `source` as whole words, ignoring case,
     /// accents and spacing. The model occasionally adds an ingredient that isn't in the recipe
     /// ("eau" in a crêpe recipe that never mentions water).
@@ -101,6 +171,20 @@ enum IngredientDescriptors {
             let pattern = "(?<![\\p{L}\\p{N}])" + NSRegularExpression.escapedPattern(for: needle) + "(?![\\p{L}\\p{N}])"
             return haystack.range(of: pattern, options: .regularExpression) != nil
         }
+    }
+
+    /// Whether `container` ends with `text` as whole words, ignoring case, accents, spacing and
+    /// surrounding punctuation (equal texts count).
+    static func endsWith(_ container: String, _ text: String) -> Bool {
+        let punctuation = CharacterSet.punctuationCharacters.union(.whitespaces)
+        let ending = folded(text).trimmingCharacters(in: punctuation)
+        let whole = folded(container).trimmingCharacters(in: punctuation)
+        guard !ending.isEmpty, whole.hasSuffix(ending) else { return false }
+        // Whole words: "chaque côté" ends "…de chaque côté", but "ôté" doesn't.
+        let start = whole.index(whole.endIndex, offsetBy: -ending.count)
+        guard start > whole.startIndex else { return true }
+        let before = whole[whole.index(before: start)]
+        return !before.isLetter && !before.isNumber
     }
 
     /// Whether two texts are equal ignoring case, accents and spacing.

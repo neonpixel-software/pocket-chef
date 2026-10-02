@@ -5,11 +5,14 @@ import FoundationModels
 struct CapturedRecipeSchema {
     @Guide(description: "A short, descriptive title for the recipe")
     let title: String
-    @Guide(description: "Each ingredient as a separate structured line")
+    /// The maximum counts stop a runaway list. With greedy sampling the model can repeat one line
+    /// until it runs out of context ("une pincée de sel" ×100 in a crêpe recipe, issue #76),
+    /// which fails the whole capture. The limits are far above any real recipe.
+    @Guide(description: "Each ingredient as a separate structured line", .maximumCount(40))
     let ingredients: [CapturedIngredientSchema]
-    @Guide(description: "Tools and cookware the recipe needs, e.g. loaf pan, whisk")
+    @Guide(description: "Tools and cookware the recipe needs, e.g. loaf pan, whisk", .maximumCount(15))
     let equipment: [String]
-    @Guide(description: "Each preparation step in order, one instruction per entry")
+    @Guide(description: "Each preparation step in order, one instruction per entry", .maximumCount(40))
     let steps: [String]
 }
 
@@ -40,10 +43,14 @@ extension CapturedRecipeSchema {
             trimmedEquipment.filter { IngredientDescriptors.appears(in: source, rawText: $0, name: "") }
         } ?? trimmedEquipment
         let grounded = source.map { source in
-            ingredients.filter { IngredientDescriptors.appears(in: source, rawText: $0.rawText, name: $0.ingredientName) }
+            ingredients.compactMap { $0.grounded(in: source) }
         } ?? ingredients
         let mappedIngredients = grounded.map { $0.toDomain() }.filter { line in
             guard line.unit == nil else { return true }
+            // A step's duration turned into an ingredient ("une heure" named "heure", #76).
+            if let name = line.ingredientName, IngredientDescriptors.isTimeUnit(name) {
+                return false
+            }
             return !groundedEquipment.contains { item in
                 IngredientDescriptors.isSameText(item, line.rawText) || IngredientDescriptors.isSameText(item, line.ingredientName ?? "")
             }
@@ -51,18 +58,68 @@ extension CapturedRecipeSchema {
         return Recipe(
             id: UUID(),
             title: title,
-            ingredients: mappedIngredients,
+            ingredients: Self.removingRepeats(mappedIngredients, by: \.rawText),
             equipment: groundedEquipment,
-            steps: steps
-                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.isEmpty },
+            steps: Self.removingRepeatedSteps(steps),
             source: .typed,
             tags: []
         )
     }
+
+    /// Drops an entry that repeats the one before it. The model can get stuck repeating a line
+    /// (issue #76); a recipe never lists the same line twice in a row.
+    private static func removingRepeats<Element>(_ elements: [Element], by text: (Element) -> String) -> [Element] {
+        var result: [Element] = []
+        for element in elements {
+            if let previous = result.last, IngredientDescriptors.isSameText(text(previous), text(element)) {
+                continue
+            }
+            result.append(element)
+        }
+        return result
+    }
+
+    /// Drops blank steps, and a step that repeats the end of the one before it: the model
+    /// sometimes finishes a step and then emits its last clause again as a step of its own
+    /// ("…légèrement huilée, environ une minute de chaque côté." then "environ une minute de
+    /// chaque côté", issue #76). Only the end counts, which is the pattern the model shows, so a
+    /// step that reuses words from the middle of the previous one stays.
+    ///
+    /// Unlike ingredients and equipment, steps aren't checked against the source text: the model
+    /// legitimately splits and rewords them, so a source check would drop real steps.
+    private static func removingRepeatedSteps(_ steps: [String]) -> [String] {
+        var result: [String] = []
+        for step in steps.map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) }) where !step.isEmpty {
+            if let previous = result.last, IngredientDescriptors.endsWith(previous, step) {
+                continue
+            }
+            result.append(step)
+        }
+        return result
+    }
 }
 
 extension CapturedIngredientSchema {
+    /// The line if it's in `source`, with a misspelled line or name replaced by the source's
+    /// spelling ("Olivenäl" → "Olivenöl"); nil if neither is in the source (an invented
+    /// ingredient).
+    func grounded(in source: String) -> CapturedIngredientSchema? {
+        func spelling(_ text: String) -> String? {
+            IngredientDescriptors.appears(in: source, rawText: text, name: "")
+                ? text
+                : IngredientDescriptors.sourceSpelling(of: text, in: source)
+        }
+        let rawSpelling = spelling(rawText)
+        let nameSpelling = spelling(ingredientName)
+        guard rawSpelling != nil || nameSpelling != nil else { return nil }
+        return CapturedIngredientSchema(
+            rawText: rawSpelling ?? rawText,
+            amount: amount,
+            unit: unit,
+            ingredientName: nameSpelling ?? ingredientName
+        )
+    }
+
     func toDomain() -> IngredientLine {
         let parsedAmount = IngredientAmountParser.parse(amount)
         let trimmedUnit = unit.trimmingCharacters(in: .whitespacesAndNewlines)

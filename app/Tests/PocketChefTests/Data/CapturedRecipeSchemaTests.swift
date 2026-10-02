@@ -126,6 +126,107 @@ final class CapturedRecipeSchemaTests: XCTestCase {
         XCTAssertEqual(recipe.ingredients.map(\.rawText), ["250 g de farine"])
     }
 
+    /// The model misspelled "Olivenöl"; the exact source check would drop a real ingredient (#76).
+    func testRecipeToDomainKeepsAMisspelledIngredientInTheSourceSpelling() {
+        let schema = CapturedRecipeSchema(
+            title: "Vinaigrette",
+            ingredients: [
+                CapturedIngredientSchema(rawText: "3 EL Olivenäl", amount: "3", unit: "EL", ingredientName: "Olivenäl"),
+                CapturedIngredientSchema(rawText: "1 TL Senf", amount: "1", unit: "TL", ingredientName: "Senf"),
+            ],
+            equipment: [],
+            steps: ["Schütteln"]
+        )
+
+        let recipe = schema.toDomain(source: "3 EL Olivenöl\n1 TL Senf\nSchütteln.")
+
+        XCTAssertEqual(recipe.ingredients.map(\.rawText), ["3 EL Olivenöl", "1 TL Senf"])
+        XCTAssertEqual(recipe.ingredients.map(\.ingredientName), ["Olivenöl", "Senf"])
+    }
+
+    /// Step durations the model turned into ingredients ("une heure" named "heure", #76).
+    func testRecipeToDomainDropsDurationsListedAsIngredients() {
+        let source = "250 g de farine. Laisser reposer une heure. Cuire environ une minute de chaque côté."
+        let schema = CapturedRecipeSchema(
+            title: "Crêpes",
+            ingredients: [
+                CapturedIngredientSchema(rawText: "250 g de farine", amount: "250", unit: "g", ingredientName: "farine"),
+                CapturedIngredientSchema(rawText: "une heure", amount: "une heure", unit: "", ingredientName: "heure"),
+                CapturedIngredientSchema(
+                    rawText: "environ une minute de chaque côté",
+                    amount: "environ une minute",
+                    unit: "",
+                    ingredientName: "minute"
+                ),
+            ],
+            equipment: [],
+            steps: ["Laisser reposer une heure."]
+        )
+
+        let recipe = schema.toDomain(source: source)
+
+        XCTAssertEqual(recipe.ingredients.map(\.rawText), ["250 g de farine"])
+    }
+
+    /// The model can get stuck repeating a line (#76); the copies go, a later mention stays.
+    func testRecipeToDomainDropsLinesRepeatedBackToBack() {
+        let salt = CapturedIngredientSchema(rawText: "une pincée de sel", amount: "une pincée", unit: "", ingredientName: "sel")
+        let flour = CapturedIngredientSchema(rawText: "250 g de farine", amount: "250", unit: "g", ingredientName: "farine")
+        let schema = CapturedRecipeSchema(
+            title: "Crêpes",
+            ingredients: [flour, salt, salt, salt, flour],
+            equipment: [],
+            steps: ["Mélanger.", "Mélanger.", "Cuire.", "Mélanger."]
+        )
+
+        let recipe = schema.toDomain(source: "250 g de farine, une pincée de sel. Mélanger. Cuire.")
+
+        XCTAssertEqual(recipe.ingredients.map(\.rawText), ["250 g de farine", "une pincée de sel", "250 g de farine"])
+        XCTAssertEqual(recipe.steps, ["Mélanger.", "Cuire.", "Mélanger."])
+    }
+
+    /// The model re-emitted a step's last clause as a step of its own (#76).
+    func testRecipeToDomainDropsAStepThatRepeatsPartOfThePreviousOne() {
+        let schema = CapturedRecipeSchema(
+            title: "Crêpes",
+            ingredients: [],
+            equipment: [],
+            steps: [
+                "Cuire les crêpes dans une poêle chaude, environ une minute de chaque côté.",
+                "environ une minute de chaque côté",
+                "Servir.",
+            ]
+        )
+
+        let recipe = schema.toDomain()
+
+        XCTAssertEqual(recipe.steps, ["Cuire les crêpes dans une poêle chaude, environ une minute de chaque côté.", "Servir."])
+    }
+
+    /// Only a repeated ending counts: a step that reuses words from the middle stays (PR #127 review).
+    func testRecipeToDomainKeepsAStepThatReusesWordsFromTheMiddleOfThePreviousOne() {
+        let schema = CapturedRecipeSchema(
+            title: "Pie",
+            ingredients: [],
+            equipment: [],
+            steps: [
+                "Spoon the filling into the pie crust and bake for 40 minutes.",
+                "into the pie crust",
+                "Cool for 40 minutes.",
+                "bake for 40 minutes",
+            ]
+        )
+
+        let recipe = schema.toDomain()
+
+        XCTAssertEqual(recipe.steps, [
+            "Spoon the filling into the pie crust and bake for 40 minutes.",
+            "into the pie crust",
+            "Cool for 40 minutes.",
+            "bake for 40 minutes",
+        ])
+    }
+
     func testRecipeToDomainMapsFieldsAndFiltersBlankSteps() {
         let schema = CapturedRecipeSchema(
             title: "Pancakes",
