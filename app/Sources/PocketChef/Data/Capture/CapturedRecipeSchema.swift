@@ -79,14 +79,18 @@ extension CapturedRecipeSchema {
         return result
     }
 
-    /// Drops blank steps, and a step that only repeats part of the one before it: the model
-    /// sometimes ends a step and then emits its last clause again as a step of its own
+    /// Drops blank steps, and a step that repeats the end of the one before it: the model
+    /// sometimes finishes a step and then emits its last clause again as a step of its own
     /// ("…légèrement huilée, environ une minute de chaque côté." then "environ une minute de
-    /// chaque côté", issue #76). A real step never sits wholly inside the previous one.
+    /// chaque côté", issue #76). Only the end counts, which is the pattern the model shows, so a
+    /// step that reuses words from the middle of the previous one stays.
+    ///
+    /// Unlike ingredients and equipment, steps aren't checked against the source text: the model
+    /// legitimately splits and rewords them, so a source check would drop real steps.
     private static func removingRepeatedSteps(_ steps: [String]) -> [String] {
         var result: [String] = []
         for step in steps.map({ $0.trimmingCharacters(in: .whitespacesAndNewlines) }) where !step.isEmpty {
-            if let previous = result.last, IngredientDescriptors.contains(previous, step) {
+            if let previous = result.last, IngredientDescriptors.endsWith(previous, step) {
                 continue
             }
             result.append(step)

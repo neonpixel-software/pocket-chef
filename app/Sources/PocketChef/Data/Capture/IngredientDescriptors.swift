@@ -173,13 +173,18 @@ enum IngredientDescriptors {
         }
     }
 
-    /// Whether `text` occurs in `container`, ignoring case, accents, spacing and trailing
-    /// punctuation (equal texts count as contained).
-    static func contains(_ container: String, _ text: String) -> Bool {
+    /// Whether `container` ends with `text` as whole words, ignoring case, accents, spacing and
+    /// surrounding punctuation (equal texts count).
+    static func endsWith(_ container: String, _ text: String) -> Bool {
         let punctuation = CharacterSet.punctuationCharacters.union(.whitespaces)
-        let needle = folded(text).trimmingCharacters(in: punctuation)
-        guard !needle.isEmpty else { return false }
-        return folded(container).contains(needle)
+        let ending = folded(text).trimmingCharacters(in: punctuation)
+        let whole = folded(container).trimmingCharacters(in: punctuation)
+        guard !ending.isEmpty, whole.hasSuffix(ending) else { return false }
+        // Whole words: "chaque côté" ends "…de chaque côté", but "ôté" doesn't.
+        let start = whole.index(whole.endIndex, offsetBy: -ending.count)
+        guard start > whole.startIndex else { return true }
+        let before = whole[whole.index(before: start)]
+        return !before.isLetter && !before.isNumber
     }
 
     /// Whether two texts are equal ignoring case, accents and spacing.

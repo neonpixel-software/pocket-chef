@@ -203,6 +203,30 @@ final class CapturedRecipeSchemaTests: XCTestCase {
         XCTAssertEqual(recipe.steps, ["Cuire les crêpes dans une poêle chaude, environ une minute de chaque côté.", "Servir."])
     }
 
+    /// Only a repeated ending counts: a step that reuses words from the middle stays (PR #127 review).
+    func testRecipeToDomainKeepsAStepThatReusesWordsFromTheMiddleOfThePreviousOne() {
+        let schema = CapturedRecipeSchema(
+            title: "Pie",
+            ingredients: [],
+            equipment: [],
+            steps: [
+                "Spoon the filling into the pie crust and bake for 40 minutes.",
+                "into the pie crust",
+                "Cool for 40 minutes.",
+                "bake for 40 minutes",
+            ]
+        )
+
+        let recipe = schema.toDomain()
+
+        XCTAssertEqual(recipe.steps, [
+            "Spoon the filling into the pie crust and bake for 40 minutes.",
+            "into the pie crust",
+            "Cool for 40 minutes.",
+            "bake for 40 minutes",
+        ])
+    }
+
     func testRecipeToDomainMapsFieldsAndFiltersBlankSteps() {
         let schema = CapturedRecipeSchema(
             title: "Pancakes",

@@ -89,4 +89,15 @@ final class IngredientDescriptorsTests: XCTestCase {
         // Part of a longer word.
         XCTAssertNil(IngredientDescriptors.sourceSpelling(of: "liven", in: source))
     }
+
+    func testEndsWithMatchesAWholeWordEnding() {
+        let step = "Cuire les crêpes, environ une minute de chaque côté."
+
+        XCTAssertTrue(IngredientDescriptors.endsWith(step, "environ une minute de chaque côté"))
+        XCTAssertTrue(IngredientDescriptors.endsWith(step, "ENVIRON une minute de chaque cote."))
+        XCTAssertTrue(IngredientDescriptors.endsWith(step, step))
+        XCTAssertFalse(IngredientDescriptors.endsWith(step, "ôté"))
+        XCTAssertFalse(IngredientDescriptors.endsWith(step, "Cuire les crêpes"))
+        XCTAssertFalse(IngredientDescriptors.endsWith(step, ""))
+    }
 }
