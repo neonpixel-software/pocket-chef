@@ -90,16 +90,22 @@ jobs:
             -configuration Release -destination 'generic/platform=macOS' \
             CODE_SIGNING_ALLOWED=NO build
       - name: Build & test iOS
+        # -collect-test-diagnostics never: on the xcode-27 image, xcodebuild otherwise spends
+        # 10 minutes after the tests trying to collect simulator diagnostics, until it times
+        # out ("Failure collecting diagnostics from simulator: Timed out after 600.0
+        # seconds"), on every run, passing or not. Failures still come with full logs.
         run: |
           xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
             -destination 'platform=iOS Simulator,name=iPhone 17' \
             -enableCodeCoverage YES -resultBundlePath ios.xcresult \
+            -collect-test-diagnostics never \
             clean test
       - name: Build & test macOS
         run: |
           xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
             -destination 'platform=macOS' \
             -enableCodeCoverage YES -resultBundlePath macos.xcresult \
+            -collect-test-diagnostics never \
             clean test
       - name: Convert coverage to SonarCloud's generic format
         run: |
