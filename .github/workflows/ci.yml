@@ -19,28 +19,60 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      app: ${{ steps.filter.outputs.app }}
-      api: ${{ steps.filter.outputs.api }}
+      app: ${{ steps.filter.outputs.app == 'true' || steps.filter.outputs.workflow == 'true' }}
+      api: ${{ steps.filter.outputs.api == 'true' || steps.filter.outputs.workflow == 'true' }}
     steps:
       - uses: actions/checkout@v7
       - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
         id: filter
         with:
+          # "every": a file counts only if it matches all of a filter's patterns, so the "!"
+          # patterns exclude documentation. A PR that only touches docs (design notes,
+          # runbooks, READMEs) skips the builds; the required "build" check still passes.
+          predicate-quantifier: every
           filters: |
             app:
               - 'app/**'
-              - '.github/workflows/ci.yml'
+              - '!app/docs/**'
+              - '!**/*.md'
             api:
               - 'api/**'
+              - '!api/docs/**'
+              - '!**/*.md'
+            workflow:
               - '.github/workflows/ci.yml'
 
-  build:
+  build-apple:
     needs: changes
     if: needs.changes.outputs.app == 'true'
+    name: build (${{ matrix.platform }})
     # Xcode 27, matching Xcode Cloud and local builds. The default macos-26 image only has
     # Xcode 26, whose SDK lacks Xcode 27 APIs (issue #119). xcode-27 is a GitHub preview
     # image: move to its GA label once there is one.
     runs-on: xcode-27
+    # iOS and macOS build and test on separate runners at the same time. The iOS simulator
+    # leg is the long one; the platform-independent checks run in the macOS leg.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: iOS
+            scheme: PocketChef-iOS
+            release-destination: generic/platform=iOS Simulator
+            test-destination: platform=iOS Simulator,name=iPhone 17
+            coverage: coverage-ios
+            runs-checks: false
+          - platform: macOS
+            scheme: PocketChef-macOS
+            release-destination: generic/platform=macOS
+            test-destination: platform=macOS
+            coverage: coverage-macos
+            runs-checks: true
+    env:
+      SCHEME: ${{ matrix.scheme }}
+      RELEASE_DESTINATION: ${{ matrix.release-destination }}
+      TEST_DESTINATION: ${{ matrix.test-destination }}
+      COVERAGE: ${{ matrix.coverage }}
     defaults:
       run:
         working-directory: app
@@ -51,6 +83,7 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
       - name: Verify the committed Package.resolved
+        if: matrix.runs-checks
         # Xcode Cloud builds from ci_scripts/Package.resolved (see ci_post_clone.sh), a
         # hand-synced copy of project.yml's packages. Resolve fresh for both schemes and
         # fail on any difference, so a stale copy breaks here instead of in Xcode Cloud.
@@ -61,6 +94,7 @@ jobs:
           diff ci_scripts/Package.resolved \
             PocketChef.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
       - name: Verify formatting
+        if: matrix.runs-checks
         # Enforces the style contract in app/.swiftformat; fails without changing anything.
         # Pinned to the version the config was validated against — a newer SwiftFormat
         # can change rule defaults and re-flag code the contract already covers. (The
@@ -70,6 +104,7 @@ jobs:
           unzip -o swiftformat.zip
           ./swiftformat Sources Tests --lint
       - name: Verify lint
+        if: matrix.runs-checks
         # Enforces the SwiftLint policy in app/.swiftlint.yml; --strict makes
         # warnings fail, so the config file is the complete policy.
         # Pinned to the version the config was validated against (the Homebrew
@@ -78,41 +113,48 @@ jobs:
           curl -fsSL --proto '=https' --tlsv1.2 https://github.com/realm/SwiftLint/releases/download/0.65.1/portable_swiftlint.zip -o swiftlint.zip
           unzip -o swiftlint.zip
           ./swiftlint Sources Tests --strict
-      - name: Build Release (iOS & macOS)
-        # The test steps only build Debug, which hides code that exists only under
+      - name: Build Release
+        # The test step only builds Debug, which hides code that exists only under
         # #if DEBUG (issue #95). Build Release too so archives can't break unnoticed.
         # Runs before the tests so a Release-only break fails in minutes, not after them.
         run: |
-          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
-            -configuration Release -destination 'generic/platform=iOS Simulator' \
+          xcodebuild -project PocketChef.xcodeproj -scheme "$SCHEME" \
+            -configuration Release -destination "$RELEASE_DESTINATION" \
             CODE_SIGNING_ALLOWED=NO build
-          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
-            -configuration Release -destination 'generic/platform=macOS' \
-            CODE_SIGNING_ALLOWED=NO build
-      - name: Build & test iOS
+      - name: Build & test
+        # -collect-test-diagnostics never: on the xcode-27 image, xcodebuild otherwise spends
+        # 10 minutes after the iOS tests trying to collect simulator diagnostics, until it
+        # times out ("Failure collecting diagnostics from simulator: Timed out after 600.0
+        # seconds"), on every run, passing or not. Failures still come with full logs.
         run: |
-          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-iOS \
-            -destination 'platform=iOS Simulator,name=iPhone 17' \
-            -enableCodeCoverage YES -resultBundlePath ios.xcresult \
-            clean test
-      - name: Build & test macOS
-        run: |
-          xcodebuild -project PocketChef.xcodeproj -scheme PocketChef-macOS \
-            -destination 'platform=macOS' \
-            -enableCodeCoverage YES -resultBundlePath macos.xcresult \
+          xcodebuild -project PocketChef.xcodeproj -scheme "$SCHEME" \
+            -destination "$TEST_DESTINATION" \
+            -enableCodeCoverage YES -resultBundlePath "$COVERAGE.xcresult" \
+            -collect-test-diagnostics never \
             clean test
       - name: Convert coverage to SonarCloud's generic format
-        run: |
-          Scripts/xccov-to-sonarqube-generic.sh ios.xcresult > coverage-ios.xml
-          Scripts/xccov-to-sonarqube-generic.sh macos.xcresult > coverage-macos.xml
-      - name: Upload coverage reports
+        run: Scripts/xccov-to-sonarqube-generic.sh "$COVERAGE.xcresult" > "$COVERAGE.xml"
+      - name: Upload coverage report
         uses: actions/upload-artifact@v7
         with:
-          name: swift-coverage-reports
-          path: |
-            app/coverage-ios.xml
-            app/coverage-macos.xml
+          name: swift-${{ matrix.coverage }}
+          path: app/${{ matrix.coverage }}.xml
           retention-days: 1
+
+  build:
+    # The required status check (main's ruleset requires "build"). Passes when both
+    # platform legs passed, or when they were skipped because nothing under app/ changed.
+    needs: [changes, build-apple]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the iOS and macOS builds
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          APPLE: ${{ needs.build-apple.result }}
+        run: |
+          echo "changes: $CHANGES, build-apple: $APPLE"
+          [ "$CHANGES" = success ] && { [ "$APPLE" = success ] || [ "$APPLE" = skipped ]; }
 
   build-api:
     needs: changes
@@ -140,7 +182,7 @@ jobs:
         run: dotnet test --no-build --configuration Release
 
   sonarcloud:
-    needs: [changes, build, build-api]
+    needs: [changes, build-apple, build, build-api]
     # One combined SonarCloud project for both Swift (app/) and .NET (api/) — not two
     # separate projects. Runs whenever either side changed (or neither build job failed
     # outright — a job that didn't need to run reports "skipped", which is fine here; only
@@ -164,10 +206,12 @@ jobs:
           distribution: temurin
           java-version: "21"
       - name: Download Swift coverage reports
-        if: needs.build.result == 'success'
+        # "build" also succeeds when the platform builds were skipped, so ask for those.
+        if: needs.build-apple.result == 'success'
         uses: actions/download-artifact@v8
         with:
-          name: swift-coverage-reports
+          pattern: swift-coverage-*
+          merge-multiple: true
           path: app
       - name: Install SonarScanner for .NET
         run: dotnet tool install --global dotnet-sonarscanner
