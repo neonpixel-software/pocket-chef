@@ -2268,6 +2268,34 @@
           }
         }
       }
+    },
+    "Conversion not available": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conversión no disponible"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conversion non disponible"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umrechnung nicht verfügbar"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omrekening niet beschikbaar"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

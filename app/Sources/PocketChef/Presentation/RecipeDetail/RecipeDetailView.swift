@@ -65,7 +65,7 @@ struct RecipeDetailView: View {
                                         Circle()
                                             .fill(PCColor.teal)
                                             .frame(width: 8, height: 8)
-                                        ingredientText(ingredient)
+                                        IngredientLineText(ingredient: ingredient, weight: showsWeights ? weights[ingredient.id] : nil)
                                         Spacer()
                                     }
                                     .padding(.vertical, 12)
@@ -172,27 +172,6 @@ struct RecipeDetailView: View {
         .tint(PCColor.pink)
         .onChange(of: showsWeights, initial: true) { updateWeights() }
         .onChange(of: recipe.ingredients) { updateWeights() }
-    }
-
-    /// The line as written, or in weight mode its weight in grams with the original below it.
-    /// Lines that can't be weighed stay as written (Phase 11.2 adds a note to those).
-    @ViewBuilder
-    private func ingredientText(_ ingredient: IngredientLine) -> some View {
-        if showsWeights, case let .grams(grams)? = weights[ingredient.id] {
-            let weight = IngredientWeightFormatter.format(grams: grams)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(verbatim: ingredient.ingredientName.map { "\(weight) \($0)" } ?? weight)
-                    .font(PCFont.body(15))
-                    .foregroundStyle(PCColor.textPrimary)
-                Text(ingredient.rawText)
-                    .font(PCFont.body(13))
-                    .foregroundStyle(PCColor.textPrimary.opacity(0.55))
-            }
-        } else {
-            Text(ingredient.rawText)
-                .font(PCFont.body(15))
-                .foregroundStyle(PCColor.textPrimary)
-        }
     }
 
     private func updateWeights() {

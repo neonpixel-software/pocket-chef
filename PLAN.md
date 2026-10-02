@@ -208,8 +208,9 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
   Note: density entries are grams per millilitre, so the conversion first turns the line's volume into millilitres. Which cup that means (US 236.6 ml vs metric 250 ml) is a client-side decision (e.g. defaulting from the device locale), not baked into the stored data.
   Acceptance: toggling shows correct gram values for ingredients with density data.
   Done 2026-10-01 (design: `app/docs/plans/2026-10-01-phase-11-1-weight-toggle-design.md`): an As Written / Weight toggle (user's choice: one-way, volume → grams; oz/lb/kg also shown in grams), cup and spoon sizes from the recipe's language (English → US customary, the other four shipped languages → metric), strict name matching (case, hyphen/space and plural only; never a related ingredient). Verified in the iOS simulator (metric region) against the cached seed densities: 2 cups all-purpose flour → 264 g, ½ cup sugar → 106 g, 1 cup milk → 258 g, 4 oz chocolate → 113 g; unweighable lines stay as written. Unit test: 1 US cup flour = 125 g.
-- [ ] **11.2 Missing-density fallback** — ingredients without a cached density entry show their original measurement plus a "conversion not available" note instead of a guess.
+- [x] **11.2 Missing-density fallback** — ingredients without a cached density entry show their original measurement plus a "conversion not available" note instead of a guess.
   Acceptance: an ingredient known to be absent from the density table shows the fallback note, not a fabricated number.
+  Done 2026-10-02: in the Weight view, a volume line without a cached density keeps its measurement as written with a small "Conversion not available" note under it. Lines with nothing to convert ("2 eggs", "salt to taste") stay as written without a note. Covered by `IngredientLineTextTests` (the note and no gram value for a missing density; no note when there's nothing to convert) and checked in the iOS simulator: "1 tsp saffron threads" and "3 tbsp unsalted butter" (strict matching: not "butter") show the note.
 
 **Checkpoint:** full v1 feature set complete — capture, tag, store/sync, convert.
 
