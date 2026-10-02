@@ -2,9 +2,9 @@ import Foundation
 
 @MainActor
 protocol ConvertIngredientsToWeightUseCase {
-    /// Each line's weight in grams, or why it has none, keyed by line id. Reads only the
-    /// cached densities, so it works offline.
-    func execute(_ lines: [IngredientLine], languageCode: String?) -> [UUID: IngredientWeight]
+    /// Each line's weight in grams, or why it has none, keyed by line id. `standard` is the cup
+    /// and spoon size the user chose. Reads only the cached densities, so it works offline.
+    func execute(_ lines: [IngredientLine], standard: VolumeStandard) -> [UUID: IngredientWeight]
 }
 
 @MainActor
@@ -15,7 +15,7 @@ final class DefaultConvertIngredientsToWeightUseCase: ConvertIngredientsToWeight
         self.cacheRepository = cacheRepository
     }
 
-    func execute(_ lines: [IngredientLine], languageCode: String?) -> [UUID: IngredientWeight] {
+    func execute(_ lines: [IngredientLine], standard: VolumeStandard) -> [UUID: IngredientWeight] {
         let entries: [DensityEntry]
         do {
             entries = try cacheRepository.allEntries()
@@ -24,7 +24,6 @@ final class DefaultConvertIngredientsToWeightUseCase: ConvertIngredientsToWeight
             entries = []
         }
         let index = DensityNameIndex(entries)
-        let standard = VolumeStandard.forLanguageCode(languageCode)
         var weights: [UUID: IngredientWeight] = [:]
         for line in lines {
             let density = line.ingredientName.flatMap(index.entry(forIngredientNamed:))

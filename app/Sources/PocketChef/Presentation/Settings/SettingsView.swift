@@ -3,6 +3,9 @@ import SwiftUI
 struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
+    /// Read by the recipe screen's weight view; not part of the view model because nothing but
+    /// this picker writes it.
+    @AppStorage(VolumeStandard.storageKey) private var volumeStandard = VolumeStandard.regionDefault()
 
     init(viewModel: SettingsViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -56,10 +59,26 @@ struct SettingsView: View {
                 Text(footerText)
             }
 
+            volumeStandardSection
+
             densitySection
         }
         .formStyle(.grouped)
         .task { viewModel.reloadDensityStatus() }
+    }
+
+    private var volumeStandardSection: some View {
+        Section {
+            Picker("Cups and Spoons", selection: $volumeStandard) {
+                Text("US Customary").tag(VolumeStandard.usCustomary)
+                Text("Metric").tag(VolumeStandard.metric)
+            }
+            .pickerStyle(.inline)
+        } header: {
+            Text("Measurements")
+        } footer: {
+            Text("Used to show ingredients by weight. A US cup is 237 ml; a metric cup is 250 ml.")
+        }
     }
 
     private var densitySection: some View {

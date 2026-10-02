@@ -2296,6 +2296,118 @@
           }
         }
       }
+    },
+    "Cups and Spoons": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tazas y cucharas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasses et cuillères"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tassen und Löffel"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopjes en lepels"
+          }
+        }
+      }
+    },
+    "US Customary": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estadounidenses"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Américaines"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "US-Maße"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amerikaans"
+          }
+        }
+      }
+    },
+    "Metric": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Métricas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Métriques"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metrisch"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metrisch"
+          }
+        }
+      }
+    },
+    "Used to show ingredients by weight. A US cup is 237 ml; a metric cup is 250 ml.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se usa para mostrar los ingredientes por peso. Una taza estadounidense equivale a 237 ml; una taza métrica, a 250 ml."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilisé pour afficher les ingrédients au poids. Une tasse américaine fait 237 ml ; une tasse métrique, 250 ml."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wird verwendet, um Zutaten nach Gewicht anzuzeigen. Eine US-Tasse fasst 237 ml, eine metrische Tasse 250 ml."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wordt gebruikt om ingrediënten op gewicht te tonen. Een Amerikaans kopje is 237 ml, een metrisch kopje 250 ml."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

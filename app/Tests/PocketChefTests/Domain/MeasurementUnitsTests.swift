@@ -21,6 +21,22 @@ final class MeasurementUnitsTests: XCTestCase {
         XCTAssertEqual(milliliters("tsp", .metric), 5)
     }
 
+    /// Until the user picks in Settings, the region decides, not the language: an English
+    /// speaker in the UK or the Netherlands gets metric cups.
+    func testTheDefaultFollowsTheRegionNotTheLanguage() {
+        XCTAssertEqual(VolumeStandard.regionDefault(for: Locale(identifier: "en_US")), .usCustomary)
+        XCTAssertEqual(VolumeStandard.regionDefault(for: Locale(identifier: "es_US")), .usCustomary)
+        XCTAssertEqual(VolumeStandard.regionDefault(for: Locale(identifier: "en_GB")), .metric)
+        XCTAssertEqual(VolumeStandard.regionDefault(for: Locale(identifier: "en_NL")), .metric)
+        XCTAssertEqual(VolumeStandard.regionDefault(for: Locale(identifier: "fr_FR")), .metric)
+    }
+
+    /// The Settings choice is stored by raw value, so renaming a case would reset users' choice.
+    func testTheStoredValuesStayStable() {
+        XCTAssertEqual(VolumeStandard.usCustomary.rawValue, "usCustomary")
+        XCTAssertEqual(VolumeStandard.metric.rawValue, "metric")
+    }
+
     func testPintsAreUSOrImperial() throws {
         XCTAssertEqual(try XCTUnwrap(milliliters("pint", .usCustomary)), 473.18, accuracy: 0.01)
         XCTAssertEqual(try XCTUnwrap(milliliters("pint", .metric)), 568.26, accuracy: 0.01)

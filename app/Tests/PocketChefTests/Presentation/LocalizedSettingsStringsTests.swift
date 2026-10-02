@@ -32,6 +32,12 @@ final class LocalizedSettingsStringsTests: XCTestCase {
         "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again.",
         "The ingredient density service isn't responding properly right now. Try again later.",
         "Couldn't save ingredient densities on this device. Try again.",
+        // The cup and spoon size setting.
+        "Measurements",
+        "Cups and Spoons",
+        "US Customary",
+        "Metric",
+        "Used to show ingredients by weight. A US cup is 237 ml; a metric cup is 250 ml.",
     ]
 
     /// A missing entry falls back to the English key, and every key here differs from its

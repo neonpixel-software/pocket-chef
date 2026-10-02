@@ -9,10 +9,11 @@ struct RecipeDetailView: View {
     /// If that changes (search, sync), refresh `viewModel.recipe` from the repository here.
     @State private var viewModel: RecipeDetailViewModel
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.locale) private var locale
     @Environment(\.convertIngredientsToWeight) private var convertIngredientsToWeight
     /// The as-written/weight choice, remembered across recipes and launches.
     @AppStorage("showsIngredientWeights") private var showsWeights = false
+    /// The cup and spoon size chosen in Settings.
+    @AppStorage(VolumeStandard.storageKey) private var volumeStandard = VolumeStandard.regionDefault()
     @State private var weights: [UUID: IngredientWeight] = [:]
 
     /// Invoked whenever this recipe is edited or deleted, so the list that pushed this
@@ -172,10 +173,11 @@ struct RecipeDetailView: View {
         .tint(PCColor.pink)
         .onChange(of: showsWeights, initial: true) { updateWeights() }
         .onChange(of: recipe.ingredients) { updateWeights() }
+        .onChange(of: volumeStandard) { updateWeights() }
     }
 
     private func updateWeights() {
-        weights = showsWeights ? convertIngredientsToWeight?.execute(recipe.ingredients, languageCode: locale.languageCode) ?? [:] : [:]
+        weights = showsWeights ? convertIngredientsToWeight?.execute(recipe.ingredients, standard: volumeStandard) ?? [:] : [:]
     }
 
     private func section(

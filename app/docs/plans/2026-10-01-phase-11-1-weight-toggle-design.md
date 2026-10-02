@@ -17,15 +17,19 @@ with density data.
 
   It doesn't convert weights into volumes, which would need rules for picking
   a cup, tablespoon or teaspoon and for rounding to kitchen fractions.
-- **Cup and spoon sizes come from the recipe's language** (PLAN.md note: the
-  client decides). Measurement convention travels with how the recipe is
-  written, not the device's region: a French recipe on a US-region device still
-  means 250 ml "tasses". English is the only English recipe language the app
-  ships, so `VolumeStandard.forLanguageCode(_:)` maps English → US customary
-  (236.6 ml cup, 14.8 ml tablespoon, 4.9 ml teaspoon, US pints and fluid
-  ounces) and everything else → metric cups and spoons (250/15/5 ml) with
-  imperial pints and fluid ounces. The view passes the locale's language; a
-  bare "oz" is always a weight, and a fluid ounce is written "fl oz".
+- **Cup and spoon sizes are a user setting** (user decision, 2026-10-02,
+  replacing a language-based rule). Settings → Measurements → Cups and Spoons
+  offers two choices:
+  - US Customary: a 236.6 ml cup, a 14.8 ml tablespoon, a 4.9 ml teaspoon,
+    and US pints and fluid ounces.
+  - Metric: 250/15/5 ml cups and spoons, with imperial pints and fluid ounces.
+
+  Until the user picks one, it defaults from the device's region
+  (`Locale.measurementSystem`), never the language. An English speaker in the
+  UK or the Netherlands gets metric cups. The choice is stored in
+  `UserDefaults` under `volumeStandard`, and the recipe screen reconverts
+  when it changes. A bare "oz" is always a weight, and a fluid ounce is
+  written "fl oz".
 - **Units** are recognized in all five shipped languages (cup, taza, tasse,
   kopje; EL, cuillère à soupe, eetlepel; ...), ignoring case, accents, a
   trailing dot and plural endings. Count and vague units (clove, can, pinch)
@@ -50,7 +54,8 @@ with density data.
 
 - Domain:
   - `MeasurementUnits` and `VolumeStandard`: the unit table and sizes; the
-    standard is derived from the recipe's language, not the device's region.
+    standard is the user's Settings choice (`VolumeStandard.storageKey`),
+    defaulting from the region.
   - `IngredientWeight.of(_:density:standard:)`: the arithmetic, plus the
     reason when a line can't be weighed.
   - `DensityNameIndex`: the name matching.
@@ -74,8 +79,11 @@ with density data.
   - The use case against a real in-memory cache with seed densities.
   - The formatter (US locale stays in grams, decimal comma in German).
   - String catalog coverage.
-- In the iOS simulator (metric region), with the cache filled from the API's
-  72 seeds:
+- In the iOS simulator (metric region, English UI, so metric 250 ml cups), with
+  the cache filled from the API's 72 seeds. These numbers were recorded before
+  the setting existed, when the region decided; the setting's region default
+  gives the same result. With US Customary chosen, the same recipe gives
+  2 cups flour → 250 g and 1 cup milk → 244 g (PR #125).
   - 2 cups all-purpose flour → 264 g, ½ cup sugar → 106 g, 1 cup milk →
     258 g, 1 tsp salt → 6,2 g, 4 oz chocolate → 113 g.
   - Saffron (no density) and "2 eggs" stay as written.

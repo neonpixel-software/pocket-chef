@@ -41,7 +41,7 @@ final class ConvertIngredientsToWeightUseCaseTests: XCTestCase {
         let eggs = line("2 eggs", 2, nil, "eggs")
         let saffron = line("1 tsp saffron", 1, "tsp", "saffron")
 
-        let weights = useCase.execute([flour, sugar, milk, eggs, saffron], languageCode: "en")
+        let weights = useCase.execute([flour, sugar, milk, eggs, saffron], standard: .usCustomary)
 
         guard case let .grams(flourGrams)? = weights[flour.id],
               case let .grams(sugarGrams)? = weights[sugar.id],
@@ -58,29 +58,19 @@ final class ConvertIngredientsToWeightUseCaseTests: XCTestCase {
         let flour = line("1 cup flour", 1, "cup", "flour")
         let butter = line("100 g butter", 100, "g", "butter")
 
-        let weights = useCase.execute([flour, butter], languageCode: "en")
+        let weights = useCase.execute([flour, butter], standard: .usCustomary)
 
         XCTAssertEqual(weights[flour.id], .unavailable(.noDensity))
         XCTAssertEqual(weights[butter.id], .grams(100))
     }
 
-    /// The standard follows the recipe's language, not the device's region (Phase 11.1).
-    func testTheVolumeStandardFollowsTheRecipesLanguage() throws {
+    /// The cup size is the user's Settings choice, passed in by the view (not the language).
+    func testUsesTheChosenVolumeStandard() throws {
         let useCase = try makeUseCase([entry("all-purpose flour", 0.528344104716297)])
         let flour = line("1 cup flour", 1, "cup", "all-purpose flour")
 
-        func grams(languageCode: String?) -> Double {
-            let weights = useCase.execute([flour], languageCode: languageCode)
-            guard case let .grams(grams)? = weights[flour.id] else { return -1 }
-            return grams
-        }
-
-        // English is the only English recipe language the app ships.
-        XCTAssertEqual(grams(languageCode: "en"), 125.0, accuracy: 0.1)
-        XCTAssertEqual(grams(languageCode: "en-US"), 125.0, accuracy: 0.1)
-        XCTAssertEqual(grams(languageCode: "fr"), 132.1, accuracy: 0.1)
-        XCTAssertEqual(grams(languageCode: "de-DE"), 132.1, accuracy: 0.1)
-        XCTAssertEqual(grams(languageCode: nil), 132.1, accuracy: 0.1)
+        XCTAssertEqual(useCase.execute([flour], standard: .usCustomary)[flour.id], .grams(236.5882365 * 0.528344104716297))
+        XCTAssertEqual(useCase.execute([flour], standard: .metric)[flour.id], .grams(250 * 0.528344104716297))
     }
 }
 
