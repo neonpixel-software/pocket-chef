@@ -16,23 +16,27 @@ using PocketChef.DensityApi.Infrastructure;
 
 string? connectionString = null;
 var dryRun = false;
-for (var i = 0; i < args.Length; i++)
+// A queue rather than an index loop, so taking --connection's value doesn't move a loop
+// counter from inside the loop body.
+var remaining = new Queue<string>(args);
+while (remaining.TryDequeue(out var arg))
 {
-    switch (args[i])
+    switch (arg)
     {
-        case "--connection" when i + 1 < args.Length:
-            connectionString = args[++i];
-            break;
         case "--connection":
-            await Console.Error.WriteLineAsync("--connection needs a connection string after it.");
-            return 2;
+            if (!remaining.TryDequeue(out connectionString))
+            {
+                await Console.Error.WriteLineAsync("--connection needs a connection string after it.");
+                return 2;
+            }
+            break;
         case "--dry-run":
             dryRun = true;
             break;
         default:
             // Fail loudly rather than ignore it: an argument the tool doesn't expect usually
             // means the command line didn't reach it as intended.
-            await Console.Error.WriteLineAsync($"Unexpected argument '{args[i]}'. Usage: --connection \"<connection string>\" [--dry-run]");
+            await Console.Error.WriteLineAsync($"Unexpected argument '{arg}'. Usage: --connection \"<connection string>\" [--dry-run]");
             return 2;
     }
 }
