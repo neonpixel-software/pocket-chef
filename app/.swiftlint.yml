@@ -1,7 +1,7 @@
 # Pocket Chef SwiftLint contract.
 #
 # Enforced in CI via `swiftlint Sources Tests --strict` (see
-# .github/workflows/ci.yml, build job). --strict promotes warnings to
+# .github/workflows/ci.yml, build-apple job, macOS leg). --strict promotes warnings to
 # failures, so this file is the complete lint policy: anything not
 # mentioned here runs at SwiftLint defaults. Run `swiftlint` from app/
 # locally to check.

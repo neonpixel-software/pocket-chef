@@ -1,7 +1,7 @@
 # Pocket Chef Swift formatting contract.
 #
 # Enforced in CI via `swiftformat Sources Tests --lint` (see
-# .github/workflows/ci.yml, build job). Run `swiftformat` from app/ to apply
+# .github/workflows/ci.yml, build-apple job, macOS leg). Run `swiftformat` from app/ to apply
 # any required changes locally.
 #
 # Deviations from the SwiftFormat defaults below exist so the formatter
