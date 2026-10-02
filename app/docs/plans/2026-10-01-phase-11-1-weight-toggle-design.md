@@ -79,8 +79,11 @@ with density data.
   - The use case against a real in-memory cache with seed densities.
   - The formatter (US locale stays in grams, decimal comma in German).
   - String catalog coverage.
-- In the iOS simulator (metric region), with the cache filled from the API's
-  72 seeds:
+- In the iOS simulator (metric region, English UI, so metric 250 ml cups), with
+  the cache filled from the API's 72 seeds. These numbers were recorded before
+  the setting existed, when the region decided; the setting's region default
+  gives the same result. With US Customary chosen, the same recipe gives
+  2 cups flour → 250 g and 1 cup milk → 244 g (PR #125).
   - 2 cups all-purpose flour → 264 g, ½ cup sugar → 106 g, 1 cup milk →
     258 g, 1 tsp salt → 6,2 g, 4 oz chocolate → 113 g.
   - Saffron (no density) and "2 eggs" stay as written.
