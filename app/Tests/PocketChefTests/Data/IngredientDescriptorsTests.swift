@@ -57,4 +57,36 @@ final class IngredientDescriptorsTests: XCTestCase {
         XCTAssertFalse(IngredientDescriptors.appears(in: source, rawText: "eau", name: "eau"))
         XCTAssertFalse(IngredientDescriptors.appears(in: source, rawText: "", name: ""))
     }
+
+    // MARK: issue #76
+
+    func testRecognizesUnitsOfTimeInEveryShippedLanguage() {
+        for unit in ["minute", "minutes", "min", "hours", "heure", "heures", "Stunde", "Stunden", "minuten", "uur", "horas", "minutos"] {
+            XCTAssertTrue(IngredientDescriptors.isTimeUnit(unit), unit)
+        }
+        for name in ["salt", "minute steak", "farine", "Mehl", "hourglass cookies"] {
+            XCTAssertFalse(IngredientDescriptors.isTimeUnit(name), name)
+        }
+    }
+
+    func testFindsTheSourceSpellingOfAOneLetterTypo() {
+        let source = "3 EL Olivenöl\n1 EL Weißweinessig"
+
+        XCTAssertEqual(IngredientDescriptors.sourceSpelling(of: "3 EL Olivenäl", in: source), "3 EL Olivenöl")
+        XCTAssertEqual(IngredientDescriptors.sourceSpelling(of: "Olivenäl", in: source), "Olivenöl")
+        XCTAssertEqual(IngredientDescriptors.sourceSpelling(of: "olivenöl", in: source), "Olivenöl")
+    }
+
+    func testDoesNotTreatABiggerDifferenceAsATypo() {
+        let source = "3 EL Olivenöl, 4 œufs, 250 g de farine"
+
+        // Two letters differ.
+        XCTAssertNil(IngredientDescriptors.sourceSpelling(of: "Olivanäl", in: source))
+        // A digit differs: a different amount, not a typo.
+        XCTAssertNil(IngredientDescriptors.sourceSpelling(of: "4 EL Olivenöl", in: source))
+        // Too short to call a one-letter difference a typo ("eau" isn't "œufs").
+        XCTAssertNil(IngredientDescriptors.sourceSpelling(of: "oeuf", in: source))
+        // Part of a longer word.
+        XCTAssertNil(IngredientDescriptors.sourceSpelling(of: "liven", in: source))
+    }
 }
