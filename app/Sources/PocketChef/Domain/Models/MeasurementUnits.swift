@@ -1,15 +1,18 @@
 import Foundation
 
 /// Which cup and spoon sizes a recipe's volume units mean. The stored recipe keeps the unit as
-/// written, so this is decided on the device (PLAN.md 11.1), from the locale by default.
+/// written, so this is decided on the device (PLAN.md 11.1) from the recipe's language: the
+/// measurement convention travels with how the recipe is written, not with the device's
+/// region — a French recipe on a US-region device still means 250 ml "tasses".
 enum VolumeStandard: Equatable {
     /// US customary: 236.6 ml cup, 14.8 ml tablespoon, US pints.
     case usCustomary
     /// Metric cups and spoons (250/15/5 ml); pints and fluid ounces are imperial.
     case metric
 
-    static var current: VolumeStandard {
-        Locale.current.measurementSystem == .us ? .usCustomary : .metric
+    /// English recipes are US customary; the app ships no other English recipe language.
+    static func forLanguageCode(_ code: String?) -> VolumeStandard {
+        code.map { $0.lowercased().hasPrefix("en") } == true ? .usCustomary : .metric
     }
 }
 

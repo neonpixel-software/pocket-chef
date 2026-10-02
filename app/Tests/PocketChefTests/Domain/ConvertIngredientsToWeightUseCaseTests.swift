@@ -11,12 +11,12 @@ final class ConvertIngredientsToWeightUseCaseTests: XCTestCase {
         super.tearDown()
     }
 
-    private func makeUseCase(_ entries: [DensityEntry], standard: VolumeStandard = .usCustomary) throws -> DefaultConvertIngredientsToWeightUseCase {
+    private func makeUseCase(_ entries: [DensityEntry]) throws -> DefaultConvertIngredientsToWeightUseCase {
         let container = try DensityStore.makeContainer(inMemory: true)
         self.container = container
         let cache = SwiftDataDensityCacheRepository(modelContext: container.mainContext)
         _ = try cache.apply(entries)
-        return DefaultConvertIngredientsToWeightUseCase(cacheRepository: cache, standard: standard)
+        return DefaultConvertIngredientsToWeightUseCase(cacheRepository: cache)
     }
 
     private func entry(_ name: String, _ gramsPerMilliliter: Double) -> DensityEntry {
@@ -41,9 +41,8 @@ final class ConvertIngredientsToWeightUseCaseTests: XCTestCase {
         let eggs = line("2 eggs", 2, nil, "eggs")
         let saffron = line("1 tsp saffron", 1, "tsp", "saffron")
 
-        let weights = useCase.execute([flour, sugar, milk, eggs, saffron])
+        let weights = useCase.execute([flour, sugar, milk, eggs, saffron], languageCode: "en")
 
-        XCTAssertEqual(weights.count, 5)
         guard case let .grams(flourGrams)? = weights[flour.id],
               case let .grams(sugarGrams)? = weights[sugar.id],
               case let .grams(milkGrams)? = weights[milk.id] else { return XCTFail("Expected grams for flour, sugar and milk: \(weights)") }
@@ -59,10 +58,29 @@ final class ConvertIngredientsToWeightUseCaseTests: XCTestCase {
         let flour = line("1 cup flour", 1, "cup", "flour")
         let butter = line("100 g butter", 100, "g", "butter")
 
-        let weights = useCase.execute([flour, butter])
+        let weights = useCase.execute([flour, butter], languageCode: "en")
 
         XCTAssertEqual(weights[flour.id], .unavailable(.noDensity))
         XCTAssertEqual(weights[butter.id], .grams(100))
+    }
+
+    /// The standard follows the recipe's language, not the device's region (Phase 11.1).
+    func testTheVolumeStandardFollowsTheRecipesLanguage() throws {
+        let useCase = try makeUseCase([entry("all-purpose flour", 0.528344104716297)])
+        let flour = line("1 cup flour", 1, "cup", "all-purpose flour")
+
+        func grams(languageCode: String?) -> Double {
+            let weights = useCase.execute([flour], languageCode: languageCode)
+            guard case let .grams(grams)? = weights[flour.id] else { return -1 }
+            return grams
+        }
+
+        // English is the only English recipe language the app ships.
+        XCTAssertEqual(grams(languageCode: "en"), 125.0, accuracy: 0.1)
+        XCTAssertEqual(grams(languageCode: "en-US"), 125.0, accuracy: 0.1)
+        XCTAssertEqual(grams(languageCode: "fr"), 132.1, accuracy: 0.1)
+        XCTAssertEqual(grams(languageCode: "de-DE"), 132.1, accuracy: 0.1)
+        XCTAssertEqual(grams(languageCode: nil), 132.1, accuracy: 0.1)
     }
 }
 

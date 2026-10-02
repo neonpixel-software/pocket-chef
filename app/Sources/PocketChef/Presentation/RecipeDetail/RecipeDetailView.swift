@@ -9,6 +9,7 @@ struct RecipeDetailView: View {
     /// If that changes (search, sync), refresh `viewModel.recipe` from the repository here.
     @State private var viewModel: RecipeDetailViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
     @Environment(\.convertIngredientsToWeight) private var convertIngredientsToWeight
     /// The as-written/weight choice, remembered across recipes and launches.
     @AppStorage("showsIngredientWeights") private var showsWeights = false
@@ -195,7 +196,7 @@ struct RecipeDetailView: View {
     }
 
     private func updateWeights() {
-        weights = showsWeights ? convertIngredientsToWeight?.execute(recipe.ingredients) ?? [:] : [:]
+        weights = showsWeights ? convertIngredientsToWeight?.execute(recipe.ingredients, languageCode: locale.languageCode) ?? [:] : [:]
     }
 
     private func section(

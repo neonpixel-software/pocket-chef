@@ -4,20 +4,18 @@ import Foundation
 protocol ConvertIngredientsToWeightUseCase {
     /// Each line's weight in grams, or why it has none, keyed by line id. Reads only the
     /// cached densities, so it works offline.
-    func execute(_ lines: [IngredientLine]) -> [UUID: IngredientWeight]
+    func execute(_ lines: [IngredientLine], languageCode: String?) -> [UUID: IngredientWeight]
 }
 
 @MainActor
 final class DefaultConvertIngredientsToWeightUseCase: ConvertIngredientsToWeightUseCase {
     private let cacheRepository: DensityCacheRepository
-    private let standard: VolumeStandard
 
-    init(cacheRepository: DensityCacheRepository, standard: VolumeStandard = .current) {
+    init(cacheRepository: DensityCacheRepository) {
         self.cacheRepository = cacheRepository
-        self.standard = standard
     }
 
-    func execute(_ lines: [IngredientLine]) -> [UUID: IngredientWeight] {
+    func execute(_ lines: [IngredientLine], languageCode: String?) -> [UUID: IngredientWeight] {
         let entries: [DensityEntry]
         do {
             entries = try cacheRepository.allEntries()
@@ -26,6 +24,7 @@ final class DefaultConvertIngredientsToWeightUseCase: ConvertIngredientsToWeight
             entries = []
         }
         let index = DensityNameIndex(entries)
+        let standard = VolumeStandard.forLanguageCode(languageCode)
         var weights: [UUID: IngredientWeight] = [:]
         for line in lines {
             let density = line.ingredientName.flatMap(index.entry(forIngredientNamed:))
@@ -55,7 +54,7 @@ struct DensityNameIndex {
         for suffix in ["es", "s"] where key.hasSuffix(suffix) {
             candidates.append(String(key.dropLast(suffix.count)))
         }
-        return candidates.lazy.compactMap { entries[$0] }.first
+        return candidates.compactMap { entries[$0] }.first
     }
 
     private static func key(for name: String) -> String {

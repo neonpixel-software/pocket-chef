@@ -17,11 +17,15 @@ with density data.
 
   It doesn't convert weights into volumes, which would need rules for picking
   a cup, tablespoon or teaspoon and for rounding to kitchen fractions.
-- **Cup and spoon sizes come from the device** (PLAN.md note). A US
-  measurement system means US customary: a 236.6 ml cup, a 14.8 ml
-  tablespoon, a 4.9 ml teaspoon, and US pints and fluid ounces. Anything else
-  means metric cups and spoons (250/15/5 ml) with imperial pints and fluid
-  ounces. A bare "oz" is always a weight; a fluid ounce is written "fl oz".
+- **Cup and spoon sizes come from the recipe's language** (PLAN.md note: the
+  client decides). Measurement convention travels with how the recipe is
+  written, not the device's region: a French recipe on a US-region device still
+  means 250 ml "tasses". English is the only English recipe language the app
+  ships, so `VolumeStandard.forLanguageCode(_:)` maps English → US customary
+  (236.6 ml cup, 14.8 ml tablespoon, 4.9 ml teaspoon, US pints and fluid
+  ounces) and everything else → metric cups and spoons (250/15/5 ml) with
+  imperial pints and fluid ounces. The view passes the locale's language; a
+  bare "oz" is always a weight, and a fluid ounce is written "fl oz".
 - **Units** are recognized in all five shipped languages (cup, taza, tasse,
   kopje; EL, cuillère à soupe, eetlepel; ...), ignoring case, accents, a
   trailing dot and plural endings. Count and vague units (clove, can, pinch)
@@ -45,7 +49,8 @@ with density data.
 ## Components
 
 - Domain:
-  - `MeasurementUnits` and `VolumeStandard`: the unit table and sizes.
+  - `MeasurementUnits` and `VolumeStandard`: the unit table and sizes; the
+    standard is derived from the recipe's language, not the device's region.
   - `IngredientWeight.of(_:density:standard:)`: the arithmetic, plus the
     reason when a line can't be weighed.
   - `DensityNameIndex`: the name matching.
