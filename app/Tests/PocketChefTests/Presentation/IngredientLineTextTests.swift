@@ -34,6 +34,16 @@ final class IngredientLineTextTests: XCTestCase {
         XCTAssertEqual(try texts(IngredientLineText(ingredient: salt, weight: .unavailable(.noAmount))), ["salt to taste"])
     }
 
+    /// The note is a string literal, so SwiftUI looks it up in the catalog (a LocalizedStringKey);
+    /// the ingredient line is user text and stays verbatim in every language.
+    func testTheNoteIsLocalizedAndTheLineIsNot() throws {
+        let german = Locale(identifier: "de")
+        let texts = try IngredientLineText(ingredient: saffron, weight: .unavailable(.noDensity))
+            .inspect().findAll(ViewType.Text.self).map { try $0.string(locale: german) }
+
+        XCTAssertEqual(texts, ["1 tsp saffron threads", "Umrechnung nicht verfügbar"])
+    }
+
     func testAConvertedLineShowsTheWeightAndTheOriginal() throws {
         let weight = IngredientWeightFormatter.format(grams: 250)
 
