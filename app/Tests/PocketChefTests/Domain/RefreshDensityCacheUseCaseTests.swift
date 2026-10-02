@@ -38,6 +38,10 @@ private final class FakeDensityCacheRepository: DensityCacheRepository {
         entries.first { $0.id == DensityEntry.lookupKey(for: name) }
     }
 
+    func allEntries() throws -> [DensityEntry] {
+        entries
+    }
+
     func isEmpty() throws -> Bool {
         entries.isEmpty
     }
