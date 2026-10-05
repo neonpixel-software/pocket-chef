@@ -8,5 +8,11 @@
 // everything stays ad hoc signed, as before.
 #include? "Signing.xcconfig"
 
-// The iCloud entitlements are the app's; a test bundle doesn't carry any.
+// The iCloud entitlements are the app's; a test bundle doesn't carry any. This plain assignment
+// also overrides Signing.xcconfig's [sdk=...] variants (checked: the bundle is signed without
+// entitlements).
 CODE_SIGN_ENTITLEMENTS =
+
+// Signing.xcconfig's ICLOUD_ENABLED comes along too, and $(inherited) can't drop it (it builds
+// on the included value). Harmless: no test source checks it, and the app code under test is
+// compiled by the app target with its own flags.
