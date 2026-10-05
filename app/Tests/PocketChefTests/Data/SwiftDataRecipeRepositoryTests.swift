@@ -10,8 +10,7 @@ final class SwiftDataRecipeRepositoryTests: XCTestCase {
             TagModel.self,
             DensityEntryModel.self,
         ])
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-        let container = try ModelContainer(for: schema, configurations: [configuration])
+        let container = try ModelContainer.inMemory(schema: schema)
         return ModelContext(container)
     }
 

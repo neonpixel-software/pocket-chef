@@ -1,0 +1,12 @@
+// Shared by the unit test targets (project.yml configFiles).
+
+// With the optional, gitignored Signing.xcconfig the app is signed by your team, and the macOS
+// app's hardened runtime only loads a test bundle signed by the same team ("mapping process and
+// mapped file have different Team IDs", #130). Unit test bundles load into the app, so they take
+// the team from it. The UI test runners are separate processes and stay ad hoc signed: signed by
+// the team, the macOS runner exited before connecting. Without the file (CI, fresh clones)
+// everything stays ad hoc signed, as before.
+#include? "Signing.xcconfig"
+
+// The iCloud entitlements are the app's; a test bundle doesn't carry any.
+CODE_SIGN_ENTITLEMENTS =

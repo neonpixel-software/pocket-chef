@@ -4,8 +4,7 @@ import XCTest
 
 final class RecipeStoreCopierTests: XCTestCase {
     private func makeInMemoryContext() throws -> ModelContext {
-        let configuration = ModelConfiguration(schema: RecipeStore.schema, isStoredInMemoryOnly: true)
-        let container = try ModelContainer(for: RecipeStore.schema, configurations: [configuration])
+        let container = try ModelContainer.inMemory()
         return ModelContext(container)
     }
 

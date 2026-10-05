@@ -32,8 +32,7 @@ final class PersistenceControllerTests: XCTestCase {
             notificationCenter: notificationCenter
         ) { [unowned self] mode in
             createdModes.append(mode)
-            let configuration = ModelConfiguration(schema: RecipeStore.schema, isStoredInMemoryOnly: true)
-            let container = try ModelContainer(for: RecipeStore.schema, configurations: [configuration])
+            let container = try ModelContainer.inMemory()
             containers[mode] = container
             return container
         }

@@ -54,6 +54,9 @@ targets:
   PocketChef-iOSTests:
     type: bundle.unit-test
     platform: iOS
+    configFiles:
+      Debug: Config/UnitTests.xcconfig
+      Release: Config/UnitTests.xcconfig
     sources:
       - Tests/PocketChefTests
     dependencies:
@@ -94,6 +97,9 @@ targets:
   PocketChef-macOSTests:
     type: bundle.unit-test
     platform: macOS
+    configFiles:
+      Debug: Config/UnitTests.xcconfig
+      Release: Config/UnitTests.xcconfig
     sources:
       - Tests/PocketChefTests
     dependencies:
