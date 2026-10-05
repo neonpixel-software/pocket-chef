@@ -44,9 +44,14 @@ final class RecipeListHeaderUITests: XCTestCase {
     func testHeaderStaysAtTopWhileTheRecipesScroll() {
         let app = launch(scenario: "manyRecipes")
 
-        let firstRecipe = app.buttons["Recipe 01"]
-        XCTAssertTrue(firstRecipe.waitForExistence(timeout: 10))
-        let firstRecipeTop = firstRecipe.frame.minY
+        XCTAssertTrue(app.buttons["Recipe 01"].waitForExistence(timeout: 10))
+        // Recipe 12 starts well below the window on both platforms; once it's on screen, the list
+        // has really moved. (Comparing Recipe 01's frame raced the lazy list dropping that row.)
+        let laterRecipe = app.buttons["Recipe 12"]
+        // Nothing moves yet, so reading the frame can't race; isHittable on an off-screen element
+        // made XCTest retry for 14 s on macOS.
+        let windowBottom = app.windows.firstMatch.frame.maxY
+        XCTAssertTrue(!laterRecipe.exists || laterRecipe.frame.minY >= windowBottom, "Recipe 12 is on screen before scrolling")
         let headerBefore = assertHeaderIsAtTop(in: app)
 
         let list = app.scrollViews["RecipeList"]
@@ -57,11 +62,8 @@ final class RecipeListHeaderUITests: XCTestCase {
         list.swipeUp()
         #endif
 
-        // A lazy list drops rows that scrolled far out of view. Recipe 15 starts well below the
-        // window on both platforms, so seeing it means the list really moved.
-        let scrolled = !firstRecipe.exists || firstRecipe.frame.minY < firstRecipeTop - 100
-        XCTAssertTrue(scrolled, "The recipe list didn't scroll, so this checked nothing")
-        XCTAssertTrue(app.buttons["Recipe 15"].isHittable, "Recipe 15 didn't scroll into view")
+        let scrolled = laterRecipe.waitForExistence(timeout: 10) && laterRecipe.wait(for: \.isHittable, toEqual: true, timeout: 10)
+        XCTAssertTrue(scrolled, "The recipe list didn't scroll (Recipe 12 never came on screen), so this checked nothing")
         let headerAfter = assertHeaderIsAtTop(in: app)
         XCTAssertEqual(headerAfter.minY, headerBefore.minY, accuracy: 1, "The header moved while the list scrolled")
     }
