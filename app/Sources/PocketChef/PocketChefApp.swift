@@ -91,7 +91,6 @@ struct PocketChefApp: App {
     #else
     private static let seedsSampleData = false
     private static let usesDensityAPI = true
-    private static let uiTestWindowSize: CGSize? = nil
     private static let makeContainer: PersistenceController.ContainerFactory = RecipeStore.makeContainer(for:)
 
     private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
@@ -143,9 +142,12 @@ struct PocketChefApp: App {
                     }
                 }
             }
+            // Only UI test runs fix the window size; Release builds leave both modifiers out.
+            #if DEBUG
             .frame(width: Self.uiTestWindowSize?.width, height: Self.uiTestWindowSize?.height)
+            #endif
         }
-        #if os(macOS)
+        #if DEBUG && os(macOS)
         .windowResizability(Self.uiTestWindowSize == nil ? .automatic : .contentSize)
         #endif
 

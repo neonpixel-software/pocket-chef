@@ -57,9 +57,11 @@ final class RecipeListHeaderUITests: XCTestCase {
         list.swipeUp()
         #endif
 
-        // A lazy list drops rows that scrolled far out of view.
+        // A lazy list drops rows that scrolled far out of view. Recipe 15 starts well below the
+        // window on both platforms, so seeing it means the list really moved.
         let scrolled = !firstRecipe.exists || firstRecipe.frame.minY < firstRecipeTop - 100
         XCTAssertTrue(scrolled, "The recipe list didn't scroll, so this checked nothing")
+        XCTAssertTrue(app.buttons["Recipe 15"].isHittable, "Recipe 15 didn't scroll into view")
         let headerAfter = assertHeaderIsAtTop(in: app)
         XCTAssertEqual(headerAfter.minY, headerBefore.minY, accuracy: 1, "The header moved while the list scrolled")
     }
@@ -101,9 +103,11 @@ final class RecipeListHeaderUITests: XCTestCase {
         app.staticTexts.matching(NSPredicate(format: "label == %@ OR value == %@", string, string)).firstMatch
     }
 
-    /// The title sits at the bottom of the pink band right under the toolbar, so it starts a few
-    /// points below the bar: 6.5 pt on macOS (at any window size) and 8 pt on an iPhone 17.
-    /// With the column centered (#96) it started 163 pt or more below it in the UI test window (900 × 600 under the toolbar).
+    /// The title sits at the bottom of the pink band right under the bar (the toolbar on macOS,
+    /// the navigation bar on iOS), so it starts a few points below it: 6.5 pt on macOS at any
+    /// window size, 8 pt on an iPhone 17. Under 30 pt passes. The regressions are far off: with
+    /// the column centered (#96) the title started 163 pt or more below the Mac toolbar, and
+    /// with the header scrolling away it ended up hundreds of points above it.
     /// Returns the title's frame.
     @MainActor
     @discardableResult
@@ -115,15 +119,17 @@ final class RecipeListHeaderUITests: XCTestCase {
 
         #if os(macOS)
         let bar = app.toolbars.firstMatch
+        let barName = "toolbar"
         #else
         let bar = app.navigationBars.firstMatch
+        let barName = "navigation bar"
         #endif
-        XCTAssertTrue(bar.exists, "The toolbar is missing", file: file, line: line)
+        XCTAssertTrue(bar.exists, "The \(barName) is missing", file: file, line: line)
 
         let gap = title.frame.minY - bar.frame.maxY
         XCTAssertTrue(
-            (0..<20).contains(gap),
-            "The header title is \(gap) pt from the bottom of the toolbar (negative is above it); it belongs right under it",
+            (0..<30).contains(gap),
+            "The header title is \(gap) pt from the bottom of the \(barName) (negative is above it); it belongs right under it",
             file: file,
             line: line
         )

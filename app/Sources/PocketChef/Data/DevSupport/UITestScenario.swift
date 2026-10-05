@@ -5,7 +5,7 @@ import SwiftData
 /// A fixed starting state for the UI tests (Tests/PocketChefUITests), picked with the launch
 /// arguments `-UITestScenario <name>`. The app then runs on an in-memory store, so a test run
 /// never reads or changes the developer's recipes, and skips the density API.
-enum UITestScenario: String {
+enum UITestScenario: String, CaseIterable {
     /// No recipes; the preset tags still show in the filter row.
     case empty
     /// One recipe without tags, and the list filtered by the Dinner tag, which matches nothing.
@@ -23,12 +23,15 @@ enum UITestScenario: String {
     /// height, for one.
     static let macContentSize = CGSize(width: 900, height: 600)
 
-    /// The scenario named in the launch arguments, or nil for a normal launch.
+    /// The scenario named in the launch arguments, or nil for a normal launch. Stops the app on
+    /// an unknown or missing name: running on, a test would check the developer's own store.
     static func current(arguments: [String] = ProcessInfo.processInfo.arguments) -> UITestScenario? {
-        guard let index = arguments.firstIndex(of: launchArgument), arguments.indices.contains(index + 1) else {
-            return nil
+        guard let index = arguments.firstIndex(of: launchArgument) else { return nil }
+        let name = arguments.indices.contains(index + 1) ? arguments[index + 1] : ""
+        guard let scenario = UITestScenario(rawValue: name) else {
+            fatalError("Unknown \(launchArgument) \"\(name)\"; expected one of \(allCases.map(\.rawValue))")
         }
-        return UITestScenario(rawValue: arguments[index + 1])
+        return scenario
     }
 
     /// The preset tag the list starts filtered by, if any.
@@ -70,7 +73,8 @@ enum UITestScenario: String {
     }
 }
 
-/// A recipe repository whose reads fail, for the load-error state.
+/// A recipe repository where every call fails, for the load-error state. That state only
+/// reads; the writes fail too rather than pretend to save.
 private struct FailingRecipeRepository: RecipeRepository {
     struct LoadError: LocalizedError {
         var errorDescription: String? {
