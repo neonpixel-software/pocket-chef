@@ -123,29 +123,48 @@ struct PocketChefApp: App {
         return viewModel
     }
 
+    @ViewBuilder
+    private var rootView: some View {
+        #if DEBUG
+        if Self.uiTestScenario?.opensRecipeDetail == true, let recipe = try? recipeRepository.fetchAll().first {
+            NavigationStack {
+                RecipeDetailView(viewModel: makeRecipeListViewModel().makeDetailViewModel(for: recipe))
+            }
+        } else {
+            recipeList
+        }
+        #else
+        recipeList
+        #endif
+    }
+
+    private var recipeList: some View {
+        RecipeListView(
+            viewModel: makeRecipeListViewModel(),
+            settingsViewModel: settingsViewModel
+        )
+    }
+
     var body: some Scene {
         WindowGroup {
-            RecipeListView(
-                viewModel: makeRecipeListViewModel(),
-                settingsViewModel: settingsViewModel
-            )
-            .environment(\.convertIngredientsToWeight, convertIngredientsToWeightUseCase)
-            // The periodic check (Phase 10.2): on launch and whenever the app comes back,
-            // refresh densities if the last refresh is more than a day old.
-            .onChange(of: scenePhase, initial: true) { _, phase in
-                guard phase == .active, let refreshDensityCacheUseCase else { return }
-                Task {
-                    do {
-                        try await refreshDensityCacheUseCase.executeIfStale()
-                    } catch {
-                        print("Refreshing ingredient densities failed: \(error)")
+            rootView
+                .environment(\.convertIngredientsToWeight, convertIngredientsToWeightUseCase)
+                // The periodic check (Phase 10.2): on launch and whenever the app comes back,
+                // refresh densities if the last refresh is more than a day old.
+                .onChange(of: scenePhase, initial: true) { _, phase in
+                    guard phase == .active, let refreshDensityCacheUseCase else { return }
+                    Task {
+                        do {
+                            try await refreshDensityCacheUseCase.executeIfStale()
+                        } catch {
+                            print("Refreshing ingredient densities failed: \(error)")
+                        }
                     }
                 }
-            }
-            // Only UI test runs fix the window size; Release builds leave both modifiers out.
-            #if DEBUG
-            .frame(width: Self.uiTestWindowSize?.width, height: Self.uiTestWindowSize?.height)
-            #endif
+                // Only UI test runs fix the window size; Release builds leave both modifiers out.
+                #if DEBUG
+                .frame(width: Self.uiTestWindowSize?.width, height: Self.uiTestWindowSize?.height)
+                #endif
         }
         #if DEBUG && os(macOS)
         .windowResizability(Self.uiTestWindowSize == nil ? .automatic : .contentSize)

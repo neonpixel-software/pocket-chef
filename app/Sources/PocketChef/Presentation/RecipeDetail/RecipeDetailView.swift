@@ -134,6 +134,10 @@ struct RecipeDetailView: View {
                     }
                 }
             }
+            // Full width, leading: a short recipe otherwise sized the scroll view to its content,
+            // centered in the window, with the window's own background on both sides and, on
+            // macOS, no pink under the toolbar (#104).
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(20)
         }
         .background(PCColor.background)
