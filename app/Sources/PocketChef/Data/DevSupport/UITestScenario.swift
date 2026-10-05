@@ -12,6 +12,8 @@ enum UITestScenario: String {
     case noMatchingTag
     /// Loading the recipes fails.
     case loadError
+    /// 40 recipes ("Recipe 01" to "Recipe 40"), far more than fit, so the list scrolls.
+    case manyRecipes
 
     static let launchArgument = "-UITestScenario"
 
@@ -41,18 +43,26 @@ enum UITestScenario: String {
             for: RecipeStore.schema,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         )
-        if self == .noMatchingTag {
+        for title in recipeTitles {
             container.mainContext.insert(Recipe(
                 id: UUID(),
-                title: "Plain Toast",
+                title: title,
                 ingredients: [],
-                steps: ["Toast the bread."],
+                steps: ["Serve."],
                 source: .typed,
                 tags: []
             ).toModel())
-            try container.mainContext.save()
         }
+        try container.mainContext.save()
         return container
+    }
+
+    private var recipeTitles: [String] {
+        switch self {
+        case .empty, .loadError: []
+        case .noMatchingTag: ["Plain Toast"]
+        case .manyRecipes: (1...40).map { String(format: "Recipe %02d", $0) }
+        }
     }
 
     func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {

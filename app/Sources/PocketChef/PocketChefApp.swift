@@ -76,7 +76,12 @@ struct PocketChefApp: App {
     private static let uiTestScenario = UITestScenario.current()
     private static let seedsSampleData = uiTestScenario == nil
     private static let usesDensityAPI = uiTestScenario == nil
+    #if os(macOS)
     private static let uiTestWindowSize = uiTestScenario.map { _ in UITestScenario.macContentSize }
+    #else
+    /// iOS windows always fill the screen.
+    private static let uiTestWindowSize: CGSize? = nil
+    #endif
     private static let makeContainer: PersistenceController.ContainerFactory =
         uiTestScenario?.makeContainer(for:) ?? RecipeStore.makeContainer(for:)
 

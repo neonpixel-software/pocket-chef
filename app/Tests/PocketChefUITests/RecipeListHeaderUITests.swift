@@ -1,9 +1,10 @@
 import XCTest
 
-/// The recipe list's header stays pinned to the top of the window when the list shows an
-/// empty or error state instead of recipes (#96, #98). Those states only take the height they
-/// need, and without the column filling the window the whole column, header included, was
-/// centered in it. ViewInspector can't see laid-out positions, hence a UI test.
+/// The recipe list's header stays pinned to the top of the window: when the list shows an
+/// empty or error state instead of recipes (#96, #98), and while the recipes scroll under it.
+/// The empty and error states only take the height they need, and without the column filling
+/// the window the whole column, header included, was centered in it. ViewInspector can't see
+/// laid-out positions, hence a UI test.
 final class RecipeListHeaderUITests: XCTestCase {
     override func setUp() {
         super.setUp()
@@ -39,6 +40,30 @@ final class RecipeListHeaderUITests: XCTestCase {
         assertHeaderIsAtTop(in: app)
     }
 
+    @MainActor
+    func testHeaderStaysAtTopWhileTheRecipesScroll() {
+        let app = launch(scenario: "manyRecipes")
+
+        let firstRecipe = app.buttons["Recipe 01"]
+        XCTAssertTrue(firstRecipe.waitForExistence(timeout: 10))
+        let firstRecipeTop = firstRecipe.frame.minY
+        let headerBefore = assertHeaderIsAtTop(in: app)
+
+        let list = app.scrollViews["RecipeList"]
+        XCTAssertTrue(list.exists, "The recipe list is missing")
+        #if os(macOS)
+        list.scroll(byDeltaX: 0, deltaY: -600)
+        #else
+        list.swipeUp()
+        #endif
+
+        // A lazy list drops rows that scrolled far out of view.
+        let scrolled = !firstRecipe.exists || firstRecipe.frame.minY < firstRecipeTop - 100
+        XCTAssertTrue(scrolled, "The recipe list didn't scroll, so this checked nothing")
+        let headerAfter = assertHeaderIsAtTop(in: app)
+        XCTAssertEqual(headerAfter.minY, headerBefore.minY, accuracy: 1, "The header moved while the list scrolled")
+    }
+
     // MARK: - Helpers
 
     @MainActor
@@ -61,6 +86,11 @@ final class RecipeListHeaderUITests: XCTestCase {
         XCTAssertTrue(window.waitForExistence(timeout: 10), "The window is missing")
         let contentHeight = window.frame.height - app.toolbars.firstMatch.frame.height
         XCTAssertEqual(contentHeight, 600, accuracy: 1, "The window isn't the UI test size")
+        #else
+        // The fixed test size is for the Mac window only; on iOS the content fills the screen.
+        let bar = app.navigationBars.firstMatch
+        XCTAssertTrue(bar.waitForExistence(timeout: 10), "The navigation bar is missing")
+        XCTAssertEqual(bar.frame.width, app.windows.firstMatch.frame.width, accuracy: 1, "The content doesn't fit the screen")
         #endif
         return app
     }
@@ -74,8 +104,10 @@ final class RecipeListHeaderUITests: XCTestCase {
     /// The title sits at the bottom of the pink band right under the toolbar, so it starts a few
     /// points below the bar: 6.5 pt on macOS (at any window size) and 8 pt on an iPhone 17.
     /// With the column centered (#96) it started 163 pt or more below it in the UI test window (900 × 600 under the toolbar).
+    /// Returns the title's frame.
     @MainActor
-    private func assertHeaderIsAtTop(in app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
+    @discardableResult
+    private func assertHeaderIsAtTop(in app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) -> CGRect {
         let titles = app.descendants(matching: .any).matching(identifier: "PCHeader.title")
         let title = titles.firstMatch
         XCTAssertTrue(title.waitForExistence(timeout: 10), "The header title is missing", file: file, line: line)
@@ -91,9 +123,10 @@ final class RecipeListHeaderUITests: XCTestCase {
         let gap = title.frame.minY - bar.frame.maxY
         XCTAssertTrue(
             (0..<20).contains(gap),
-            "The header title starts \(gap) pt below the toolbar; it belongs right under it",
+            "The header title is \(gap) pt from the bottom of the toolbar (negative is above it); it belongs right under it",
             file: file,
             line: line
         )
+        return title.frame
     }
 }

@@ -65,6 +65,7 @@ struct RecipeListView: View {
                             }
                             .padding(16)
                         }
+                        .accessibilityIdentifier("RecipeList")
                     }
                 }
                 // The empty and error states only take the height they need; without this the
