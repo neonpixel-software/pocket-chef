@@ -46,7 +46,9 @@ final class RecipeListHeaderUITests: XCTestCase {
 
         XCTAssertTrue(app.buttons["Recipe 01"].waitForExistence(timeout: 10))
         // Recipe 12 starts well below the window on both platforms; once it's on screen, the list
-        // has really moved. (Comparing Recipe 01's frame raced the lazy list dropping that row.)
+        // has really moved. Waiting for it also rides out the moment after a scroll when the macOS
+        // runner's accessibility snapshot comes back without the rows: an earlier check read
+        // Recipe 01's frame right then and failed with no buttons but the window's zoom button.
         let laterRecipe = app.buttons["Recipe 12"]
         // Nothing moves yet, so reading the frame can't race; isHittable on an off-screen element
         // made XCTest retry for 14 s on macOS.
