@@ -22,23 +22,17 @@ struct PocketChefApp: App {
     init() {
         PCFontRegistrar.registerCustomFonts()
 
-        #if DEBUG
-        let seedsSampleData = true
-        #else
-        let seedsSampleData = false
-        #endif
-
         do {
             persistence = try PersistenceController(
                 isICloudEnabledInBuild: BuildConfiguration.isICloudEnabled,
-                seedsSampleData: seedsSampleData,
-                makeContainer: RecipeStore.makeContainer(for:)
+                seedsSampleData: Self.seedsSampleData,
+                makeContainer: Self.makeContainer
             )
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
         let contextProvider = persistence.contextProvider
-        recipeRepository = SwiftDataRecipeRepository(modelContext: contextProvider.context)
+        recipeRepository = Self.recipeRepository(wrapping: SwiftDataRecipeRepository(modelContext: contextProvider.context))
         tagRepository = SwiftDataTagRepository(modelContext: contextProvider.context)
         captureService = FoundationModelsRecipeCaptureService()
         webPageFetcher = URLSessionWebPageFetcher()
@@ -52,7 +46,7 @@ struct PocketChefApp: App {
         convertIngredientsToWeightUseCase = densityContainer.map {
             DefaultConvertIngredientsToWeightUseCase(cacheRepository: SwiftDataDensityCacheRepository(modelContext: $0.mainContext))
         }
-        if let densityContainer,
+        if Self.usesDensityAPI, let densityContainer,
            let configuration = DensityAPIConfiguration(infoDictionary: Bundle.main.infoDictionary) {
             refreshDensityCacheUseCase = DefaultRefreshDensityCacheUseCase(
                 remoteSource: URLSessionDensityEntryRemoteSource(configuration: configuration),
@@ -72,6 +66,30 @@ struct PocketChefApp: App {
             refreshDensityCacheUseCase: refreshDensityCacheUseCase
         )
     }
+
+    // MARK: - UI test runs
+
+    // A UI test run (-UITestScenario, Debug only) gets an in-memory store in a fixed state,
+    // no sample recipes and no density API; see Data/DevSupport/UITestScenario.swift.
+    #if DEBUG
+    private static let uiTestScenario = UITestScenario.current()
+    private static let seedsSampleData = uiTestScenario == nil
+    private static let usesDensityAPI = uiTestScenario == nil
+    private static let makeContainer: PersistenceController.ContainerFactory =
+        uiTestScenario?.makeContainer(for:) ?? RecipeStore.makeContainer(for:)
+
+    private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
+        uiTestScenario?.recipeRepository(wrapping: repository) ?? repository
+    }
+    #else
+    private static let seedsSampleData = false
+    private static let usesDensityAPI = true
+    private static let makeContainer: PersistenceController.ContainerFactory = RecipeStore.makeContainer(for:)
+
+    private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
+        repository
+    }
+    #endif
 
     var body: some Scene {
         WindowGroup {

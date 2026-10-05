@@ -48,6 +48,7 @@ targets:
     scheme:
       testTargets:
         - PocketChef-iOSTests
+        - PocketChef-iOSUITests
       gatherCoverageData: true
 
   PocketChef-iOSTests:
@@ -58,6 +59,16 @@ targets:
     dependencies:
       - target: PocketChef-iOS
       - package: ViewInspector
+
+  # Layout checks that need a running app, such as where the header lands (#98).
+  # They start the Debug app with -UITestScenario (Data/DevSupport/UITestScenario.swift).
+  PocketChef-iOSUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - Tests/PocketChefUITests
+    dependencies:
+      - target: PocketChef-iOS
 
   PocketChef-macOS:
     type: application
@@ -77,6 +88,7 @@ targets:
     scheme:
       testTargets:
         - PocketChef-macOSTests
+        - PocketChef-macOSUITests
       gatherCoverageData: true
 
   PocketChef-macOSTests:
@@ -87,3 +99,11 @@ targets:
     dependencies:
       - target: PocketChef-macOS
       - package: ViewInspector
+
+  PocketChef-macOSUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - Tests/PocketChefUITests
+    dependencies:
+      - target: PocketChef-macOS
