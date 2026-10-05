@@ -6,6 +6,14 @@
 	<string>$(DENSITY_API_HOST)</string>
 	<key>DensityAPIReadKey</key>
 	<string>$(DENSITY_API_READ_KEY)</string>
+	<!-- The launch screen's background: PCColor.background's cream / ink, so a cold launch
+	     doesn't flash the system white / black first (#102). UILaunchScreen_Generation in
+	     project.yml can't set a nested key. -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
