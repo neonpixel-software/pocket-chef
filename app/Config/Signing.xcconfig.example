@@ -1,6 +1,10 @@
-// Copy to Signing.xcconfig (gitignored), fill in your team ID, then run `xcodegen generate`.
+// Local signing settings for iCloud sync. As Signing.xcconfig.example this is the template:
+// copy it to Signing.xcconfig (gitignored), replace the placeholder team ID with yours, then run
+// `xcodegen generate`. A Signing.xcconfig still holding the placeholder fails at code signing.
 // Find the team ID under Membership details on developer.apple.com/account.
 // Xcode must be signed in to that team (Settings > Apple Accounts).
+// The app targets include this file (PocketChef.xcconfig), and so do the unit test targets
+// (UnitTests.xcconfig) for the team, without the entitlements.
 
 DEVELOPMENT_TEAM = ABCDE12345
 CODE_SIGN_STYLE = Automatic

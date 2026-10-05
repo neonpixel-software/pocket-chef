@@ -25,10 +25,7 @@ final class UITestScenarioTests: XCTestCase {
     }
 
     func testOnlyTheLoadErrorScenarioFailsToLoad() throws {
-        let container = try ModelContainer(
-            for: RecipeStore.schema,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
-        )
+        let container = try ModelContainer.inMemory()
         let repository = SwiftDataRecipeRepository(modelContext: ModelContext(container))
         for scenario in UITestScenario.allCases {
             let wrapped = scenario.recipeRepository(wrapping: repository)
