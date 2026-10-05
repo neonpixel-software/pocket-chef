@@ -94,23 +94,35 @@ struct PocketChefApp: App {
     }
     #endif
 
+    private func makeRecipeListViewModel() -> RecipeListViewModel {
+        let viewModel = RecipeListViewModel(dependencies: .init(
+            fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: recipeRepository),
+            createRecipeUseCase: DefaultCreateRecipeUseCase(repository: recipeRepository),
+            updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: recipeRepository),
+            deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: recipeRepository),
+            fetchTagsUseCase: DefaultFetchTagsUseCase(repository: tagRepository),
+            findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository),
+            captureRecipeUseCase: captureRecipeUseCase,
+            checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: captureService),
+            captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
+                webPageFetcher: webPageFetcher,
+                captureRecipeUseCase: captureRecipeUseCase
+            )
+        ))
+        #if DEBUG
+        // Tapping a chip doesn't reach the app on GitHub's macOS runner, so the scenario
+        // starts with the tag selected instead.
+        if let tagName = Self.uiTestScenario?.selectedTagName {
+            viewModel.selectTag((try? tagRepository.fetchAll())?.first { $0.name == tagName }?.id)
+        }
+        #endif
+        return viewModel
+    }
+
     var body: some Scene {
         WindowGroup {
             RecipeListView(
-                viewModel: RecipeListViewModel(dependencies: .init(
-                    fetchRecipesUseCase: DefaultFetchRecipesUseCase(repository: recipeRepository),
-                    createRecipeUseCase: DefaultCreateRecipeUseCase(repository: recipeRepository),
-                    updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: recipeRepository),
-                    deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: recipeRepository),
-                    fetchTagsUseCase: DefaultFetchTagsUseCase(repository: tagRepository),
-                    findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository),
-                    captureRecipeUseCase: captureRecipeUseCase,
-                    checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: captureService),
-                    captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
-                        webPageFetcher: webPageFetcher,
-                        captureRecipeUseCase: captureRecipeUseCase
-                    )
-                )),
+                viewModel: makeRecipeListViewModel(),
                 settingsViewModel: settingsViewModel
             )
             .environment(\.convertIngredientsToWeight, convertIngredientsToWeightUseCase)

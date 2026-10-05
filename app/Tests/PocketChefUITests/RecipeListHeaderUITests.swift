@@ -22,10 +22,10 @@ final class RecipeListHeaderUITests: XCTestCase {
     func testHeaderStaysAtTopWhenNoRecipeHasTheSelectedTag() {
         let app = launch(scenario: "noMatchingTag")
 
+        // The scenario starts with the Dinner tag selected (UITestScenario.selectedTagName).
         let tagChip = app.buttons["Dinner"]
         XCTAssertTrue(tagChip.waitForExistence(timeout: 10))
-        tagChip.tap()
-        XCTAssertTrue(tagChip.wait(for: \.isSelected, toEqual: true, timeout: 10), "Tapping the Dinner chip didn't select it")
+        XCTAssertTrue(tagChip.isSelected, "The Dinner chip isn't selected")
 
         XCTAssertTrue(text("No Recipes With This Tag", in: app).waitForExistence(timeout: 10))
         assertHeaderIsAtTop(in: app)
@@ -55,8 +55,6 @@ final class RecipeListHeaderUITests: XCTestCase {
         ]
         app.launch()
         #if os(macOS)
-        // On CI another app can be in front, and then the first click only activates the window.
-        app.activate()
         // The app pins its content to 900 × 600 under the toolbar in a UI test run
         // (UITestScenario.macContentSize), whatever size the last run left the window.
         let window = app.windows.firstMatch

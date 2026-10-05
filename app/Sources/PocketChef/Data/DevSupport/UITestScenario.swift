@@ -8,7 +8,7 @@ import SwiftData
 enum UITestScenario: String {
     /// No recipes; the preset tags still show in the filter row.
     case empty
-    /// One recipe without tags, so selecting any preset tag matches nothing.
+    /// One recipe without tags, and the list filtered by the Dinner tag, which matches nothing.
     case noMatchingTag
     /// Loading the recipes fails.
     case loadError
@@ -27,6 +27,11 @@ enum UITestScenario: String {
             return nil
         }
         return UITestScenario(rawValue: arguments[index + 1])
+    }
+
+    /// The preset tag the list starts filtered by, if any.
+    var selectedTagName: String? {
+        self == .noMatchingTag ? "Dinner" : nil
     }
 
     /// Ignores the storage mode: there is no iCloud in a UI test run.
