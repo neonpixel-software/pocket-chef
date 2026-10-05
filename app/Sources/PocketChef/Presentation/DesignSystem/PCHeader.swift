@@ -17,10 +17,14 @@ struct PCHeader: View {
     private static let horizontalPadding: CGFloat = 20
     private static let bottomPadding: CGFloat = 22
 
+    /// Lets the UI tests find the title whatever the language (Tests/PocketChefUITests).
+    static let titleAccessibilityIdentifier = "PCHeader.title"
+
     let title: String
 
     var body: some View {
         OutlinedText(text: title, font: PCFont.display(Self.titleSize), fill: .white, outline: PCColor.ink, width: Self.titleOutlineWidth)
+            .accessibilityIdentifier(Self.titleAccessibilityIdentifier)
             .padding(.horizontal, Self.horizontalPadding)
             .padding(.bottom, Self.bottomPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
@@ -82,7 +86,10 @@ private struct OutlinedText: View {
                             .offset(x: direction.x * width, y: direction.y * width)
                     }
                 }
-                .accessibilityHidden(true)
             }
+            // One element for the fill and its copies. Hiding the copies' ZStack didn't remove
+            // them: the accessibility tree had the title 17 times (found by the UI tests, #98).
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(text))
     }
 }
