@@ -43,7 +43,7 @@ xcodegen generate
 
 Then open `app/PocketChef.xcodeproj` and use the `PocketChef-iOS` / `PocketChef-macOS` schemes (build, test, coverage). Deployment targets are iOS 26 / macOS 26; the UI is localized into English, Spanish, French, German, and Dutch.
 
-Each scheme's tests include a small UI test target (`app/Tests/PocketChefUITests`) for layout that unit tests can't see. It launches the Debug app with `-UITestScenario <name>`, which swaps in an in-memory store in a fixed state, so your own recipes are never touched. On macOS the first run asks you to authenticate to turn on Automation Mode.
+Each scheme's tests include a small UI test target (`app/Tests/PocketChefUITests`) for layout that unit tests can't see. It launches the Debug app with `-UITestScenario <name>`, which swaps in an in-memory store in a fixed state, so your own recipes are never touched. On macOS a run asks you to authenticate to turn on Automation Mode, and the header checks take screenshots, which need the Screen Recording permission: if they fail with "Image creation failed", allow the prompt or add `PocketChef-macOSUITests-Runner` (in the DerivedData `Build/Products/Debug` folder) under Privacy & Security > Screen & System Audio Recording.
 
 iCloud sync needs a signing team, which stays out of this public repo: copy `app/Config/Signing.xcconfig.example` to `app/Config/Signing.xcconfig` (gitignored), fill in your team ID, and run `xcodegen generate` again. Without it the app builds without the iCloud entitlement and the storage setting is disabled; that's how CI builds it.
 

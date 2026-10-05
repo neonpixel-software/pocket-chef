@@ -77,6 +77,11 @@ struct RecipeListView: View {
                 PCHeader(title: String(localized: "Recipes"))
             }
             .navigationTitle("")
+            #if os(macOS)
+            // macOS drew its own dark toolbar background over the header's pink here, while the
+            // detail screen and iOS show the pink up to the window top (#104).
+            .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
+            #endif
             .toolbar {
                 #if os(iOS)
                 if settingsViewModel != nil {

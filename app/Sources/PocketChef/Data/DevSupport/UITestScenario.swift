@@ -14,6 +14,9 @@ enum UITestScenario: String, CaseIterable {
     case loadError
     /// 40 recipes ("Recipe 01" to "Recipe 40"), far more than fit, so the list scrolls.
     case manyRecipes
+    /// Opens on the detail screen of one recipe (no tags), as if tapped from the list: clicks
+    /// don't reach the app on GitHub's macOS runner, so a test can't navigate there.
+    case recipeDetail
 
     static let launchArgument = "-UITestScenario"
 
@@ -32,6 +35,11 @@ enum UITestScenario: String, CaseIterable {
             fatalError("Unknown \(launchArgument) \"\(name)\"; expected one of \(allCases.map(\.rawValue))")
         }
         return scenario
+    }
+
+    /// Whether the app opens on the first recipe's detail screen instead of the list.
+    var opensRecipeDetail: Bool {
+        self == .recipeDetail
     }
 
     /// The preset tag the list starts filtered by, if any.
@@ -65,6 +73,7 @@ enum UITestScenario: String, CaseIterable {
         case .empty, .loadError: []
         case .noMatchingTag: ["Plain Toast"]
         case .manyRecipes: (1...40).map { String(format: "Recipe %02d", $0) }
+        case .recipeDetail: ["Plain Toast"]
         }
     }
 

@@ -16,7 +16,7 @@ final class UITestScenarioTests: XCTestCase {
 
     @MainActor
     func testEachScenarioStartsWithItsRecipes() throws {
-        let expectedCounts: [UITestScenario: Int] = [.empty: 0, .noMatchingTag: 1, .loadError: 0, .manyRecipes: 40]
+        let expectedCounts: [UITestScenario: Int] = [.empty: 0, .noMatchingTag: 1, .loadError: 0, .manyRecipes: 40, .recipeDetail: 1]
         for scenario in UITestScenario.allCases {
             let container = try scenario.makeContainer(for: .local)
             let count = try container.mainContext.fetchCount(FetchDescriptor<RecipeModel>())
