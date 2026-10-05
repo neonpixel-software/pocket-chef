@@ -57,27 +57,15 @@ final class RecipeListHeaderUITests: XCTestCase {
         #if os(macOS)
         // On CI another app can be in front, and then the first click only activates the window.
         app.activate()
-        setWindowSize(CGSize(width: 900, height: 600), in: app)
+        // The app pins its content to 900 × 600 under the toolbar in a UI test run
+        // (UITestScenario.macContentSize), whatever size the last run left the window.
+        let window = app.windows.firstMatch
+        XCTAssertTrue(window.waitForExistence(timeout: 10), "The window is missing")
+        let contentHeight = window.frame.height - app.toolbars.firstMatch.frame.height
+        XCTAssertEqual(contentHeight, 600, accuracy: 1, "The window isn't the UI test size")
         #endif
         return app
     }
-
-    #if os(macOS)
-    /// macOS reopens the window at the size the last run left it, so every test sets the same
-    /// size by dragging the bottom-right corner. The bug needs spare height to show (in a window
-    /// at its 168 pt minimum the column already fills it), and a narrow window can scroll the
-    /// tag chips out of reach.
-    @MainActor
-    private func setWindowSize(_ size: CGSize, in app: XCUIApplication) {
-        let window = app.windows.firstMatch
-        XCTAssertTrue(window.waitForExistence(timeout: 10), "The window is missing")
-        let corner = window.coordinate(withNormalizedOffset: CGVector(dx: 1, dy: 1)).withOffset(CGVector(dx: -2, dy: -2))
-        let drag = CGVector(dx: size.width - window.frame.width, dy: size.height - window.frame.height)
-        corner.press(forDuration: 0.3, thenDragTo: corner.withOffset(drag))
-        XCTAssertEqual(window.frame.width, size.width, accuracy: 1, "Couldn't resize the window")
-        XCTAssertEqual(window.frame.height, size.height, accuracy: 1, "Couldn't resize the window")
-    }
-    #endif
 
     /// iOS exposes a text's string as its label, macOS as its value.
     @MainActor
@@ -87,7 +75,7 @@ final class RecipeListHeaderUITests: XCTestCase {
 
     /// The title sits at the bottom of the pink band right under the toolbar, so it starts a few
     /// points below the bar: 6.5 pt on macOS (at any window size) and 8 pt on an iPhone 17.
-    /// With the column centered (#96) it started 137 pt or more below it in the 900 × 600 Mac window.
+    /// With the column centered (#96) it started 163 pt or more below it in the UI test window (900 × 600 under the toolbar).
     @MainActor
     private func assertHeaderIsAtTop(in app: XCUIApplication, file: StaticString = #filePath, line: UInt = #line) {
         let titles = app.descendants(matching: .any).matching(identifier: "PCHeader.title")

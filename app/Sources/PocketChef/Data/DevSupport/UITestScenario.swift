@@ -15,6 +15,12 @@ enum UITestScenario: String {
 
     static let launchArgument = "-UITestScenario"
 
+    /// The Mac window's content size (below the toolbar) in a UI test run. macOS otherwise
+    /// reopens the window at the size the last run left it, and layout checks need the same
+    /// window every time: the header bug of #96 can't show in a window at its 168 pt minimum
+    /// height, for one.
+    static let macContentSize = CGSize(width: 900, height: 600)
+
     /// The scenario named in the launch arguments, or nil for a normal launch.
     static func current(arguments: [String] = ProcessInfo.processInfo.arguments) -> UITestScenario? {
         guard let index = arguments.firstIndex(of: launchArgument), arguments.indices.contains(index + 1) else {

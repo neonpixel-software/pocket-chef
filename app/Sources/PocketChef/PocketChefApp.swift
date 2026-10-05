@@ -70,11 +70,13 @@ struct PocketChefApp: App {
     // MARK: - UI test runs
 
     // A UI test run (-UITestScenario, Debug only) gets an in-memory store in a fixed state,
-    // no sample recipes and no density API; see Data/DevSupport/UITestScenario.swift.
+    // no sample recipes, no density API and a fixed-size Mac window; see
+    // Data/DevSupport/UITestScenario.swift.
     #if DEBUG
     private static let uiTestScenario = UITestScenario.current()
     private static let seedsSampleData = uiTestScenario == nil
     private static let usesDensityAPI = uiTestScenario == nil
+    private static let uiTestWindowSize = uiTestScenario.map { _ in UITestScenario.macContentSize }
     private static let makeContainer: PersistenceController.ContainerFactory =
         uiTestScenario?.makeContainer(for:) ?? RecipeStore.makeContainer(for:)
 
@@ -84,6 +86,7 @@ struct PocketChefApp: App {
     #else
     private static let seedsSampleData = false
     private static let usesDensityAPI = true
+    private static let uiTestWindowSize: CGSize? = nil
     private static let makeContainer: PersistenceController.ContainerFactory = RecipeStore.makeContainer(for:)
 
     private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
@@ -123,7 +126,11 @@ struct PocketChefApp: App {
                     }
                 }
             }
+            .frame(width: Self.uiTestWindowSize?.width, height: Self.uiTestWindowSize?.height)
         }
+        #if os(macOS)
+        .windowResizability(Self.uiTestWindowSize == nil ? .automatic : .contentSize)
+        #endif
 
         #if os(macOS)
         Settings {
