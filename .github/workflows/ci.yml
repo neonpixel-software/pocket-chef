@@ -144,7 +144,11 @@ jobs:
             -collect-test-diagnostics never \
             clean test
       - name: Convert coverage to SonarCloud's generic format
-        run: Scripts/xccov-to-sonarqube-generic.sh "$COVERAGE.xcresult" > "$COVERAGE.xml"
+        # xccov writes absolute paths on this macOS runner, which the Ubuntu sonarcloud job
+        # can't match to its checkout, so make them relative to the repository root.
+        run: |
+          Scripts/xccov-to-sonarqube-generic.sh "$COVERAGE.xcresult" |
+            sed "s#path=\"$GITHUB_WORKSPACE/#path=\"#" > "$COVERAGE.xml"
       - name: Upload coverage report
         uses: actions/upload-artifact@v7
         with:
@@ -278,6 +282,9 @@ jobs:
             /d:sonar.issue.ignore.multicriteria.e1.resourceKey="app/Sources/PocketChef/Presentation/RecipeCapture/RecipeURLCaptureView.swift"
       - name: Build .NET API (captures C# semantic data for the scanner)
         run: dotnet build api/PocketChef.DensityApi.slnx --configuration Release
+      - name: Add the Swift sources to the analysis
+        # The Scanner for .NET only analyzes Swift files an MSBuild project includes (#138).
+        run: dotnet build app/Sonar/PocketChef.App.Sonar.csproj --configuration Release
       - name: Test .NET API with coverage
         run: |
           dotnet test api/PocketChef.DensityApi.slnx --configuration Release --logger trx \
