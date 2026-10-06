@@ -24,8 +24,8 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      app: ${{ steps.filter.outputs.app == 'true' || steps.filter.outputs.workflow == 'true' }}
-      api: ${{ steps.filter.outputs.api == 'true' || steps.filter.outputs.workflow == 'true' }}
+      app: ${{ steps.filter.outputs.app == 'true' || steps.filter.outputs.workflow == 'true' || steps.filter.outputs.coverage-gate == 'true' }}
+      api: ${{ steps.filter.outputs.api == 'true' || steps.filter.outputs.workflow == 'true' || steps.filter.outputs.coverage-gate == 'true' }}
     steps:
       - uses: actions/checkout@v7
       - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
@@ -46,8 +46,9 @@ jobs:
               - '!**/*.md'
             workflow:
               - '.github/workflows/ci.yml'
-              - '.github/scripts/check-coverage.py'
-              - '.github/coverage-exclusions.txt'
+            # A separate filter: "every" would require one file to match both paths.
+            coverage-gate:
+              - '.github/{scripts/check-coverage.py,coverage-exclusions.txt}'
 
   build-apple:
     needs: changes
