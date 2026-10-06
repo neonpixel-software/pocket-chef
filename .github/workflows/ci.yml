@@ -15,6 +15,11 @@ on:
   push:
     branches: [main]
 
+env:
+  # PLAN.md's coverage target (issue #135). A build fails below it: each Apple platform's line
+  # coverage of app/Sources, and the API's of api/src, minus .github/coverage-exclusions.txt.
+  COVERAGE_MIN: 90
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -41,6 +46,8 @@ jobs:
               - '!**/*.md'
             workflow:
               - '.github/workflows/ci.yml'
+              - '.github/scripts/check-coverage.py'
+              - '.github/coverage-exclusions.txt'
 
   build-apple:
     needs: changes
@@ -140,21 +147,31 @@ jobs:
           name: swift-${{ matrix.coverage }}
           path: app/${{ matrix.coverage }}.xml
           retention-days: 1
+      - name: Check coverage
+        # After the upload, so a failing report can still be downloaded and read.
+        working-directory: .
+        run: |
+          python3 .github/scripts/check-coverage.py --source app/Sources --min "$COVERAGE_MIN" \
+            "app/$COVERAGE.xml"
 
   build:
     # The required status check (main's ruleset requires "build"). Passes when both
-    # platform legs passed, or when they were skipped because nothing under app/ changed.
-    needs: [changes, build-apple]
+    # platform legs and the API build passed, or were skipped because nothing under their
+    # folder changed.
+    needs: [changes, build-apple, build-api]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Check the iOS and macOS builds
+      - name: Check the iOS, macOS and API builds
         env:
           CHANGES: ${{ needs.changes.result }}
           APPLE: ${{ needs.build-apple.result }}
+          API: ${{ needs.build-api.result }}
         run: |
-          echo "changes: $CHANGES, build-apple: $APPLE"
-          [ "$CHANGES" = success ] && { [ "$APPLE" = success ] || [ "$APPLE" = skipped ]; }
+          echo "changes: $CHANGES, build-apple: $APPLE, build-api: $API"
+          [ "$CHANGES" = success ] &&
+            { [ "$APPLE" = success ] || [ "$APPLE" = skipped ]; } &&
+            { [ "$API" = success ] || [ "$API" = skipped ]; }
 
   build-api:
     needs: changes
@@ -179,7 +196,14 @@ jobs:
         # Testcontainers.PostgreSql needs a Docker-compatible daemon — ubuntu-latest runners
         # have Docker preinstalled, so this works unmodified (local dev here uses Podman
         # instead; see docs/plans for why).
-        run: dotnet test --no-build --configuration Release
+        run: |
+          dotnet test --no-build --configuration Release \
+            --collect:"XPlat Code Coverage" --results-directory coverage
+      - name: Check coverage
+        working-directory: .
+        run: |
+          python3 .github/scripts/check-coverage.py --source api/src --min "$COVERAGE_MIN" \
+            api/coverage/*/coverage.cobertura.xml
 
   sonarcloud:
     needs: [changes, build-apple, build, build-api]
@@ -225,6 +249,8 @@ jobs:
           # nonexistent file isn't a graceful no-op: it's a hard parse error that aborts the
           # whole analysis (confirmed the hard way on an api-only PR).
           SWIFT_COVERAGE_ARG=""
+          # The same exclusions as the CI coverage gate, as Sonar's comma-separated list.
+          COVERAGE_EXCLUSIONS=$(grep -v -e '^#' -e '^$' .github/coverage-exclusions.txt | paste -sd, -)
           if [ -f app/coverage-ios.xml ] && [ -f app/coverage-macos.xml ]; then
             SWIFT_COVERAGE_ARG='/d:sonar.coverageReportPaths=app/coverage-ios.xml,app/coverage-macos.xml'
           fi
@@ -238,7 +264,7 @@ jobs:
             $SWIFT_COVERAGE_ARG \
             /d:sonar.cs.opencover.reportsPaths="api/**/coverage.opencover.xml" \
             /d:sonar.cs.vstest.reportsPaths="api/**/*.trx" \
-            /d:sonar.coverage.exclusions="app/Sources/PocketChef/Data/DevSupport/**,app/Sources/PocketChef/Data/Capture/FoundationModelsRecipeCaptureService.swift,app/Sources/PocketChef/Data/Capture/URLSessionWebPageFetcher.swift,api/src/PocketChef.DensityApi.Api/Program.cs,api/src/PocketChef.DensityApi.Seed/Program.cs,api/src/PocketChef.DensityApi.Infrastructure/Migrations/**,api/src/PocketChef.DensityApi.Api/Authentication/ServiceCollectionExtensions.cs,api/src/PocketChef.DensityApi.Infrastructure/ServiceCollectionExtensions.cs,api/src/PocketChef.DensityApi.Application/ServiceCollectionExtensions.cs" \
+            /d:sonar.coverage.exclusions="$COVERAGE_EXCLUSIONS" \
             /d:sonar.issue.ignore.multicriteria="e1" \
             /d:sonar.issue.ignore.multicriteria.e1.ruleKey="swift:S1075" \
             /d:sonar.issue.ignore.multicriteria.e1.resourceKey="app/Sources/PocketChef/Presentation/RecipeCapture/RecipeURLCaptureView.swift"

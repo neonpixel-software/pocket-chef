@@ -1,0 +1,14 @@
+# Source files left out of the coverage numbers, as repo-relative globs. Read by both the CI
+# coverage gate (.github/scripts/check-coverage.py) and the SonarCloud analysis in ci.yml, so
+# the two agree. Only list code no test can reasonably reach: dev-only scaffolding, the live
+# Apple Intelligence and network adapters (faked in tests), entry points, generated migrations
+# and DI wiring.
+app/Sources/PocketChef/Data/DevSupport/**
+app/Sources/PocketChef/Data/Capture/FoundationModelsRecipeCaptureService.swift
+app/Sources/PocketChef/Data/Capture/URLSessionWebPageFetcher.swift
+api/src/PocketChef.DensityApi.Api/Program.cs
+api/src/PocketChef.DensityApi.Seed/Program.cs
+api/src/PocketChef.DensityApi.Infrastructure/Migrations/**
+api/src/PocketChef.DensityApi.Api/Authentication/ServiceCollectionExtensions.cs
+api/src/PocketChef.DensityApi.Infrastructure/ServiceCollectionExtensions.cs
+api/src/PocketChef.DensityApi.Application/ServiceCollectionExtensions.cs
