@@ -145,10 +145,13 @@ jobs:
             clean test
       - name: Convert coverage to SonarCloud's generic format
         # xccov writes absolute paths on this macOS runner, which the Ubuntu sonarcloud job
-        # can't match to its checkout, so make them relative to the repository root.
+        # can't match to its checkout, so make them relative to the repository root. Fails if
+        # no path came out relative: SonarCloud would otherwise drop the coverage silently.
         run: |
           Scripts/xccov-to-sonarqube-generic.sh "$COVERAGE.xcresult" |
             sed "s#path=\"$GITHUB_WORKSPACE/#path=\"#" > "$COVERAGE.xml"
+          grep -q 'path="app/Sources/' "$COVERAGE.xml" ||
+            { echo "::error::No repo-relative app/Sources paths in $COVERAGE.xml"; exit 1; }
       - name: Upload coverage report
         uses: actions/upload-artifact@v7
         with:

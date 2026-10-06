@@ -4,6 +4,7 @@
   sonar.sources and only picks up a fixed list of non-.NET languages on its own. Swift
   isn't on that list, but files a project includes as Content are always analyzed. The
   sonarcloud job in .github/workflows/ci.yml builds this between "begin" and "end".
+  Keep TargetFramework in step with the api/ projects and ci.yml's setup-dotnet version.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
