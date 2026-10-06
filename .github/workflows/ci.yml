@@ -18,6 +18,9 @@ on:
 env:
   # PLAN.md's coverage target (issue #135). A build fails below it: each Apple platform's line
   # coverage of app/Sources, and the API's of api/src, minus .github/coverage-exclusions.txt.
+  # Each side is checked when its build runs, so a PR that only changes app/ doesn't check the
+  # API, and the other way round. When the gate fails, add tests, or exclude a file no test can
+  # reasonably reach (with its reason in that file). Don't lower this number.
   COVERAGE_MIN: 90
 
 jobs:
@@ -149,7 +152,8 @@ jobs:
           path: app/${{ matrix.coverage }}.xml
           retention-days: 1
       - name: Check coverage
-        # After the upload, so a failing report can still be downloaded and read.
+        # After the upload, so a failing report can still be downloaded and read. From the
+        # repository root, which the script makes the report paths relative to.
         working-directory: .
         run: |
           python3 .github/scripts/check-coverage.py --source app/Sources --min "$COVERAGE_MIN" \
@@ -201,6 +205,7 @@ jobs:
           dotnet test --no-build --configuration Release \
             --collect:"XPlat Code Coverage" --results-directory coverage
       - name: Check coverage
+        # From the repository root, which the script makes the report paths relative to.
         working-directory: .
         run: |
           python3 .github/scripts/check-coverage.py --source api/src --min "$COVERAGE_MIN" \
@@ -250,8 +255,10 @@ jobs:
           # nonexistent file isn't a graceful no-op: it's a hard parse error that aborts the
           # whole analysis (confirmed the hard way on an api-only PR).
           SWIFT_COVERAGE_ARG=""
-          # The same exclusions as the CI coverage gate, as Sonar's comma-separated list.
-          COVERAGE_EXCLUSIONS=$(grep -v -e '^#' -e '^$' .github/coverage-exclusions.txt | paste -sd, -)
+          # The same exclusions as the CI coverage gate, as Sonar's comma-separated list. Trims
+          # each line and skips blank and # lines, like the script's load_exclusions().
+          COVERAGE_EXCLUSIONS=$(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' .github/coverage-exclusions.txt |
+            grep -v -e '^#' -e '^$' | paste -sd, -)
           if [ -f app/coverage-ios.xml ] && [ -f app/coverage-macos.xml ]; then
             SWIFT_COVERAGE_ARG='/d:sonar.coverageReportPaths=app/coverage-ios.xml,app/coverage-macos.xml'
           fi

@@ -20,8 +20,10 @@ EXCLUSIONS_FILE = os.path.join(os.path.dirname(__file__), "..", "coverage-exclus
 
 
 def load_exclusions():
+    """The globs, trimmed, without blank and # lines. ci.yml's SonarCloud step reads the same way."""
     with open(EXCLUSIONS_FILE, encoding="utf-8") as file:
-        return [line.strip() for line in file if line.strip() and not line.startswith("#")]
+        lines = [line.strip() for line in file]
+    return [line for line in lines if line and not line.startswith("#")]
 
 
 def repo_relative(path):
