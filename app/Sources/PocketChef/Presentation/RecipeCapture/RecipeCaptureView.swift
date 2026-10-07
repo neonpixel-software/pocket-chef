@@ -73,7 +73,7 @@ struct RecipeCaptureView: View {
         viewModel: RecipeCaptureViewModel(
             captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: PreviewRecipeCaptureService())
         ),
-        onCaptured: { _ in }
+        onCaptured: PreviewRecipeHandler.ignore
     )
 }
 #endif
