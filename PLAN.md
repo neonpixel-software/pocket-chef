@@ -47,6 +47,7 @@ Priority for this project: maintainable, testable, scalable over fastest-to-ship
 ## Data model
 
 - **Recipe** — title, ingredient lines, equipment (tools and cookware, e.g. "loaf pan"), steps, source (`typed` or the original URL), tags.
+- **Photo** — an image the user added to a recipe (photo library or camera), stored scaled down without metadata. A recipe has any number, in order; the first is its cover. Syncs with the recipe.
 - **Ingredient line** — raw text as entered/extracted, plus (where AI could identify it) structured amount, unit, and ingredient name. The structured fields are what make conversion possible; lines without them show as-is.
 - **Tag** — name + flag for built-in preset vs. user-created. Many-to-many with recipes. Presets ship in-app (breakfast, lunch, dinner, dessert, etc.); users can add their own freely.
 - **Density entry** — ingredient name → grams per millilitre. Metric is the base unit; cups and spoons are derived from it on the client, because "a cup" varies by country (US 236.6 ml, metric 250 ml). Sourced from the .NET API, cached locally on-device.
@@ -217,6 +218,17 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
 
 **Checkpoint:** full v1 feature set complete — capture, tag, store/sync, convert.
 
+### Phase 13: Recipe photos
+Added 2026-10-07, before the first release, and done before Phase 12 despite its number (Phase 12's numbering is referenced elsewhere, so it isn't renumbered). Photos add a CloudKit record type, so they must land before 12.4 deploys the schema to production, after which it can only grow. Design: `app/docs/plans/2026-10-07-recipe-photos-design.md`.
+- [ ] **13.1 Photo storage** — `RecipePhotoModel` (position, image and thumbnail in external storage) linked to `RecipeModel` with cascade delete, sorted by `(position, id)` so concurrent reorders from two devices give the same order everywhere; domain `RecipePhoto` references without image bytes; `RecipePhotoRepository` loading bytes on demand; `ImageIOPhotoProcessor` (scales to 2048 px, 300 px thumbnail, JPEG without metadata); the Local ↔ iCloud copier carries photos.
+  Acceptance: unit tests cover mapping, ordering (including the `id` tie-break and position normalization on save), cascade delete, the copier and the processor (orientation applied, no EXIF/GPS left, junk input rejected).
+- [ ] **13.2 Adding and arranging photos** — a Photos section in the recipe form: add from the photo library (all platforms) or the camera (iPhone/iPad with a camera), Make Cover, Move Left/Right, Delete; changes save or cancel with the recipe.
+  Acceptance: photos added in the form are saved with the recipe in the chosen order, Cancel discards them, and the camera permission prompt is localized.
+- [ ] **13.3 Showing photos** — the cover as a list thumbnail, a gallery at the top of the recipe detail, and a full-screen viewer.
+  Acceptance: UI tests cover the thumbnail, gallery and cover reordering; on a Mac and an iPhone in iCloud mode, photos and their deletion and reordering sync both ways.
+
+**Checkpoint:** recipes carry photos on all three platforms, synced like the rest of the recipe.
+
 ### Phase 12: Release & distribution
 - [ ] **12.1 App Store Connect setup + App Privacy labels** — register the app in App Store Connect and complete the mandatory App Privacy labels. The labels must be truthful: this app collects no user data (see the plan's privacy stance above), so the declaration is "data not collected".
   Acceptance: privacy labels submitted and passing review with a truthful no-data-collection declaration for all three platforms.
@@ -226,6 +238,7 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
   Acceptance: one tag push produces signed App Store builds for macOS and iOS/iPadOS that reach TestFlight.
 - [ ] **12.4 TestFlight → production rollout** — internal testing, then beta, then public release, with a short runbook for what to verify at each stage.
   Acceptance: v1 live in the public App Store on all three platforms.
+  Order: deploy the CloudKit schema to production only after Phase 13 (recipe photos) has merged, because the production schema can't drop or rename what's deployed.
   Blocking for 4.1: with the TestFlight builds on a Mac and an iPhone, an iPhone edit must appear in a Mac window that's already open and in front, within about a minute, without clicking it (see 4.1: development pushes to the Mac only arrive every 13–24 minutes). Check off 4.1 when this passes.
 
 **Checkpoint:** Pocket Chef is publicly available on the App Store (macOS, iPadOS, iOS).
