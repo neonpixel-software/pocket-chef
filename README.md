@@ -68,6 +68,7 @@ See [`api/README.md`](api/README.md) for full details (one-time `dotnet-ef` inst
 - [`app/docs/plans/`](app/docs/plans/) — Swift app design docs (entry form, tagging, capture, localization)
 - [`api/docs/plans/`](api/docs/plans/) — density API design docs
 - [`api/docs/deploy.md`](api/docs/deploy.md) — deployment runbook for the density API
+- [`app/docs/release.md`](app/docs/release.md) — release builds: versioning, the tag that starts them, and the Xcode Cloud Release workflow
 
 Development proceeds in vertical slices (see `PLAN.md`); the project is not yet at its full v1 feature set. Still on the roadmap: checking live iCloud sync to the Mac on a TestFlight build (Phase 4.1, see `PLAN.md`), verification of the on-device AI capture on real devices (Phases 5.1/6.1/7.3), the client's density cache (Phase 10), and unit conversion — the volume/weight toggle on each recipe (Phase 11).
 
@@ -75,7 +76,7 @@ Development proceeds in vertical slices (see `PLAN.md`); the project is not yet 
 
 GitHub Actions runs on every PR targeting `main` and every push to `main`: Swift build + test + coverage (iOS and macOS), .NET build + test, linting (SwiftLint/SwiftFormat, `dotnet format`), and a SonarCloud analysis with quality gate for the whole repo (the badges above). The 90% coverage target is enforced: each iOS and macOS build fails below 90% line coverage of `app/Sources`, and the .NET build below 90% of `api/src` ([`check-coverage.py`](.github/scripts/check-coverage.py); the minimum is `COVERAGE_MIN` in `ci.yml`). Files that no test can reasonably reach are listed in [`coverage-exclusions.txt`](.github/coverage-exclusions.txt), which SonarCloud uses too. When the gate fails, add tests, or exclude a file no test can reasonably reach and give the reason in that file. Don't lower the minimum. Each side is only checked when its build runs, so an app-only PR doesn't check the API. SonarCloud analyzes both sides in one project. The .NET scanner only sees Swift files through [`app/Sonar/PocketChef.App.Sonar.csproj`](app/Sonar/PocketChef.App.Sonar.csproj) (#138).
 
-Xcode Cloud builds the app for TestFlight. Since the Xcode project is generated and gitignored, [`app/ci_scripts/ci_post_clone.sh`](app/ci_scripts/ci_post_clone.sh) runs `xcodegen generate` and resolves the Swift packages after each clone. For iCloud-enabled builds, set a secret `DEVELOPMENT_TEAM` environment variable in the Xcode Cloud workflow; the script writes it into `Signing.xcconfig`.
+Xcode Cloud builds the app for TestFlight. Since the Xcode project is generated and gitignored, [`app/ci_scripts/ci_post_clone.sh`](app/ci_scripts/ci_post_clone.sh) runs `xcodegen generate` and resolves the Swift packages after each clone. For iCloud-enabled builds, set a secret `DEVELOPMENT_TEAM` environment variable in the Xcode Cloud workflow; the script writes it into `Signing.xcconfig`. Releases go out by pushing a `vX.Y.Z` tag, which starts the Xcode Cloud Release workflow for iOS and macOS: see [`app/docs/release.md`](app/docs/release.md).
 
 ## License
 
