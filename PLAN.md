@@ -222,8 +222,8 @@ Ordered as vertical slices — each phase leaves the app in a working, testable 
   Acceptance: privacy labels submitted and passing review with a truthful no-data-collection declaration for all three platforms.
 - [ ] **12.2 Store assets** — app icon plus per-platform screenshot sets at every required size (macOS, iPadOS, iOS), built from real app captures, not mockups.
   Acceptance: every required screenshot slot for each platform is filled and renders correctly in a TestFlight build.
-- [ ] **12.3 Versioning, signing, notarization** — version/scheme management, signing identities, and a macOS notarization flow wired into a single command or CI job, so producing a distributable build is one step.
-  Acceptance: one command produces a signed, notarized macOS build and an App Store build for iOS/iPadOS.
+- [ ] **12.3 Versioning and signing** — version/scheme management and signing wired into a single CI job, so producing a distributable build is one step. The Mac app ships through the Mac App Store only (decided 2026-10-07), so there's no Developer ID signing or notarization: pushing a `vX.Y.Z` tag starts an Xcode Cloud Release workflow that archives iOS and macOS with cloud-managed signing and uploads both to App Store Connect (`app/docs/release.md`).
+  Acceptance: one tag push produces signed App Store builds for macOS and iOS/iPadOS that reach TestFlight.
 - [ ] **12.4 TestFlight → production rollout** — internal testing, then beta, then public release, with a short runbook for what to verify at each stage.
   Acceptance: v1 live in the public App Store on all three platforms.
   Blocking for 4.1: with the TestFlight builds on a Mac and an iPhone, an iPhone edit must appear in a Mac window that's already open and in front, within about a minute, without clicking it (see 4.1: development pushes to the Mac only arrive every 13–24 minutes). Check off 4.1 when this passes.

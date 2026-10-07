@@ -11,8 +11,12 @@ settings:
     GENERATE_INFOPLIST_FILE: YES
     INFOPLIST_KEY_CFBundleDisplayName: Pocket Chef
     SWIFT_VERSION: "6.0"
+    # The release version; a release tag must be v<MARKETING_VERSION> (app/docs/release.md).
+    # Xcode Cloud replaces the build number with its own, so CURRENT_PROJECT_VERSION stays 1.
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
+    # The app only uses HTTPS (exempt encryption), so uploads skip the export-compliance question.
+    INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
     CFBundleLocalizations: [en, es, fr, de, nl]
     CFBundleDevelopmentRegion: en
 
@@ -87,6 +91,8 @@ targets:
       # Merged with the generated Info.plist: carries the density API settings.
       INFOPLIST_FILE: Config/Info-macOS.plist
       COMBINE_HIDPI_IMAGES: YES
+      # Required for a Mac App Store upload.
+      INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.food-and-drink
       ENABLE_HARDENED_RUNTIME: YES
     scheme:
       testTargets:

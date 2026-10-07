@@ -6,6 +6,21 @@ set -eu
 
 cd "$CI_PRIMARY_REPOSITORY_PATH/app"
 
+# A release build starts from a tag (app/docs/release.md), which must name the version in
+# project.yml, or App Store Connect would get a build under a different version than the tag.
+if [ -n "${CI_TAG:-}" ]; then
+  # The value may be quoted or not.
+  version=$(sed -n 's/^ *MARKETING_VERSION: *"\{0,1\}\([^" ]*\)"\{0,1\} *$/\1/p' project.yml)
+  if [ -z "$version" ]; then
+    echo "error: no MARKETING_VERSION found in project.yml to check tag $CI_TAG against" >&2
+    exit 1
+  fi
+  if [ "$CI_TAG" != "v$version" ]; then
+    echo "error: tag $CI_TAG doesn't match MARKETING_VERSION $version in project.yml (expected v$version)" >&2
+    exit 1
+  fi
+fi
+
 # Optional: the signing team and iCloud entitlements (see Config/Signing.xcconfig.example).
 # Set DEVELOPMENT_TEAM as a secret environment variable in the Xcode Cloud workflow so the
 # team ID stays out of the public repo. Without it the app builds without iCloud.
