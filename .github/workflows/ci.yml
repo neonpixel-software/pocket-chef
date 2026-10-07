@@ -269,6 +269,12 @@ jobs:
           if [ -f app/coverage-ios.xml ] && [ -f app/coverage-macos.xml ]; then
             SWIFT_COVERAGE_ARG='/d:sonar.coverageReportPaths=app/coverage-ios.xml,app/coverage-macos.xml'
           fi
+          # Ignored issues, kept here rather than accepted in SonarCloud so the reasons are reviewed (#141):
+          #   e1      swift:S1075  the URL field's placeholder text, not a URI the app requests.
+          #   e2      swift:S1075  the https scheme is fixed on purpose; the host comes from
+          #                        DensityAPI.xcconfig.
+          #   e3      swift:S107   RecipeModel.init maps one-to-one to the SwiftData model's stored
+          #                        properties, and most parameters have defaults.
           $HOME/.dotnet/tools/dotnet-sonarscanner begin \
             /k:"neonpixel-software_pocket-chef" \
             /o:"neonpixel-software" \
@@ -280,9 +286,13 @@ jobs:
             /d:sonar.cs.opencover.reportsPaths="api/**/coverage.opencover.xml" \
             /d:sonar.cs.vstest.reportsPaths="api/**/*.trx" \
             /d:sonar.coverage.exclusions="$COVERAGE_EXCLUSIONS" \
-            /d:sonar.issue.ignore.multicriteria="e1" \
+            /d:sonar.issue.ignore.multicriteria="e1,e2,e3" \
             /d:sonar.issue.ignore.multicriteria.e1.ruleKey="swift:S1075" \
-            /d:sonar.issue.ignore.multicriteria.e1.resourceKey="app/Sources/PocketChef/Presentation/RecipeCapture/RecipeURLCaptureView.swift"
+            /d:sonar.issue.ignore.multicriteria.e1.resourceKey="app/Sources/PocketChef/Presentation/RecipeCapture/RecipeURLCaptureView.swift" \
+            /d:sonar.issue.ignore.multicriteria.e2.ruleKey="swift:S1075" \
+            /d:sonar.issue.ignore.multicriteria.e2.resourceKey="app/Sources/PocketChef/Data/Density/DensityAPIConfiguration.swift" \
+            /d:sonar.issue.ignore.multicriteria.e3.ruleKey="swift:S107" \
+            /d:sonar.issue.ignore.multicriteria.e3.resourceKey="app/Sources/PocketChef/Data/Models/RecipeModel.swift"
       - name: Build .NET API (captures C# semantic data for the scanner)
         run: dotnet build api/PocketChef.DensityApi.slnx --configuration Release
       - name: Add the Swift sources to the analysis

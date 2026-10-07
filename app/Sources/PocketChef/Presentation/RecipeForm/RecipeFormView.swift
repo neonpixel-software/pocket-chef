@@ -289,7 +289,9 @@ private struct RowControls: View {
             fetchTagsUseCase: DefaultFetchTagsUseCase(repository: PreviewTagRepository()),
             findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: PreviewTagRepository())
         ),
-        onSave: { _ in }
+        onSave: { _ in
+            // Nothing to do: the preview has nowhere to save the recipe.
+        }
     )
 }
 #endif
