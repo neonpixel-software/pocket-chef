@@ -4,11 +4,11 @@ import ViewInspector
 import XCTest
 
 private struct NoOpCreateRecipeUseCase: CreateRecipeUseCase {
-    func execute(_: Recipe) throws {}
+    func execute(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
 }
 
 private struct NoOpUpdateRecipeUseCase: UpdateRecipeUseCase {
-    func execute(_: Recipe) throws {}
+    func execute(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
 }
 
 private final class RecordingDeleteRecipeUseCase: DeleteRecipeUseCase {

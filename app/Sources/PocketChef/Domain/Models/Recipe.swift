@@ -9,6 +9,8 @@ struct Recipe: Identifiable, Equatable {
     var steps: [String]
     var source: RecipeSource
     var tags: [Tag]
+    /// The gallery, cover first. Bytes load through RecipePhotoRepository.
+    var photos: [RecipePhoto] = []
 }
 
 enum RecipeSource: Equatable {

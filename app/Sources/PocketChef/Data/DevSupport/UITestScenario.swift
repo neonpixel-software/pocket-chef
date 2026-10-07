@@ -95,8 +95,8 @@ private struct FailingRecipeRepository: RecipeRepository {
         throw LoadError()
     }
 
-    func create(_: Recipe) throws { throw LoadError() }
-    func update(_: Recipe) throws { throw LoadError() }
+    func create(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws { throw LoadError() }
+    func update(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws { throw LoadError() }
     func delete(id _: UUID) throws { throw LoadError() }
 }
 #endif

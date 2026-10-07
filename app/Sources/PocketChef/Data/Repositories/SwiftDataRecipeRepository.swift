@@ -18,21 +18,22 @@ final class SwiftDataRecipeRepository: RecipeRepository {
         return try modelContext.fetch(descriptor).map { $0.toDomain() }
     }
 
-    func create(_ recipe: Recipe) throws {
+    func create(_ recipe: Recipe, newPhotos: [UUID: ProcessedPhoto]) throws {
         let model = recipe.toModel()
         model.tags = try resolveTagModels(for: recipe.tags)
         modelContext.insert(model)
+        model.replacePhotos(with: recipe.photos, newPhotos: newPhotos, in: modelContext)
         try modelContext.save()
     }
 
-    func update(_ recipe: Recipe) throws {
+    func update(_ recipe: Recipe, newPhotos: [UUID: ProcessedPhoto]) throws {
         let targetID = recipe.id
         let descriptor = FetchDescriptor<RecipeModel>(predicate: #Predicate { $0.id == targetID })
         guard let model = try modelContext.fetch(descriptor).first else {
             throw RecipeRepositoryError.recipeNotFound
         }
 
-        model.overwrite(with: recipe, in: modelContext)
+        model.overwrite(with: recipe, newPhotos: newPhotos, in: modelContext)
 
         // Tags are a shared (non-owned) relationship: resolve to the existing,
         // already-persisted TagModel rows by id rather than remapping via

@@ -8,8 +8,8 @@ private struct FakeRecipeRepository: RecipeRepository {
         try result.get()
     }
 
-    func create(_: Recipe) throws {}
-    func update(_: Recipe) throws {}
+    func create(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
+    func update(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
     func delete(id _: UUID) throws {}
 }
 

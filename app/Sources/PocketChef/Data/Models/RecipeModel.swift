@@ -11,6 +11,7 @@ final class RecipeModel {
     var sourceURL: URL?
     @Relationship(deleteRule: .cascade) var ingredients: [IngredientLineModel]? = []
     @Relationship var tags: [TagModel]? = []
+    @Relationship(deleteRule: .cascade) var photos: [RecipePhotoModel]? = []
 
     init(
         id: UUID = UUID(),
@@ -20,7 +21,8 @@ final class RecipeModel {
         isTypedSource: Bool,
         sourceURL: URL? = nil,
         ingredients: [IngredientLineModel] = [],
-        tags: [TagModel] = []
+        tags: [TagModel] = [],
+        photos: [RecipePhotoModel] = []
     ) {
         self.id = id
         self.title = title
@@ -30,5 +32,6 @@ final class RecipeModel {
         self.sourceURL = sourceURL
         self.ingredients = ingredients
         self.tags = tags
+        self.photos = photos
     }
 }
