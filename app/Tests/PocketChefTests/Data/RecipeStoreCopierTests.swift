@@ -206,4 +206,45 @@ final class RecipeStoreCopierTests: XCTestCase {
 
         XCTAssertEqual(try recipes(in: target).first?.photos, [RecipePhoto(id: downloaded)])
     }
+
+    func testAPhotoLeftOutIsCopiedByALaterMergeOnceItsBytesAreHere() throws {
+        let source = try makeInMemoryContext()
+        let target = try makeInMemoryContext()
+        let photo = UUID()
+        let row = RecipePhotoModel(id: photo, imageData: nil, thumbnailData: nil)
+        source.insert(RecipeModel(title: "Banana Bread", steps: [], isTypedSource: true, photos: [row]))
+        try source.save()
+        try RecipeStoreCopier.merge(from: source, into: target)
+        XCTAssertEqual(try recipes(in: target).first?.photos, [])
+
+        row.imageData = Data([1])
+        row.thumbnailData = Data([2])
+        try source.save()
+        try RecipeStoreCopier.merge(from: source, into: target)
+
+        XCTAssertEqual(try recipes(in: target).first?.photos, [RecipePhoto(id: photo)])
+        XCTAssertEqual(try SwiftDataRecipePhotoRepository(modelContext: target).image(id: photo), Data([1]))
+    }
+
+    func testMergeFillsInATargetRowThatLacksItsBytes() throws {
+        let source = try makeInMemoryContext()
+        let target = try makeInMemoryContext()
+        let photo = UUID()
+        let recipeID = UUID()
+        target.insert(RecipeModel(id: recipeID, title: "Banana Bread", steps: [], isTypedSource: true, photos: [
+            RecipePhotoModel(id: photo, imageData: nil, thumbnailData: nil),
+        ]))
+        try target.save()
+        source.insert(RecipeModel(id: recipeID, title: "Banana Bread", steps: [], isTypedSource: true, photos: [
+            RecipePhotoModel(id: photo, imageData: Data([1]), thumbnailData: Data([2])),
+        ]))
+        try source.save()
+
+        try RecipeStoreCopier.merge(from: source, into: target)
+
+        XCTAssertEqual(try photoRows(in: target).count, 1)
+        let photos = SwiftDataRecipePhotoRepository(modelContext: target)
+        XCTAssertEqual(try photos.image(id: photo), Data([1]))
+        XCTAssertEqual(try photos.thumbnail(id: photo), Data([2]))
+    }
 }

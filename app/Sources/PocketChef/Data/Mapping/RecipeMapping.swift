@@ -15,9 +15,9 @@ extension RecipeModel {
         )
     }
 
-    /// By position, then id: two devices reordering the same gallery offline can leave
-    /// colliding positions (CloudKit merges per record), and the id keeps the order, and so the
-    /// cover, the same on every device. The next save numbers them 0..<n again.
+    /// Sorted by position, then by id. Two devices reordering the same gallery offline can
+    /// leave colliding positions (CloudKit merges per record). Breaking ties by id gives every
+    /// device the same order, and so the same cover. The next save numbers them 0..<n again.
     var sortedPhotos: [RecipePhotoModel] {
         (photos ?? []).sorted {
             ($0.position, $0.id.uuidString) < ($1.position, $1.id.uuidString)
@@ -99,7 +99,9 @@ extension RecipeModel {
     /// Makes the gallery match `photos`, numbering positions 0..<n. Existing rows are kept
     /// (unlike ingredient lines, which are rebuilt), so unchanged photos aren't uploaded
     /// again. Rows not in `photos` are deleted. A photo without a row is inserted from
-    /// `newPhotos`, or skipped if its bytes aren't there.
+    /// `newPhotos`, or skipped if its bytes aren't there. A kept row missing its bytes takes
+    /// them from `newPhotos`; a row that has them is never rewritten (a photo's bytes don't
+    /// change).
     func replacePhotos(with photos: [RecipePhoto], newPhotos: [UUID: ProcessedPhoto], in context: ModelContext) {
         let current = self.photos ?? []
         var rowsByID: [UUID: RecipePhotoModel] = [:]
@@ -110,6 +112,10 @@ extension RecipeModel {
         var gallery: [RecipePhotoModel] = []
         for photo in photos where !gallery.contains(where: { $0.id == photo.id }) {
             if let row = rowsByID[photo.id] {
+                if !row.hasBytes, let bytes = newPhotos[photo.id] {
+                    row.imageData = bytes.imageData
+                    row.thumbnailData = bytes.thumbnailData
+                }
                 gallery.append(row)
             } else if let bytes = newPhotos[photo.id] {
                 let row = RecipePhotoModel(id: photo.id, imageData: bytes.imageData, thumbnailData: bytes.thumbnailData)

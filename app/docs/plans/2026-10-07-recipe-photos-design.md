@@ -94,7 +94,11 @@ Rejected alternatives:
   removed, and normalizes any duplicate or missing positions. Existing rows
   are kept rather than rebuilt (unlike ingredient lines), so an unchanged
   photo isn't uploaded again; a duplicate row for one id is deleted. A photo
-  with neither a row nor bytes is skipped.
+  with neither a row nor bytes is skipped. A kept row without bytes takes them
+  from `newPhotos` when they're there; a row with bytes is never rewritten.
+  The Local ↔ iCloud copier relies on this: a photo whose bytes aren't on the
+  device is left out of that copy only, and a later switch copies it, or fills
+  in a target row that lacks them, once the bytes are here.
 - `protocol PhotoProcessor` turns picked or captured image data into a
   `ProcessedPhoto`. The Data implementation, `ImageIOPhotoProcessor`:
   - runs off the main actor;

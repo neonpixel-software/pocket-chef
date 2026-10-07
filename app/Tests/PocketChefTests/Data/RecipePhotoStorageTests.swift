@@ -160,4 +160,32 @@ final class RecipePhotoStorageTests: XCTestCase {
         XCTAssertNil(try photos.image(id: photo))
         XCTAssertEqual(try storedRecipe(in: context).photos, [RecipePhoto(id: photo)])
     }
+
+    func testSavingFillsInTheBytesOfAKeptRowThatHasNone() throws {
+        let context = try makeInMemoryContext()
+        let photo = UUID()
+        context.insert(RecipeModel(title: "Banana Bread", steps: [], isTypedSource: true, photos: [
+            RecipePhotoModel(id: photo, imageData: nil, thumbnailData: nil),
+        ]))
+        try context.save()
+        let row = try XCTUnwrap(photoRows(in: context).first)
+
+        try SwiftDataRecipeRepository(modelContext: context)
+            .update(storedRecipe(in: context), newPhotos: [photo: bytes(1)])
+
+        XCTAssertTrue(try photoRows(in: context).first === row, "the row is kept, not replaced")
+        XCTAssertEqual(try SwiftDataRecipePhotoRepository(modelContext: context).image(id: photo), bytes(1).imageData)
+    }
+
+    func testSavingNeverRewritesTheBytesOfARowThatHasThem() throws {
+        let context = try makeInMemoryContext()
+        let repository = SwiftDataRecipeRepository(modelContext: context)
+        let photo = UUID()
+        let recipe = recipe(photos: [photo])
+        try repository.create(recipe, newPhotos: [photo: bytes(1)])
+
+        try repository.update(recipe, newPhotos: [photo: bytes(2)])
+
+        XCTAssertEqual(try SwiftDataRecipePhotoRepository(modelContext: context).image(id: photo), bytes(1).imageData)
+    }
 }

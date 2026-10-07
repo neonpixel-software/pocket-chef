@@ -30,7 +30,7 @@ enum RecipeStoreCopier {
         for sourceRecipe in try source.fetch(FetchDescriptor<RecipeModel>()) {
             let recipe = sourceRecipe.toDomain()
             let model: RecipeModel
-            let storedPhotoIDs = Set((targetRecipes[recipe.id]?.photos ?? []).map(\.id))
+            let storedPhotoIDs = Set((targetRecipes[recipe.id]?.photos ?? []).filter(\.hasBytes).map(\.id))
             let newPhotos = photoBytes(of: sourceRecipe, excluding: storedPhotoIDs)
             if let existing = targetRecipes[recipe.id] {
                 existing.overwrite(with: recipe, newPhotos: newPhotos, in: target)
@@ -56,9 +56,11 @@ enum RecipeStoreCopier {
         try merge(from: source, into: target)
     }
 
-    /// The bytes of `recipe`'s photos, except those `target` already stores (a photo's bytes
-    /// never change, so a stored row is kept rather than copied again). A photo whose bytes
-    /// aren't on this device can't be copied and is left out.
+    /// The bytes of `recipe`'s photos, except those `target` already stores with their bytes
+    /// (a photo's bytes never change, so a complete row is kept rather than copied again).
+    /// A photo whose bytes aren't on this device can't be copied and is left out of this copy
+    /// only: every switch reads the source again, so the next one copies it once the bytes are
+    /// here, and fills in a target row that lacks them (RecipeModel.replacePhotos).
     private static func photoBytes(of recipe: RecipeModel, excluding storedIDs: Set<UUID>) -> [UUID: ProcessedPhoto] {
         var bytes: [UUID: ProcessedPhoto] = [:]
         for photo in recipe.photos ?? [] where !storedIDs.contains(photo.id) {
