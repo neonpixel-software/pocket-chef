@@ -1,7 +1,14 @@
 import Foundation
 
 protocol UpdateRecipeUseCase {
-    func execute(_ recipe: Recipe) throws
+    /// `newPhotos` holds the bytes of photos in `recipe.photos` that aren't stored yet.
+    func execute(_ recipe: Recipe, newPhotos: [UUID: ProcessedPhoto]) throws
+}
+
+extension UpdateRecipeUseCase {
+    func execute(_ recipe: Recipe) throws {
+        try execute(recipe, newPhotos: [:])
+    }
 }
 
 final class DefaultUpdateRecipeUseCase: UpdateRecipeUseCase {
@@ -11,7 +18,7 @@ final class DefaultUpdateRecipeUseCase: UpdateRecipeUseCase {
         self.repository = repository
     }
 
-    func execute(_ recipe: Recipe) throws {
-        try repository.update(recipe)
+    func execute(_ recipe: Recipe, newPhotos: [UUID: ProcessedPhoto]) throws {
+        try repository.update(recipe, newPhotos: newPhotos)
     }
 }

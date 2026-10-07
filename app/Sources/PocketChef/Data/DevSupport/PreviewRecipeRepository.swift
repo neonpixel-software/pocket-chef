@@ -7,8 +7,8 @@ struct PreviewRecipeRepository: RecipeRepository {
         SampleData.recipes
     }
 
-    func create(_: Recipe) throws { /* no-op: previews render fixed SampleData, never persisted */ }
-    func update(_: Recipe) throws { /* no-op: previews render fixed SampleData, never persisted */ }
+    func create(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws { /* no-op: previews render fixed SampleData, never persisted */ }
+    func update(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws { /* no-op: previews render fixed SampleData, never persisted */ }
     func delete(id _: UUID) throws { /* no-op: previews render fixed SampleData, never persisted */ }
 }
 #endif

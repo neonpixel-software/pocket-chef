@@ -10,8 +10,18 @@ extension RecipeModel {
             equipment: equipment,
             steps: steps,
             source: source,
-            tags: (tags ?? []).map { $0.toDomain() }
+            tags: (tags ?? []).map { $0.toDomain() },
+            photos: sortedPhotos.map { RecipePhoto(id: $0.id) }
         )
+    }
+
+    /// Sorted by position, then by id. Two devices reordering the same gallery offline can
+    /// leave colliding positions (CloudKit merges per record). Breaking ties by id gives every
+    /// device the same order, and so the same cover. The next save numbers them 0..<n again.
+    var sortedPhotos: [RecipePhotoModel] {
+        (photos ?? []).sorted {
+            ($0.position, $0.id.uuidString) < ($1.position, $1.id.uuidString)
+        }
     }
 }
 
@@ -64,7 +74,8 @@ extension Recipe {
 extension RecipeModel {
     /// Replaces every field except tags with `recipe`'s. Tags are left to the caller,
     /// because they're a shared relationship that must resolve to rows already in `context`.
-    func overwrite(with recipe: Recipe, in context: ModelContext) {
+    /// `newPhotos` holds the bytes of photos that have no row yet (see replacePhotos).
+    func overwrite(with recipe: Recipe, newPhotos: [UUID: ProcessedPhoto], in context: ModelContext) {
         title = recipe.title
         steps = recipe.steps
         equipment = recipe.equipment
@@ -82,5 +93,46 @@ extension RecipeModel {
         // they leak as orphaned rows.
         (ingredients ?? []).forEach { context.delete($0) }
         ingredients = recipe.ingredientModels()
+        replacePhotos(with: recipe.photos, newPhotos: newPhotos, in: context)
+    }
+
+    /// Makes the gallery match `photos`, numbering positions 0..<n. Existing rows are kept
+    /// (unlike ingredient lines, which are rebuilt), so unchanged photos aren't uploaded
+    /// again. Rows not in `photos` are deleted. A photo without a row is inserted from
+    /// `newPhotos`, or skipped if its bytes aren't there. A kept row missing its bytes takes
+    /// them from `newPhotos`; a row that has them is never rewritten (a photo's bytes don't
+    /// change).
+    func replacePhotos(with photos: [RecipePhoto], newPhotos: [UUID: ProcessedPhoto], in context: ModelContext) {
+        let current = self.photos ?? []
+        var rowsByID: [UUID: RecipePhotoModel] = [:]
+        for row in current where rowsByID[row.id] == nil {
+            rowsByID[row.id] = row
+        }
+
+        var gallery: [RecipePhotoModel] = []
+        for photo in photos where !gallery.contains(where: { $0.id == photo.id }) {
+            if let row = rowsByID[photo.id] {
+                if !row.hasBytes, let bytes = newPhotos[photo.id] {
+                    row.imageData = bytes.imageData
+                    row.thumbnailData = bytes.thumbnailData
+                }
+                gallery.append(row)
+            } else if let bytes = newPhotos[photo.id] {
+                let row = RecipePhotoModel(id: photo.id, imageData: bytes.imageData, thumbnailData: bytes.thumbnailData)
+                context.insert(row)
+                gallery.append(row)
+            }
+        }
+
+        // The .cascade rule doesn't fire on reassigning the relationship (see overwrite),
+        // so dropped rows, including duplicate rows for one id, are deleted here.
+        let kept = Set(gallery.map(ObjectIdentifier.init))
+        for row in current where !kept.contains(ObjectIdentifier(row)) {
+            context.delete(row)
+        }
+        for (index, row) in gallery.enumerated() where row.position != index {
+            row.position = index
+        }
+        self.photos = gallery
     }
 }

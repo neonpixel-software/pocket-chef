@@ -10,11 +10,11 @@ private struct FakeFetchRecipesUseCase: FetchRecipesUseCase {
 }
 
 private struct NoOpCreateRecipeUseCase: CreateRecipeUseCase {
-    func execute(_: Recipe) throws {}
+    func execute(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
 }
 
 private struct NoOpUpdateRecipeUseCase: UpdateRecipeUseCase {
-    func execute(_: Recipe) throws {}
+    func execute(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
 }
 
 private struct FakeDeleteRecipeUseCase: DeleteRecipeUseCase {

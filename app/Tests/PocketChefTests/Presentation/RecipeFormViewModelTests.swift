@@ -5,7 +5,7 @@ private final class FakeCreateRecipeUseCase: CreateRecipeUseCase {
     var result: Result<Void, Error> = .success(())
     private(set) var createdRecipes: [Recipe] = []
 
-    func execute(_ recipe: Recipe) throws {
+    func execute(_ recipe: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {
         createdRecipes.append(recipe)
         try result.get()
     }
@@ -15,7 +15,7 @@ private final class FakeUpdateRecipeUseCase: UpdateRecipeUseCase {
     var result: Result<Void, Error> = .success(())
     private(set) var updatedRecipes: [Recipe] = []
 
-    func execute(_ recipe: Recipe) throws {
+    func execute(_ recipe: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {
         updatedRecipes.append(recipe)
         try result.get()
     }

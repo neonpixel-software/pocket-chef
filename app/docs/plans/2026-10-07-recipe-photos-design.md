@@ -70,10 +70,13 @@ Rejected alternatives:
 
 ## Domain
 
-- `struct RecipePhoto: Identifiable, Equatable { let id: UUID; var position: Int }`.
+- `struct RecipePhoto: Identifiable, Equatable { let id: UUID }`.
   No image bytes: `RecipeRepository.fetchAll()` maps every recipe, and the
-  list must not load photos.
-- `Recipe` gets `var photos: [RecipePhoto] = []`, sorted by `(position, id)`.
+  list must not load photos. No position either (changed while building
+  13.1): the gallery order is the order of `Recipe.photos`, like ingredient
+  lines, so the two can't disagree.
+- `Recipe` gets `var photos: [RecipePhoto] = []`, mapped from the stored rows
+  sorted by `(position, id)`.
   `recipe.photos.first` is the cover. The `id` tie-break keeps the order the
   same on every device when positions collide (see "Concurrent edits").
 - `protocol RecipePhotoRepository` loads bytes on demand:
@@ -81,11 +84,21 @@ Rejected alternatives:
   `nil` means the bytes aren't on this device (yet).
 - New photo bytes travel with the save: the form passes a
   `[UUID: ProcessedPhoto]` map (image + thumbnail) alongside the `Recipe` to
-  the create and update use cases. The repository inserts models for new
+  the create and update use cases, and on to `RecipeRepository.create` /
+  `update(_:newPhotos:)`. Both protocols keep a `create(_:)` / `update(_:)` /
+  `execute(_:)` convenience that passes no new photos, so existing callers
+  don't change. The repository inserts models for new
   ids, deletes models whose id is no longer in `recipe.photos`, and sets each
   photo's `position` to its index in `recipe.photos`. That changes the stored
   values whenever photos are reordered (Make Cover, Move Left/Right) or one is
-  removed, and normalizes any duplicate or missing positions.
+  removed, and normalizes any duplicate or missing positions. Existing rows
+  are kept rather than rebuilt (unlike ingredient lines), so an unchanged
+  photo isn't uploaded again; a duplicate row for one id is deleted. A photo
+  with neither a row nor bytes is skipped. A kept row without bytes takes them
+  from `newPhotos` when they're there; a row with bytes is never rewritten.
+  The Local ↔ iCloud copier relies on this: a photo whose bytes aren't on the
+  device is left out of that copy only, and a later switch copies it, or fills
+  in a target row that lacks them, once the bytes are here.
 - `protocol PhotoProcessor` turns picked or captured image data into a
   `ProcessedPhoto`. The Data implementation, `ImageIOPhotoProcessor`:
   - runs off the main actor;

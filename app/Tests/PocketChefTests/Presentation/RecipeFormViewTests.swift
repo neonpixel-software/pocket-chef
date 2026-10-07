@@ -5,15 +5,15 @@ import XCTest
 
 private final class RecordingCreateRecipeUseCase: CreateRecipeUseCase {
     var result: Result<Void, Error> = .success(())
-    func execute(_: Recipe) throws { try result.get() }
+    func execute(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws { try result.get() }
 }
 
 private struct NoOpUpdateRecipeUseCase: UpdateRecipeUseCase {
-    func execute(_: Recipe) throws {}
+    func execute(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
 }
 
 private struct NoOpCreateRecipeUseCase: CreateRecipeUseCase {
-    func execute(_: Recipe) throws {}
+    func execute(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
 }
 
 private struct NoOpDeleteRecipeUseCase: DeleteRecipeUseCase {

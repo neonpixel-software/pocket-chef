@@ -11,6 +11,7 @@ enum RecipeStore {
         RecipeModel.self,
         IngredientLineModel.self,
         TagModel.self,
+        RecipePhotoModel.self,
     ])
 
     /// Every configuration names its CloudKit database explicitly: once the app has the iCloud

@@ -7,12 +7,15 @@ private final class FakeRecipeRepository: RecipeRepository {
 
     func fetchAll() throws -> [Recipe] { [] }
 
-    func create(_ recipe: Recipe) throws {
+    private(set) var newPhotos: [[UUID: ProcessedPhoto]] = []
+
+    func create(_ recipe: Recipe, newPhotos: [UUID: ProcessedPhoto]) throws {
         createdRecipes.append(recipe)
+        self.newPhotos.append(newPhotos)
         try createResult.get()
     }
 
-    func update(_: Recipe) throws {}
+    func update(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
     func delete(id _: UUID) throws {}
 }
 
@@ -27,6 +30,21 @@ final class CreateRecipeUseCaseTests: XCTestCase {
         try useCase.execute(recipe)
 
         XCTAssertEqual(repository.createdRecipes, [recipe])
+        XCTAssertEqual(repository.newPhotos, [[:]])
+    }
+
+    func testExecutePassesNewPhotoBytesToRepository() throws {
+        let repository = FakeRecipeRepository()
+        let useCase = DefaultCreateRecipeUseCase(repository: repository)
+        let photoID = UUID()
+        let bytes = ProcessedPhoto(imageData: Data([1]), thumbnailData: Data([2]))
+        var recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
+        recipe.photos = [RecipePhoto(id: photoID)]
+
+        try useCase.execute(recipe, newPhotos: [photoID: bytes])
+
+        XCTAssertEqual(repository.createdRecipes, [recipe])
+        XCTAssertEqual(repository.newPhotos, [[photoID: bytes]])
     }
 
     func testExecutePropagatesRepositoryError() {

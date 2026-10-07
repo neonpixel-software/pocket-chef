@@ -6,8 +6,8 @@ private final class FakeRecipeRepository: RecipeRepository {
     private(set) var deletedIDs: [UUID] = []
 
     func fetchAll() throws -> [Recipe] { [] }
-    func create(_: Recipe) throws {}
-    func update(_: Recipe) throws {}
+    func create(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
+    func update(_: Recipe, newPhotos _: [UUID: ProcessedPhoto]) throws {}
 
     func delete(id: UUID) throws {
         deletedIDs.append(id)
