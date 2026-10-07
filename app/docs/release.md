@@ -28,14 +28,32 @@ signing certificates or App Store Connect keys are needed locally.
 3. Xcode Cloud's **Release** workflow builds both platforms. When it's green, both builds are in
    TestFlight for internal testers. From there, follow the 12.4 rollout.
 
-If the build fails, fix the problem on `main`. Then either bump the version and use a new tag, or
-delete the tag and push it again on the new commit (`git push origin :v1.0.0`) as long as no build
-of that version was uploaded.
+If no build starts, check that the Release workflow was saved before the tag was pushed: Xcode
+Cloud ignores tags pushed before the workflow existed. Start the build by hand with Xcode (⌘9 →
+Cloud → right-click Release → Start Build…) and pick the tag.
+
+If both archives fail at `ci_post_clone.sh`, the tag probably doesn't match `MARKETING_VERSION`:
+it was pushed before the version bump merged, or on the wrong commit. The log says which version
+it expected.
+
+If the build fails, fix the problem on `main`. If no build of that version was uploaded (it failed
+before the upload, as with a mismatched tag), you can move the tag to the fixed commit:
+```sh
+git switch main && git pull
+git tag -f v1.0.0            # move the tag to the current main
+git push origin :v1.0.0      # delete the old tag on GitHub
+git push origin v1.0.0       # push the moved tag, which starts a new build
+```
+Once a build of that version is in App Store Connect, don't move its tag: bump the version
+instead, so each tag names exactly the commit that was uploaded.
 
 ## One-time setup: the Release workflow
 
-Set this up in Xcode (Integrate → Manage Workflows) or in App Store Connect (Xcode Cloud →
-Manage Workflows). The existing TestFlight workflow stays as it is.
+Set this up in Xcode (⌘9 → Cloud → right-click the product → Manage Workflows) or in App Store
+Connect (Xcode Cloud → Manage Workflows). The existing TestFlight workflow stays as it is. Xcode
+Cloud has one product for the app, named PocketChef-iOS after the scheme it was created from. iOS
+and macOS share the bundle ID, so the macOS archive goes in the same product's workflow, and the
+App Store Connect app record must list macOS as a platform.
 
 | Setting | Value |
 |---|---|
