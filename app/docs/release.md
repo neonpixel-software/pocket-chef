@@ -32,9 +32,20 @@ If no build starts, check that the Release workflow was saved before the tag was
 Cloud ignores tags pushed before the workflow existed. Start the build by hand with Xcode (⌘9 →
 Cloud → right-click Release → Start Build…) and pick the tag.
 
-If the build fails, fix the problem on `main`. Then either bump the version and use a new tag, or
-delete the tag and push it again on the new commit (`git push origin :v1.0.0`) as long as no build
-of that version was uploaded.
+If both archives fail at `ci_post_clone.sh`, the tag probably doesn't match `MARKETING_VERSION`:
+it was pushed before the version bump merged, or on the wrong commit. The log says which version
+it expected.
+
+If the build fails, fix the problem on `main`. If no build of that version was uploaded (it failed
+before the upload, as with a mismatched tag), you can move the tag to the fixed commit:
+```sh
+git switch main && git pull
+git tag -f v1.0.0            # move the tag to the current main
+git push origin :v1.0.0      # delete the old tag on GitHub
+git push origin v1.0.0       # push the moved tag, which starts a new build
+```
+Once a build of that version is in App Store Connect, don't move its tag: bump the version
+instead, so each tag names exactly the commit that was uploaded.
 
 ## One-time setup: the Release workflow
 
