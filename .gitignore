@@ -65,6 +65,9 @@ fastlane/screenshots/**/*.png
 fastlane/test_output
 *.profraw
 
+## macOS Finder metadata
+.DS_Store
+
 ## Local signing team, kept out of the public repo (see app/Config/Signing.xcconfig.example)
 app/Config/Signing.xcconfig
 
