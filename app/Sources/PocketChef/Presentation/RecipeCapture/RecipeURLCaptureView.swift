@@ -82,7 +82,7 @@ struct RecipeURLCaptureView: View {
                 captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: PreviewRecipeCaptureService())
             )
         ),
-        onCaptured: { _ in }
+        onCaptured: PreviewRecipeHandler.ignore
     )
 }
 #endif

@@ -289,7 +289,7 @@ private struct RowControls: View {
             fetchTagsUseCase: DefaultFetchTagsUseCase(repository: PreviewTagRepository()),
             findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: PreviewTagRepository())
         ),
-        onSave: { _ in }
+        onSave: PreviewRecipeHandler.ignore
     )
 }
 #endif
