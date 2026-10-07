@@ -52,8 +52,9 @@ final class RecipePhotoModel {
 ```
 
 - `RecipeModel` gets `@Relationship(deleteRule: .cascade) var photos: [RecipePhotoModel]? = []`.
-- `RecipeStore.schema` adds `RecipePhotoModel.self`. Existing stores migrate
-  lightweight (an empty relationship).
+- `RecipeStore.schema` adds `RecipePhotoModel.self`. SwiftData migrates
+  existing stores automatically when they open (a new table, and an empty
+  `photos` on every recipe), so no migration plan or code is needed.
 - External storage keeps the bytes out of the SQLite rows, and CloudKit
   uploads them as `CKAsset`s, so record size limits (1 MB) don't apply.
 - `RecipeStoreCopier.merge` and `.replace` copy photos with their bytes and
@@ -72,16 +73,19 @@ Rejected alternatives:
 - `struct RecipePhoto: Identifiable, Equatable { let id: UUID; var position: Int }`.
   No image bytes: `RecipeRepository.fetchAll()` maps every recipe, and the
   list must not load photos.
-- `Recipe` gets `var photos: [RecipePhoto] = []`, sorted by position.
-  `recipe.photos.first` is the cover.
+- `Recipe` gets `var photos: [RecipePhoto] = []`, sorted by `(position, id)`.
+  `recipe.photos.first` is the cover. The `id` tie-break keeps the order the
+  same on every device when positions collide (see "Concurrent edits").
 - `protocol RecipePhotoRepository` loads bytes on demand:
   `thumbnail(id:) throws -> Data?` and `image(id:) throws -> Data?`.
   `nil` means the bytes aren't on this device (yet).
 - New photo bytes travel with the save: the form passes a
   `[UUID: ProcessedPhoto]` map (image + thumbnail) alongside the `Recipe` to
   the create and update use cases. The repository inserts models for new
-  ids, deletes models whose id is no longer in `recipe.photos`, and rewrites
-  positions.
+  ids, deletes models whose id is no longer in `recipe.photos`, and sets each
+  photo's `position` to its index in `recipe.photos`. That changes the stored
+  values whenever photos are reordered (Make Cover, Move Left/Right) or one is
+  removed, and normalizes any duplicate or missing positions.
 - `protocol PhotoProcessor` turns picked or captured image data into a
   `ProcessedPhoto`. The Data implementation, `ImageIOPhotoProcessor`:
   - runs off the main actor;
@@ -158,15 +162,33 @@ Rejected alternatives:
 - Deleting a photo or a recipe removes the external storage files through the
   cascade delete; CloudKit deletes the records on other devices.
 
+## Concurrent edits
+
+CloudKit resolves conflicts per record, and the last writer wins. Each photo
+is its own record with its own `position`, so two devices reordering the same
+gallery while offline can end up with duplicate or missing positions (a mix of
+both orders). Two rules keep this harmless:
+
+- Every device sorts by `(position, id)`, so colliding positions still give
+  the same order everywhere, and the cover is the same on every device.
+- The next save of that recipe on any device writes positions `0..<n` again
+  (see Domain).
+
+The result can mix the two devices' orders, which is acceptable for a gallery.
+Ingredient lines have the same exposure today, but they sort by `position`
+alone; giving them the same tie-break is outside this phase.
+
 ## Testing
 
-Unit tests (the 90% coverage gate applies):
+Unit tests (both coverage gates apply: CI's 90% line coverage,
+`COVERAGE_MIN` in `.github/workflows/ci.yml`, and SonarCloud's new-code gate):
 
-- Mapping: position ordering, round trip, cascade delete.
+- Mapping: position ordering, the `id` tie-break for duplicate positions,
+  round trip, cascade delete.
 - `SwiftDataRecipePhotoRepository`: thumbnail and image loading, `nil` for an
   unknown id.
-- Create/update: new photos inserted, removed ones deleted, positions
-  rewritten.
+- Create/update: new photos inserted, removed ones deleted, positions set to
+  `0..<n` after a reorder or delete, and duplicate positions normalized.
 - `RecipeStoreCopier`: merge and replace carry photos with bytes and order.
 - `ImageIOPhotoProcessor` with fixtures (landscape JPEG, portrait HEIC with
   EXIF orientation 6, a small PNG, junk data): long edge ≤ 2048, thumbnail
