@@ -82,9 +82,7 @@ struct RecipeURLCaptureView: View {
                 captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: PreviewRecipeCaptureService())
             )
         ),
-        onCaptured: { _ in
-            // Nothing to do: the preview has nowhere to save a captured recipe.
-        }
+        onCaptured: PreviewRecipeHandler.ignore
     )
 }
 #endif
