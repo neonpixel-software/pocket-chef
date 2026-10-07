@@ -28,14 +28,21 @@ signing certificates or App Store Connect keys are needed locally.
 3. Xcode Cloud's **Release** workflow builds both platforms. When it's green, both builds are in
    TestFlight for internal testers. From there, follow the 12.4 rollout.
 
+If no build starts, check that the Release workflow was saved before the tag was pushed: Xcode
+Cloud ignores tags pushed before the workflow existed. Start the build by hand with Xcode (⌘9 →
+Cloud → right-click Release → Start Build…) and pick the tag.
+
 If the build fails, fix the problem on `main`. Then either bump the version and use a new tag, or
 delete the tag and push it again on the new commit (`git push origin :v1.0.0`) as long as no build
 of that version was uploaded.
 
 ## One-time setup: the Release workflow
 
-Set this up in Xcode (Integrate → Manage Workflows) or in App Store Connect (Xcode Cloud →
-Manage Workflows). The existing TestFlight workflow stays as it is.
+Set this up in Xcode (⌘9 → Cloud → right-click the product → Manage Workflows) or in App Store
+Connect (Xcode Cloud → Manage Workflows). The existing TestFlight workflow stays as it is. Xcode
+Cloud has one product for the app, named PocketChef-iOS after the scheme it was created from. iOS
+and macOS share the bundle ID, so the macOS archive goes in the same product's workflow, and the
+App Store Connect app record must list macOS as a platform.
 
 | Setting | Value |
 |---|---|
