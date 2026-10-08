@@ -13,9 +13,9 @@ recipe when storage is set to iCloud.
   the detail gallery. A recipe without photos looks exactly like it does
   today.
 - **No limit on the number of photos.** Each photo is scaled down to at most
-  2048 px on its long edge before it's saved (about 0.5 MB as JPEG), so a
-  large gallery doesn't fill the user's iCloud storage. Originals are not
-  kept.
+  2048 px on its long edge before it's saved (about 1 MB as JPEG, measured in
+  13.3's device check; the first estimate was 0.5 MB), so a large gallery
+  doesn't fill the user's iCloud storage. Originals are not kept.
 - **Sources: photo library and camera.** The photo library is available on
   every platform. The camera is offered only on iPhone and iPad, and only
   when the device has one. Not in scope: importing files, drag and drop, and
@@ -243,7 +243,8 @@ through Make Cover (an accessibility action, not a click). The camera and
 Manual device check (Mac + iPhone 12, iCloud mode): add from the library on
 both, take a photo on the iPhone, photos and their deletion/reordering sync
 both ways, the cover shows in the list, a Local ↔ iCloud switch keeps photos,
-and a 10-photo recipe takes about 5 MB.
+and a 10-photo recipe takes about 5 MB. (Measured 2026-10-08: about 10 MB;
+real food photos at 2048 px and quality 0.8 are 764 KB–1.2 MB each.)
 
 ## Delivery
 
