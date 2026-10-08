@@ -163,6 +163,8 @@ struct RecipeDetailView: View {
             }
             ToolbarItem(placement: .destructiveAction) {
                 Button("Delete", role: .destructive) { viewModel.isPresentingDeleteConfirmation = true }
+                    // Ink like Edit, deliberately not destructive red: on the pink header it has
+                    // to be readable first. The dialog below keeps its red Delete as the guard.
                     .pcHeaderToolbarButton()
                     // On the button so the popover anchors to it, not mid-screen (#106).
                     .confirmationDialog(
