@@ -80,6 +80,11 @@ targets:
   PocketChef-macOS:
     type: application
     platform: macOS
+    # The app menu (About, Hide, Quit) and the .app in Applications use the product name,
+    # which otherwise is the target name, PocketChef-macOS. Xcode builds with PRODUCT_NAME
+    # below; XcodeGen derives the unit tests' TEST_HOST (and so BUNDLE_LOADER) from this key.
+    # Keep the two the same.
+    productName: Pocket Chef
     sources:
       - Sources/PocketChef
     configFiles:
@@ -87,8 +92,6 @@ targets:
       Release: Config/PocketChef.xcconfig
     settings:
       PRODUCT_MODULE_NAME: PocketChef
-      # The app menu (About, Hide, Quit) and the .app in Applications use the product name,
-      # which otherwise is the target name, PocketChef-macOS.
       PRODUCT_NAME: Pocket Chef
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
       # Merged with the generated Info.plist: carries the density API settings.
@@ -109,10 +112,6 @@ targets:
     configFiles:
       Debug: Config/UnitTests.xcconfig
       Release: Config/UnitTests.xcconfig
-    settings:
-      # XcodeGen builds the host path from the app's target name; the app's product name
-      # is "Pocket Chef".
-      TEST_HOST: $(BUILT_PRODUCTS_DIR)/Pocket Chef.app/Contents/MacOS/Pocket Chef
     sources:
       - Tests/PocketChefTests
     dependencies:
