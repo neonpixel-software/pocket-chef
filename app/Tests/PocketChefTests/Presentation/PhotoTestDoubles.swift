@@ -1,5 +1,5 @@
-@testable import PocketChef
 import Foundation
+@testable import PocketChef
 
 /// Thumbnails by photo id; an unknown id has none, like a photo not downloaded yet.
 struct StubFetchPhotoThumbnailUseCase: FetchPhotoThumbnailUseCase {

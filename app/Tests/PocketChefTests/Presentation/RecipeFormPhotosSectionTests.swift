@@ -1,6 +1,6 @@
-@testable import PocketChef
 import ImageIO
 import PhotosUI
+@testable import PocketChef
 import SwiftUI
 import UniformTypeIdentifiers
 import ViewInspector
@@ -77,13 +77,14 @@ final class RecipeFormPhotosSectionTests: XCTestCase {
     func testAProcessingPhotoShowsASpinner() async throws {
         let viewModel = makeViewModel(photos: [])
         let (stream, continuation) = AsyncStream.makeStream(of: Data.self)
+        let loader: RecipeFormViewModel.PhotoLoader = {
+            for await data in stream {
+                return data
+            }
+            return nil
+        }
         let adding = Task {
-            await viewModel.addPhotos([{
-                for await data in stream {
-                    return data
-                }
-                return nil
-            }, ])
+            await viewModel.addPhotos([loader])
         }
         while !viewModel.isProcessingPhotos {
             await Task.yield()
@@ -98,7 +99,7 @@ final class RecipeFormPhotosSectionTests: XCTestCase {
     }
 
     func testThumbnailsLoadWhenShownAndAMissingOneShowsAPlaceholder() async throws {
-        let viewModel = makeViewModel(photos: Array(photos[0...1]), thumbnails: [photos[0].id: try Self.pngData()])
+        let viewModel = try makeViewModel(photos: Array(photos[0...1]), thumbnails: [photos[0].id: Self.pngData()])
         let sut = RecipeFormPhotosSection(viewModel: viewModel)
 
         let thumbnails = try sut.inspect().findAll(ViewType.ZStack.self)
