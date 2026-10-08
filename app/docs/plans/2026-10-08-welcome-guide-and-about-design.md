@@ -36,7 +36,10 @@ code or report a problem.
 ### Presentation
 
 - **iPhone:** full screen.
-- **iPad and Mac:** a sheet, about 560 × 520 pt.
+- **iPad and Mac:** a sheet, about 560 × 520 pt. The size is fixed so it doesn't
+  jump between pages; 520 pt fits the longest page (4) as a short list. A page
+  whose text still doesn't fit, with large Dynamic Type or a long translation,
+  scrolls inside the page rather than being cut off.
 - One page at a time, in a paged horizontal scroll view like the photo gallery
   (13.3), with page dots. On the Mac there are arrow buttons and ← → as well.
 - Skip at the top on every page but the last. The bottom button reads Next, and
@@ -97,14 +100,23 @@ check it once, and cook from a clean page.
 **Open source.** Pocket Chef is open source under the MIT license. Anyone can
 read the code, check what the app does, and build it themselves.
 
-**No tracking.** This has to stay literally true:
+**No tracking.** This has to stay literally true, and the online list has to
+be complete, not a set of examples:
 - No account, no ads, no analytics, no tracking.
 - Your recipes stay on this device, or in your own iCloud if you turn on sync.
 - Recipe capture runs on your device.
 - The app only goes online to:
-  - open a recipe link you paste;
-  - download ingredient densities from Pocket Chef's server, which receives
+  - fetch the recipe from a link you paste (that website sees the visit, as it
+    would in a browser);
+  - sync your recipes through your own iCloud, if you turn it on;
+  - download ingredient densities from Pocket Chef's server. The app sends it
     nothing about you or your recipes.
+
+Checked against the code on 2026-10-08: the app's only network code is
+`URLSessionWebPageFetcher` (links), `URLSessionDensityEntryRemoteSource`
+(densities) and CloudKit (`RecipeStore` with iCloud on, and
+`CloudKitAccountStatusProvider`). Its one `openURL` opens the system Settings.
+The About links open in the browser, which the user starts.
 
 **Links.** Both open in the browser:
 - **View the Code on GitHub:** https://github.com/neonpixel-software/pocket-chef
@@ -127,8 +139,11 @@ and "Made by NeonPixel".
   title then body. The page dots are hidden from VoiceOver, since each page
   says its position ("Page 2 of 4").
 - All text is in the five languages (en, es, fr, de, nl), informal register.
-  Drafts go to #65 for native-speaker review. The About and guide texts are
-  longer than earlier strings, so the review matters more here.
+  The About and guide texts are longer than earlier strings, so the drafts get
+  a native-speaker review of their own: 14.1 opens a new issue for de, es, fr
+  and nl, which 14.2 adds to. #65 only covers two capture-flow error strings in
+  nl and es, so it isn't widened. Where the guide names capture-flow screens
+  and buttons, it uses their existing translations.
 
 ## Testing
 
@@ -147,7 +162,11 @@ UI tests:
 - A normal scenario launch doesn't show it.
 
 The privacy text gets a manual read against the code before release: Phase
-12.1's privacy labels and this page must say the same thing.
+12.1's privacy labels and this page must say the same thing. That read repeats
+the network check above, searching `Sources/` for every way out (`URLSession`,
+`URLRequest`, CloudKit, web views, `openURL`, any URL string) and for any App
+Transport Security exception in the Info.plists. It passes only if every hit
+is on the About page's list.
 
 ## Delivery
 
