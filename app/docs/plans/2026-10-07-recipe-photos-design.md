@@ -244,7 +244,8 @@ Manual device check (Mac + iPhone 12, iCloud mode): add from the library on
 both, take a photo on the iPhone, photos and their deletion/reordering sync
 both ways, the cover shows in the list, a Local ↔ iCloud switch keeps photos,
 and a 10-photo recipe takes about 5 MB. (Measured 2026-10-08: about 10 MB;
-real food photos at 2048 px and quality 0.8 are 764 KB–1.2 MB each.)
+real food photos at 2048 px and quality 0.8 are 764 KB–1.2 MB each. Kept
+at 2048 px and 0.8 by the user's choice, for a sharp gallery and zoom.)
 
 ## Delivery
 
