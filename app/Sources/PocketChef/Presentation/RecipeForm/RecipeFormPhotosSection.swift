@@ -81,9 +81,7 @@ struct RecipeFormPhotosSection: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityIdentifier(Self.photoAccessibilityIdentifier)
-            .accessibilityLabel(index == 0
-                ? String(localized: "Cover photo")
-                : String(localized: "Photo \(index + 1) of \(count)"))
+            .accessibilityLabel(PhotoPaging.accessibilityLabel(at: index, of: count))
             .accessibilityValue(photo.state == .processing ? String(localized: "Processing") : "")
             .accessibilityActions {
                 photoActions(at: index, count: count)

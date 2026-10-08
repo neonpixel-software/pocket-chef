@@ -1,3 +1,4 @@
+import ImageIO
 @testable import PocketChef
 import SwiftData
 import XCTest
@@ -16,12 +17,37 @@ final class UITestScenarioTests: XCTestCase {
 
     @MainActor
     func testEachScenarioStartsWithItsRecipes() throws {
-        let expectedCounts: [UITestScenario: Int] = [.empty: 0, .noMatchingTag: 1, .loadError: 0, .manyRecipes: 40, .recipeDetail: 1]
+        let expectedCounts: [UITestScenario: Int] = [
+            .empty: 0, .noMatchingTag: 1, .loadError: 0, .manyRecipes: 40, .recipeDetail: 1,
+            .recipeWithPhotos: 1, .recipeWithPhotosDetail: 1,
+        ]
         for scenario in UITestScenario.allCases {
             let container = try scenario.makeContainer(for: .local)
             let count = try container.mainContext.fetchCount(FetchDescriptor<RecipeModel>())
             XCTAssertEqual(count, expectedCounts[scenario], "\(scenario)")
         }
+    }
+
+    /// The photo UI tests tell the photos apart by color: red is the cover, then green, then blue.
+    @MainActor
+    func testThePhotoScenariosSeedThreeColoredPhotosInOrder() throws {
+        for scenario in [UITestScenario.recipeWithPhotos, .recipeWithPhotosDetail] {
+            let container = try scenario.makeContainer(for: .local)
+            let context = container.mainContext
+            let recipe = try XCTUnwrap(SwiftDataRecipeRepository(modelContext: context).fetchAll().first)
+            XCTAssertEqual(recipe.photos.count, 3, "\(scenario)")
+            let photoRepository = SwiftDataRecipePhotoRepository(modelContext: context)
+            let colors = try recipe.photos.map { photo in
+                try Self.centerColor(of: XCTUnwrap(photoRepository.image(id: photo.id)))
+            }
+            XCTAssertEqual(colors, ["red", "green", "blue"], "\(scenario)")
+            XCTAssertNotNil(try photoRepository.thumbnail(id: recipe.photos[0].id), "\(scenario)")
+        }
+    }
+
+    func testOnlyTheDetailScenariosOpenOnARecipe() {
+        let opening = UITestScenario.allCases.filter(\.opensRecipeDetail)
+        XCTAssertEqual(Set(opening), [.recipeDetail, .recipeWithPhotosDetail])
     }
 
     func testOnlyTheLoadErrorScenarioFailsToLoad() throws {
@@ -35,5 +61,26 @@ final class UITestScenarioTests: XCTestCase {
                 XCTAssertNoThrow(try wrapped.fetchAll(), "\(scenario)")
             }
         }
+    }
+
+    /// The strongest channel of the image's center pixel.
+    private static func centerColor(of data: Data) throws -> String {
+        let source = try XCTUnwrap(CGImageSourceCreateWithData(data as CFData, nil))
+        let image = try XCTUnwrap(CGImageSourceCreateImageAtIndex(source, 0, nil))
+        var rgba = [UInt8](repeating: 0, count: 4)
+        rgba.withUnsafeMutableBytes { buffer in
+            let context = CGContext(
+                data: buffer.baseAddress,
+                width: 1,
+                height: 1,
+                bitsPerComponent: 8,
+                bytesPerRow: 4,
+                space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+            )
+            context?.draw(image, in: CGRect(x: -image.width / 2, y: -image.height / 2, width: image.width, height: image.height))
+        }
+        let channels = [("red", rgba[0]), ("green", rgba[1]), ("blue", rgba[2])]
+        return channels.max { $0.1 < $1.1 }?.0 ?? ""
     }
 }

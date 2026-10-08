@@ -58,7 +58,11 @@ struct RecipeListView: View {
                                         viewModel: viewModel.makeDetailViewModel(for: recipe),
                                         onRecipeChanged: { viewModel.load() }
                                     )) {
-                                        RecipeRow(recipe: recipe, onDelete: { viewModel.delete(recipe) })
+                                        RecipeRow(
+                                            recipe: recipe,
+                                            loadCover: { viewModel.coverThumbnailData(for: recipe) },
+                                            onDelete: { viewModel.delete(recipe) }
+                                        )
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -186,10 +190,15 @@ struct RecipeListView: View {
 
 private struct RecipeRow: View {
     let recipe: Recipe
+    let loadCover: () -> Data?
     let onDelete: () -> Void
 
     var body: some View {
-        HStack {
+        HStack(spacing: 14) {
+            // Rows without photos stay as they were, without a placeholder.
+            if let cover = recipe.photos.first {
+                RecipeCoverThumbnail(photoID: cover.id, load: loadCover)
+            }
             VStack(alignment: .leading, spacing: 6) {
                 Text(recipe.title)
                     .font(PCFont.body(17, weight: .semibold))
@@ -224,6 +233,43 @@ private struct RecipeRow: View {
     }
 }
 
+/// The cover photo at the start of a list row, read lazily as the row appears.
+struct RecipeCoverThumbnail: View {
+    static let size: CGFloat = 56
+    static let accessibilityIdentifier = "RecipeRowCover"
+
+    let photoID: UUID
+    let load: () -> Data?
+    @State private var image: Image?
+
+    var body: some View {
+        ZStack {
+            PCColor.background
+            if let image {
+                image
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                // The cover's bytes haven't synced to this device yet.
+                Image(systemName: "photo")
+                    .font(.system(size: 18))
+                    .foregroundStyle(PCColor.textPrimary.opacity(0.4))
+            }
+        }
+        .frame(width: Self.size, height: Self.size)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityHidden(true)
+        .accessibilityIdentifier(Self.accessibilityIdentifier)
+        // Keyed by the photo, so a new cover (Make Cover in the form) loads its own image.
+        .task(id: photoID) { reload() }
+        .onReceive(NotificationCenter.default.publisher(for: .recipeStoreDidChange)) { _ in reload() }
+    }
+
+    private func reload() {
+        image = load().flatMap(Image.init(photoData:))
+    }
+}
+
 // The preview doubles live in Data/DevSupport behind #if DEBUG, so the preview must too (#95).
 #if DEBUG
 #Preview {
@@ -242,6 +288,7 @@ private struct RecipeRow: View {
             captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: PreviewRecipeCaptureService())
         ),
         fetchPhotoThumbnailUseCase: DefaultFetchPhotoThumbnailUseCase(repository: PreviewRecipePhotoRepository()),
+        fetchPhotoImageUseCase: DefaultFetchPhotoImageUseCase(repository: PreviewRecipePhotoRepository()),
         photoProcessor: ImageIOPhotoProcessor()
     )))
 }

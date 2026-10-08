@@ -1,8 +1,9 @@
 @testable import PocketChef
 import XCTest
 
-/// Verifies the String Catalog entries for the form's Photos section (PLAN 13.2), read per
-/// language from the compiled catalog (see LocalizationTestHelper).
+/// Verifies the String Catalog entries for the form's Photos section (PLAN 13.2) and the
+/// gallery's arrows (13.3), read per language from the compiled catalog (see
+/// LocalizationTestHelper).
 final class LocalizedPhotoStringsTests: XCTestCase {
     private let strings: [String: [String: String]] = [
         "Photos": ["es": "Fotos", "fr": "Photos", "de": "Fotos", "nl": "Foto's"],
@@ -24,6 +25,8 @@ final class LocalizedPhotoStringsTests: XCTestCase {
             "de": "Ein Foto konnte nicht hinzugefügt werden.",
             "nl": "Een foto kon niet worden toegevoegd.",
         ],
+        "Next Photo": ["es": "Foto siguiente", "fr": "Photo suivante", "de": "Nächstes Foto", "nl": "Volgende foto"],
+        "Previous Photo": ["es": "Foto anterior", "fr": "Photo précédente", "de": "Vorheriges Foto", "nl": "Vorige foto"],
     ]
 
     func testEachPhotoStringTranslatesPerLocale() {

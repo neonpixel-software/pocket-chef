@@ -1,0 +1,102 @@
+import SwiftUI
+
+/// The pieces the detail gallery and the full-screen viewer share: the VoiceOver label of a
+/// page, a loaded page image, the page dots and the Mac's arrow buttons.
+enum PhotoPaging {
+    /// "Cover photo" for the first photo, "Photo 2 of 5" for the others; the form's strip uses
+    /// the same labels.
+    static func accessibilityLabel(at index: Int, of count: Int) -> String {
+        index == 0
+            ? String(localized: "Cover photo")
+            : String(localized: "Photo \(index + 1) of \(count)")
+    }
+
+    /// The page index `step` pages from `currentID`, or nil past either end.
+    static func index(of currentID: UUID?, steppedBy step: Int, in photos: [RecipePhoto]) -> Int? {
+        let current = photos.firstIndex { $0.id == currentID } ?? 0
+        let target = current + step
+        return photos.indices.contains(target) ? target : nil
+    }
+}
+
+/// One photo's image, read when the page appears. Shows a photo icon while the bytes aren't
+/// on this device, and reloads when a sync brings them.
+struct PhotoPageImage: View {
+    let photoID: UUID
+    let contentMode: ContentMode
+    let load: () -> Data?
+    var placeholderStyle: Color = PCColor.textPrimary.opacity(0.4)
+    @State private var image: Image?
+
+    var body: some View {
+        ZStack {
+            if let image {
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: contentMode)
+            } else {
+                Image(systemName: "photo")
+                    .font(.system(size: 36))
+                    .foregroundStyle(placeholderStyle)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
+        .task(id: photoID) { reload() }
+        .onReceive(NotificationCenter.default.publisher(for: .recipeStoreDidChange)) { _ in reload() }
+    }
+
+    private func reload() {
+        image = load().flatMap(Image.init(photoData:))
+    }
+}
+
+/// One dot per page, the current one filled. Hidden from VoiceOver: each page says its
+/// position itself.
+struct PhotoPageDots: View {
+    let count: Int
+    let currentIndex: Int
+    var color: Color = PCColor.pink
+
+    var body: some View {
+        HStack(spacing: 7) {
+            ForEach(0..<count, id: \.self) { index in
+                Circle()
+                    .fill(index == currentIndex ? color : color.opacity(0.3))
+                    .frame(width: 7, height: 7)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+}
+
+#if os(macOS)
+/// Previous and next buttons over a paged scroll view: a Mac has no swipe on a mouse.
+struct PhotoPagingArrows: View {
+    let canGoBack: Bool
+    let canGoForward: Bool
+    let onStep: (Int) -> Void
+
+    var body: some View {
+        HStack {
+            arrow("chevron.left", label: "Previous Photo", isEnabled: canGoBack, step: -1)
+            Spacer()
+            arrow("chevron.right", label: "Next Photo", isEnabled: canGoForward, step: 1)
+        }
+        .padding(12)
+    }
+
+    private func arrow(_ systemImage: String, label: LocalizedStringKey, isEnabled: Bool, step: Int) -> some View {
+        Button { onStep(step) } label: {
+            Image(systemName: systemImage)
+                .font(.system(size: 15, weight: .bold))
+                .frame(width: 32, height: 32)
+                .background(.regularMaterial, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+        .opacity(isEnabled ? 1 : 0)
+        .disabled(!isEnabled)
+    }
+}
+#endif

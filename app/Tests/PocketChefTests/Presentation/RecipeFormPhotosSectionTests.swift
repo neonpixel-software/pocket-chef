@@ -1,8 +1,6 @@
-import ImageIO
 import PhotosUI
 @testable import PocketChef
 import SwiftUI
-import UniformTypeIdentifiers
 import ViewInspector
 import XCTest
 
@@ -99,7 +97,7 @@ final class RecipeFormPhotosSectionTests: XCTestCase {
     }
 
     func testThumbnailsLoadWhenShownAndAMissingOneShowsAPlaceholder() async throws {
-        let viewModel = try makeViewModel(photos: Array(photos[0...1]), thumbnails: [photos[0].id: Self.pngData()])
+        let viewModel = try makeViewModel(photos: Array(photos[0...1]), thumbnails: [photos[0].id: TestImages.png()])
         let sut = RecipeFormPhotosSection(viewModel: viewModel)
 
         let thumbnails = try sut.inspect().findAll(ViewType.ZStack.self)
@@ -172,20 +170,5 @@ final class RecipeFormPhotosSectionTests: XCTestCase {
             findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase(),
             fetchPhotoThumbnailUseCase: StubFetchPhotoThumbnailUseCase(thumbnails: thumbnails)
         ))
-    }
-
-    private static func pngData() throws -> Data {
-        let context = try XCTUnwrap(CGContext(
-            data: nil, width: 4, height: 4, bitsPerComponent: 8, bytesPerRow: 0,
-            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-        ))
-        context.setFillColor(CGColor(red: 1, green: 0, blue: 0, alpha: 1))
-        context.fill(CGRect(x: 0, y: 0, width: 4, height: 4))
-        let image = try XCTUnwrap(context.makeImage())
-        let data = NSMutableData()
-        let destination = try XCTUnwrap(CGImageDestinationCreateWithData(data, UTType.png.identifier as CFString, 1, nil))
-        CGImageDestinationAddImage(destination, image, nil)
-        XCTAssertTrue(CGImageDestinationFinalize(destination))
-        return data as Data
     }
 }

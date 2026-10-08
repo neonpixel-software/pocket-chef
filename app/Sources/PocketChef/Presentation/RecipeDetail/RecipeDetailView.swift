@@ -15,6 +15,7 @@ struct RecipeDetailView: View {
     /// The cup and spoon size chosen in Settings.
     @AppStorage(VolumeStandard.storageKey) private var volumeStandard = VolumeStandard.regionDefault()
     @State private var weights: [UUID: IngredientWeight] = [:]
+    @State private var viewerStart: PhotoViewerStart?
 
     /// Invoked whenever this recipe is edited or deleted, so the list that pushed this
     /// screen can refresh — NavigationStack's `.onAppear` on pop-back isn't reliably
@@ -31,6 +32,15 @@ struct RecipeDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 32) {
+                // Recipes without photos look as they did before photos existed.
+                if !recipe.photos.isEmpty {
+                    RecipePhotoGallery(
+                        photos: recipe.photos,
+                        loadImage: viewModel.imageData(for:),
+                        onOpen: { viewerStart = PhotoViewerStart(index: $0) }
+                    )
+                }
+
                 if !recipe.tags.isEmpty {
                     FlowLayout(spacing: 8) {
                         ForEach(recipe.tags) { tag in
@@ -168,6 +178,15 @@ struct RecipeDetailView: View {
                 onRecipeChanged()
             }
         }
+        #if os(iOS)
+        .fullScreenCover(item: $viewerStart) { start in
+            PhotoViewer(photos: recipe.photos, startIndex: start.index, loadImage: viewModel.imageData(for:))
+        }
+        #else
+        .sheet(item: $viewerStart) { start in
+            PhotoViewer(photos: recipe.photos, startIndex: start.index, loadImage: viewModel.imageData(for:))
+        }
+        #endif
         .onChange(of: viewModel.isDeleted) { _, isDeleted in
             if isDeleted {
                 onRecipeChanged()
@@ -212,7 +231,8 @@ struct RecipeDetailView: View {
         RecipeDetailView(viewModel: RecipeDetailViewModel(
             recipe: SampleData.recipes[0],
             formDependencies: .preview,
-            deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: PreviewRecipeRepository())
+            deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: PreviewRecipeRepository()),
+            fetchPhotoImageUseCase: DefaultFetchPhotoImageUseCase(repository: PreviewRecipePhotoRepository())
         ))
     }
 }

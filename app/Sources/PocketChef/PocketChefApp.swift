@@ -115,6 +115,7 @@ struct PocketChefApp: App {
                 captureRecipeUseCase: captureRecipeUseCase
             ),
             fetchPhotoThumbnailUseCase: DefaultFetchPhotoThumbnailUseCase(repository: photoRepository),
+            fetchPhotoImageUseCase: DefaultFetchPhotoImageUseCase(repository: photoRepository),
             photoProcessor: ImageIOPhotoProcessor()
         ))
         #if DEBUG
