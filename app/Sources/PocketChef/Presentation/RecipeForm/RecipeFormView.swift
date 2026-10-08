@@ -19,6 +19,10 @@ struct RecipeFormView: View {
                 VStack(alignment: .leading, spacing: 28) {
                     titleField
 
+                    formSection(title: String(localized: "Photos"), accent: PCColor.pink) {
+                        RecipeFormPhotosSection(viewModel: viewModel)
+                    }
+
                     formSection(title: String(localized: "Ingredients"), accent: PCColor.teal) {
                         VStack(spacing: 12) {
                             ForEach(Array(viewModel.ingredients.enumerated()), id: \.element.id) { index, _ in
@@ -282,13 +286,7 @@ private struct RowControls: View {
 #Preview {
     PCFontRegistrar.registerCustomFonts()
     return RecipeFormView(
-        viewModel: RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: DefaultCreateRecipeUseCase(repository: PreviewRecipeRepository()),
-            updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: PreviewRecipeRepository()),
-            fetchTagsUseCase: DefaultFetchTagsUseCase(repository: PreviewTagRepository()),
-            findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: PreviewTagRepository())
-        ),
+        viewModel: RecipeFormViewModel(mode: .create, dependencies: .preview),
         onSave: PreviewRecipeHandler.ignore
     )
 }

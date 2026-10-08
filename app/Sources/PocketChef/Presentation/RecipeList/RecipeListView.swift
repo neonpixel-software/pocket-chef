@@ -240,7 +240,9 @@ private struct RecipeRow: View {
         captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
             webPageFetcher: PreviewWebPageFetcher(),
             captureRecipeUseCase: DefaultCaptureRecipeUseCase(captureService: PreviewRecipeCaptureService())
-        )
+        ),
+        fetchPhotoThumbnailUseCase: DefaultFetchPhotoThumbnailUseCase(repository: PreviewRecipePhotoRepository()),
+        photoProcessor: ImageIOPhotoProcessor()
     )))
 }
 #endif

@@ -20,6 +20,7 @@ private struct NoOpFindOrCreateTagUseCase: FindOrCreateTagUseCase {
 }
 
 /// Fractional amounts on the form, and keeping an untouched line's wording (issue #87).
+@MainActor
 final class RecipeFormViewModelAmountTests: XCTestCase {
     func testCaptureModeShowsAThirdsAmountReadablyAndSavesTheOriginalWordingUntouched() throws {
         let line = IngredientLine(
@@ -106,12 +107,11 @@ final class RecipeFormViewModelAmountTests: XCTestCase {
     }
 
     private func makeViewModel(mode: RecipeFormMode) -> RecipeFormViewModel {
-        RecipeFormViewModel(
-            mode: mode,
+        RecipeFormViewModel(mode: mode, dependencies: .testing(
             createRecipeUseCase: NoOpCreateRecipeUseCase(),
             updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
             fetchTagsUseCase: NoOpFetchTagsUseCase(),
             findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
-        )
+        ))
     }
 }

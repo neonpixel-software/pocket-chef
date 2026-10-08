@@ -20,6 +20,7 @@ private struct NoOpFindOrCreateTagUseCase: FindOrCreateTagUseCase {
 }
 
 /// The Equipment section of the form (issue #82).
+@MainActor
 final class RecipeFormViewModelEquipmentTests: XCTestCase {
     func testAddRemoveMoveEquipment() {
         let viewModel = makeViewModel(mode: .create)
@@ -65,12 +66,11 @@ final class RecipeFormViewModelEquipmentTests: XCTestCase {
     }
 
     private func makeViewModel(mode: RecipeFormMode) -> RecipeFormViewModel {
-        RecipeFormViewModel(
-            mode: mode,
+        RecipeFormViewModel(mode: mode, dependencies: .testing(
             createRecipeUseCase: NoOpCreateRecipeUseCase(),
             updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
             fetchTagsUseCase: NoOpFetchTagsUseCase(),
             findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
-        )
+        ))
     }
 }
