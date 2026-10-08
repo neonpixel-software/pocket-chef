@@ -1,6 +1,9 @@
 #if DEBUG
+import CoreGraphics
 import Foundation
+import ImageIO
 import SwiftData
+import UniformTypeIdentifiers
 
 /// A fixed starting state for the UI tests (Tests/PocketChefUITests), picked with the launch
 /// arguments `-UITestScenario <name>`. The app then runs on an in-memory store, so a test run
@@ -17,6 +20,11 @@ enum UITestScenario: String, CaseIterable {
     /// Opens on the detail screen of one recipe (no tags), as if tapped from the list: clicks
     /// don't reach the app on GitHub's macOS runner, so a test can't navigate there.
     case recipeDetail
+    /// One recipe ("Rainbow Salad") with three photos in solid colors, red (the cover), green
+    /// and blue, so a screenshot shows which photo is where.
+    case recipeWithPhotos
+    /// The recipeWithPhotos recipe, opened on its detail screen like recipeDetail.
+    case recipeWithPhotosDetail
 
     static let launchArgument = "-UITestScenario"
 
@@ -39,7 +47,7 @@ enum UITestScenario: String, CaseIterable {
 
     /// Whether the app opens on the first recipe's detail screen instead of the list.
     var opensRecipeDetail: Bool {
-        self == .recipeDetail
+        self == .recipeDetail || self == .recipeWithPhotosDetail
     }
 
     /// The preset tag the list starts filtered by, if any.
@@ -64,8 +72,66 @@ enum UITestScenario: String, CaseIterable {
                 tags: []
             ).toModel())
         }
+        if self == .recipeWithPhotos || self == .recipeWithPhotosDetail {
+            try Self.insertRecipeWithPhotos(into: container.mainContext)
+        }
         try container.mainContext.save()
         return container
+    }
+
+    struct PhotoColor {
+        let red: CGFloat
+        let green: CGFloat
+        let blue: CGFloat
+    }
+
+    /// Red, green and blue, in gallery order.
+    static let photoColors = [
+        PhotoColor(red: 0.9, green: 0.1, blue: 0.1),
+        PhotoColor(red: 0.1, green: 0.7, blue: 0.2),
+        PhotoColor(red: 0.1, green: 0.3, blue: 0.9),
+    ]
+
+    private static func insertRecipeWithPhotos(into context: ModelContext) throws {
+        let photos = try photoColors.map { color in try (RecipePhoto(id: UUID()), solidJPEG(color)) }
+        let recipe = Recipe(
+            id: UUID(),
+            title: "Rainbow Salad",
+            ingredients: [],
+            steps: ["Serve."],
+            source: .typed,
+            tags: [],
+            photos: photos.map(\.0)
+        )
+        let newPhotos = Dictionary(uniqueKeysWithValues: photos.map { photo, data in
+            (photo.id, ProcessedPhoto(imageData: data, thumbnailData: data))
+        })
+        try SwiftDataRecipeRepository(modelContext: context).create(recipe, newPhotos: newPhotos)
+    }
+
+    /// A 400 × 300 JPEG in one color: generated, so the app bundle carries no test images.
+    private static func solidJPEG(_ color: PhotoColor) throws -> Data {
+        struct EncodingFailed: Error {}
+        guard let space = CGColorSpace(name: CGColorSpace.sRGB),
+              let context = CGContext(
+                  data: nil,
+                  width: 400,
+                  height: 300,
+                  bitsPerComponent: 8,
+                  bytesPerRow: 0,
+                  space: space,
+                  bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+              ) else { throw EncodingFailed() }
+        context.setFillColor(CGColor(srgbRed: color.red, green: color.green, blue: color.blue, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: 400, height: 300))
+        let data = NSMutableData()
+        guard let image = context.makeImage(),
+              let destination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
+            throw EncodingFailed()
+        }
+        CGImageDestinationAddImage(destination, image, nil)
+        guard CGImageDestinationFinalize(destination) else { throw EncodingFailed() }
+        return data as Data
     }
 
     private var recipeTitles: [String] {
@@ -74,6 +140,7 @@ enum UITestScenario: String, CaseIterable {
         case .noMatchingTag: ["Plain Toast"]
         case .manyRecipes: (1...40).map { String(format: "Recipe %02d", $0) }
         case .recipeDetail: ["Plain Toast"]
+        case .recipeWithPhotos, .recipeWithPhotosDetail: []
         }
     }
 

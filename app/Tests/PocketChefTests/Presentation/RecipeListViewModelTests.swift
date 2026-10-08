@@ -64,7 +64,8 @@ private func makeViewModel(
     fetchResult: Result<[Recipe], Error> = .success([]),
     deleteResult: Result<Void, Error> = .success(()),
     fetchTagsResult: Result<[Tag], Error> = .success([]),
-    captureAvailable: Bool = true
+    captureAvailable: Bool = true,
+    thumbnails: FetchPhotoThumbnailUseCase = StubFetchPhotoThumbnailUseCase()
 ) -> RecipeListViewModel {
     RecipeListViewModel(dependencies: .init(
         fetchRecipesUseCase: FakeFetchRecipesUseCase(result: fetchResult),
@@ -76,7 +77,8 @@ private func makeViewModel(
         captureRecipeUseCase: NoOpCaptureRecipeUseCase(),
         checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(result: captureAvailable),
         captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase(),
-        fetchPhotoThumbnailUseCase: StubFetchPhotoThumbnailUseCase(),
+        fetchPhotoThumbnailUseCase: thumbnails,
+        fetchPhotoImageUseCase: StubFetchPhotoImageUseCase(),
         photoProcessor: FakePhotoProcessor()
     ))
 }
@@ -121,6 +123,7 @@ final class RecipeListViewModelTests: XCTestCase {
             checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(),
             captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase(),
             fetchPhotoThumbnailUseCase: StubFetchPhotoThumbnailUseCase(),
+            fetchPhotoImageUseCase: StubFetchPhotoImageUseCase(),
             photoProcessor: FakePhotoProcessor()
         ))
 
@@ -253,6 +256,43 @@ final class RecipeListViewModelTests: XCTestCase {
         let formViewModel = viewModel.makeCaptureReviewFormViewModel(for: recipe)
 
         XCTAssertEqual(formViewModel.title, "Pancakes")
+    }
+
+    func testCoverThumbnailIsNilForARecipeWithoutPhotos() {
+        let thumbnails = CountingFetchPhotoThumbnailUseCase()
+        let viewModel = makeViewModel(thumbnails: thumbnails)
+        let recipe = Recipe(id: UUID(), title: "Toast", ingredients: [], steps: [], source: .typed, tags: [])
+
+        XCTAssertNil(viewModel.coverThumbnailData(for: recipe))
+        XCTAssertEqual(thumbnails.reads, 0)
+    }
+
+    func testCoverThumbnailIsTheFirstPhotosAndIsReadOnce() {
+        let cover = RecipePhoto(id: UUID())
+        let thumbnails = CountingFetchPhotoThumbnailUseCase(thumbnails: [cover.id: Data([1])])
+        let viewModel = makeViewModel(thumbnails: thumbnails)
+        let recipe = Recipe(
+            id: UUID(), title: "Salad", ingredients: [], steps: [], source: .typed, tags: [],
+            photos: [cover, RecipePhoto(id: UUID())]
+        )
+
+        XCTAssertEqual(viewModel.coverThumbnailData(for: recipe), Data([1]))
+        XCTAssertEqual(viewModel.coverThumbnailData(for: recipe), Data([1]))
+        XCTAssertEqual(thumbnails.reads, 1)
+    }
+
+    /// The bytes of a synced photo can arrive later, so a miss is asked again next time.
+    func testAMissingCoverThumbnailIsReadAgain() {
+        let cover = RecipePhoto(id: UUID())
+        let thumbnails = CountingFetchPhotoThumbnailUseCase()
+        let viewModel = makeViewModel(thumbnails: thumbnails)
+        let recipe = Recipe(id: UUID(), title: "Salad", ingredients: [], steps: [], source: .typed, tags: [], photos: [cover])
+
+        XCTAssertNil(viewModel.coverThumbnailData(for: recipe))
+        thumbnails.thumbnails[cover.id] = Data([2])
+
+        XCTAssertEqual(viewModel.coverThumbnailData(for: recipe), Data([2]))
+        XCTAssertEqual(thumbnails.reads, 2)
     }
 
     @MainActor

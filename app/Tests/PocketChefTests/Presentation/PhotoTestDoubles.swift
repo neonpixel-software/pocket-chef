@@ -1,5 +1,8 @@
 import Foundation
+import ImageIO
 @testable import PocketChef
+import UniformTypeIdentifiers
+import XCTest
 
 /// Thumbnails by photo id; an unknown id has none, like a photo not downloaded yet.
 struct StubFetchPhotoThumbnailUseCase: FetchPhotoThumbnailUseCase {
@@ -7,6 +10,30 @@ struct StubFetchPhotoThumbnailUseCase: FetchPhotoThumbnailUseCase {
 
     func execute(id: UUID) throws -> Data? {
         thumbnails[id]
+    }
+}
+
+/// Thumbnails by photo id that counts its reads, for checking a cache.
+final class CountingFetchPhotoThumbnailUseCase: FetchPhotoThumbnailUseCase {
+    var thumbnails: [UUID: Data]
+    private(set) var reads = 0
+
+    init(thumbnails: [UUID: Data] = [:]) {
+        self.thumbnails = thumbnails
+    }
+
+    func execute(id: UUID) throws -> Data? {
+        reads += 1
+        return thumbnails[id]
+    }
+}
+
+/// Full images by photo id; an unknown id has none, like a photo not downloaded yet.
+struct StubFetchPhotoImageUseCase: FetchPhotoImageUseCase {
+    var images: [UUID: Data] = [:]
+
+    func execute(id: UUID) throws -> Data? {
+        images[id]
     }
 }
 
@@ -42,5 +69,23 @@ extension RecipeFormViewModel.Dependencies {
             fetchPhotoThumbnailUseCase: fetchPhotoThumbnailUseCase,
             photoProcessor: photoProcessor
         )
+    }
+}
+
+enum TestImages {
+    /// A 4 × 4 red PNG that Image(photoData:) can decode.
+    static func png() throws -> Data {
+        let context = try XCTUnwrap(CGContext(
+            data: nil, width: 4, height: 4, bitsPerComponent: 8, bytesPerRow: 0,
+            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ))
+        context.setFillColor(CGColor(red: 1, green: 0, blue: 0, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: 4, height: 4))
+        let image = try XCTUnwrap(context.makeImage())
+        let data = NSMutableData()
+        let destination = try XCTUnwrap(CGImageDestinationCreateWithData(data, UTType.png.identifier as CFString, 1, nil))
+        CGImageDestinationAddImage(destination, image, nil)
+        XCTAssertTrue(CGImageDestinationFinalize(destination))
+        return data as Data
     }
 }

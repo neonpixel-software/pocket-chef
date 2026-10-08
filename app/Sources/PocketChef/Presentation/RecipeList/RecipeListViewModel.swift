@@ -18,6 +18,7 @@ final class RecipeListViewModel {
         let checkCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase
         let captureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase
         let fetchPhotoThumbnailUseCase: FetchPhotoThumbnailUseCase
+        let fetchPhotoImageUseCase: FetchPhotoImageUseCase
         let photoProcessor: PhotoProcessor
 
         var form: RecipeFormViewModel.Dependencies {
@@ -38,6 +39,10 @@ final class RecipeListViewModel {
     private(set) var errorMessage: String?
 
     private let dependencies: Dependencies
+    /// Cover thumbnails already read, by photo id, so scrolling back up doesn't read them
+    /// again. A photo's bytes never change once stored (a new photo gets a new id), so entries
+    /// don't go stale. Missing bytes aren't cached: they can still arrive through sync.
+    @ObservationIgnored private var coverThumbnails: [UUID: Data] = [:]
 
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
@@ -78,6 +83,16 @@ final class RecipeListViewModel {
         selectedTagID = id
     }
 
+    /// The recipe's cover thumbnail, or nil without photos or while its bytes aren't on this
+    /// device.
+    func coverThumbnailData(for recipe: Recipe) -> Data? {
+        guard let cover = recipe.photos.first else { return nil }
+        if let cached = coverThumbnails[cover.id] { return cached }
+        guard let data = try? dependencies.fetchPhotoThumbnailUseCase.execute(id: cover.id) else { return nil }
+        coverThumbnails[cover.id] = data
+        return data
+    }
+
     func delete(_ recipe: Recipe) {
         do {
             try dependencies.deleteRecipeUseCase.execute(id: recipe.id)
@@ -102,7 +117,8 @@ final class RecipeListViewModel {
         RecipeDetailViewModel(
             recipe: recipe,
             formDependencies: dependencies.form,
-            deleteRecipeUseCase: dependencies.deleteRecipeUseCase
+            deleteRecipeUseCase: dependencies.deleteRecipeUseCase,
+            fetchPhotoImageUseCase: dependencies.fetchPhotoImageUseCase
         )
     }
 

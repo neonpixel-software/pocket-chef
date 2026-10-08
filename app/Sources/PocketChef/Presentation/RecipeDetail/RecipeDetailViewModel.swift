@@ -11,15 +11,23 @@ final class RecipeDetailViewModel {
 
     private let formDependencies: RecipeFormViewModel.Dependencies
     private let deleteRecipeUseCase: DeleteRecipeUseCase
+    private let fetchPhotoImageUseCase: FetchPhotoImageUseCase
 
     init(
         recipe: Recipe,
         formDependencies: RecipeFormViewModel.Dependencies,
-        deleteRecipeUseCase: DeleteRecipeUseCase
+        deleteRecipeUseCase: DeleteRecipeUseCase,
+        fetchPhotoImageUseCase: FetchPhotoImageUseCase
     ) {
         self.recipe = recipe
         self.formDependencies = formDependencies
         self.deleteRecipeUseCase = deleteRecipeUseCase
+        self.fetchPhotoImageUseCase = fetchPhotoImageUseCase
+    }
+
+    /// A gallery photo's full image, or nil while its bytes aren't on this device.
+    func imageData(for photo: RecipePhoto) -> Data? {
+        try? fetchPhotoImageUseCase.execute(id: photo.id)
     }
 
     @MainActor

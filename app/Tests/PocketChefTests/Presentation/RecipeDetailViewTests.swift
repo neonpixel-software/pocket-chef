@@ -31,7 +31,8 @@ private struct NoOpFindOrCreateTagUseCase: FindOrCreateTagUseCase {
 
 private func makeViewModel(
     recipe: Recipe,
-    deleteRecipeUseCase: DeleteRecipeUseCase = RecordingDeleteRecipeUseCase()
+    deleteRecipeUseCase: DeleteRecipeUseCase = RecordingDeleteRecipeUseCase(),
+    images: [UUID: Data] = [:]
 ) -> RecipeDetailViewModel {
     RecipeDetailViewModel(
         recipe: recipe,
@@ -41,7 +42,8 @@ private func makeViewModel(
             fetchTagsUseCase: NoOpFetchTagsUseCase(),
             findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
         ),
-        deleteRecipeUseCase: deleteRecipeUseCase
+        deleteRecipeUseCase: deleteRecipeUseCase,
+        fetchPhotoImageUseCase: StubFetchPhotoImageUseCase(images: images)
     )
 }
 

@@ -127,6 +127,23 @@ Rejected alternatives:
 - Tapping a photo opens a full-screen viewer: pinch to zoom, swipe between
   photos, Done.
 
+- Built in 13.3: iOS and the Mac share one gallery, a horizontal `ScrollView`
+  with paging, instead of a paged `TabView` on iOS; the Mac adds arrow buttons.
+  The gallery is at most 560 pt wide (420 pt tall), so on a Mac window or an
+  iPad it doesn't push the recipe off screen. The viewer is a full-screen cover
+  on iOS and a sheet on the Mac (Esc and ← → work there). Zooming goes up to
+  5×, or 2.5× with a double tap; turning the page zooms back out. The list
+  keeps cover thumbnails it has read in memory; a missing one is asked for
+  again, since sync can still bring it. The UI test scenarios generate their
+  three photos (solid red, green and blue) at launch rather than bundling
+  images, so the app carries no test images.
+- Review of 13.3: the gallery and viewer read the full image (up to 2048 px), not
+  the 300 px thumbnail, which would look soft on a 560 pt page at 2× or 3×. Both
+  are CloudKit assets on the same record and arrive together, so falling back
+  to the thumbnail wouldn't bridge a sync gap. Photos decode off the main actor
+  (`PhotoDecoder`), and a page that has its photo doesn't read it again on a
+  store change. A zoomed photo pans only as far as its edges.
+
 ### Form
 
 - A Photos section, in the existing `formSection` style, under the title and

@@ -40,7 +40,8 @@ private struct UseCaseFailure: LocalizedError {
 
 private func makeViewModel(
     recipe: Recipe,
-    deleteRecipeUseCase: FakeDeleteRecipeUseCase = FakeDeleteRecipeUseCase()
+    deleteRecipeUseCase: FakeDeleteRecipeUseCase = FakeDeleteRecipeUseCase(),
+    images: [UUID: Data] = [:]
 ) -> RecipeDetailViewModel {
     RecipeDetailViewModel(
         recipe: recipe,
@@ -50,7 +51,8 @@ private func makeViewModel(
             fetchTagsUseCase: NoOpFetchTagsUseCase(),
             findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
         ),
-        deleteRecipeUseCase: deleteRecipeUseCase
+        deleteRecipeUseCase: deleteRecipeUseCase,
+        fetchPhotoImageUseCase: StubFetchPhotoImageUseCase(images: images)
     )
 }
 
@@ -66,6 +68,16 @@ final class RecipeDetailViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.isDeleted)
         XCTAssertNil(viewModel.errorMessage)
         XCTAssertEqual(deletedID, recipe.id)
+    }
+
+    func testImageDataIsThePhotosImageOrNilWhenItIsntHere() {
+        let here = RecipePhoto(id: UUID())
+        let missing = RecipePhoto(id: UUID())
+        let recipe = Recipe(id: UUID(), title: "Salad", ingredients: [], steps: [], source: .typed, tags: [], photos: [here, missing])
+        let viewModel = makeViewModel(recipe: recipe, images: [here.id: Data([3])])
+
+        XCTAssertEqual(viewModel.imageData(for: here), Data([3]))
+        XCTAssertNil(viewModel.imageData(for: missing))
     }
 
     func testDeleteSetsErrorMessageAndLeavesIsDeletedFalseOnFailure() {

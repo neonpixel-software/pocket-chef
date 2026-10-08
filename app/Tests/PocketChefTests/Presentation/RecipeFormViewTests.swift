@@ -239,7 +239,8 @@ final class RecipeFormViewTests: XCTestCase {
                 fetchTagsUseCase: FakeFetchTagsUseCase(result: .success(presets)),
                 findOrCreateTagUseCase: FakeFindOrCreateTagUseCase()
             ),
-            deleteRecipeUseCase: NoOpDeleteRecipeUseCase()
+            deleteRecipeUseCase: NoOpDeleteRecipeUseCase(),
+            fetchPhotoImageUseCase: StubFetchPhotoImageUseCase()
         )
         let viewModel = detailViewModel.makeEditFormViewModel()
         viewModel.loadTags() // .task doesn't run without real hosting; call directly
