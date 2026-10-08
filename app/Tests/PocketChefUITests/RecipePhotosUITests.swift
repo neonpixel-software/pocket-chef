@@ -34,9 +34,11 @@ final class RecipePhotosUITests: XCTestCase {
         XCTAssertTrue(cover.waitForExistence(timeout: 10))
         XCTAssertEqual(photoColor(pixel(atCenterOf: cover, in: app)), .red, "The gallery doesn't start on the red cover")
         // On the Mac the gallery is narrower than the window (RecipePhotoGallery.maxWidth); it
-        // belongs in the middle, not against the left margin.
+        // belongs in the middle, not against the left margin (150 pt left of the middle). The
+        // GitHub macOS runner has no trackpad, so the scroll view keeps a 16 pt scroll bar on
+        // the right, and the middle of the content sits 8 pt left of the window's: hence 10 pt.
         let window = app.windows.firstMatch.frame
-        XCTAssertEqual(cover.frame.midX, window.midX, accuracy: 2, "The gallery isn't centered in the window")
+        XCTAssertEqual(cover.frame.midX, window.midX, accuracy: 10, "The gallery isn't centered in the window")
 
         #if os(iOS)
         // A swipe doesn't reach the app on GitHub's macOS runner, and the Mac's arrow buttons
