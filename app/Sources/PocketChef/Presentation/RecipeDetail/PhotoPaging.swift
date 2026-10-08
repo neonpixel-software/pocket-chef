@@ -44,7 +44,9 @@ struct PhotoPageImage: View {
         .clipped()
         .task(id: photoID) { image = await PhotoPageImage.image(from: load) }
         .onReceive(NotificationCenter.default.publisher(for: .recipeStoreDidChange)) { _ in
-            // A photo's bytes never change once stored, so only a missing one is read again.
+            // Only while no photo is showing (its bytes weren't here yet). A photo that's
+            // showing isn't read again: its id's bytes never change once stored, and a
+            // different photo (a new cover) comes with a new id, which reruns the task.
             guard image == nil else { return }
             Task { image = await PhotoPageImage.image(from: load) }
         }

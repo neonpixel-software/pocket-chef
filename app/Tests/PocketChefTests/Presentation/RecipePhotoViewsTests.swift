@@ -110,6 +110,26 @@ final class RecipePhotoViewsTests: XCTestCase {
         XCTAssertNil(junk)
     }
 
+    /// A cover whose bytes hadn't synced yet appears once an import brings them: the store
+    /// posts recipeStoreDidChange for every CloudKit import (PersistenceController), and the
+    /// row reads the cover again. Once it shows, a later change doesn't read it again.
+    func testAMissingListCoverIsReadAgainWhenTheStoreChangesUntilItShows() async throws {
+        let source = CoverSource()
+        ViewHosting.host(view: RecipeCoverThumbnail(photoID: UUID(), load: { source.read() }))
+        defer { ViewHosting.expel() }
+        try await waitUntil { source.reads == 1 }
+
+        source.data = try TestImages.png()
+        NotificationCenter.default.post(name: .recipeStoreDidChange, object: nil)
+        try await waitUntil { source.reads == 2 }
+
+        // Give the decoded image time to land in the view's state, then change the store again.
+        try await Task.sleep(for: .milliseconds(300))
+        NotificationCenter.default.post(name: .recipeStoreDidChange, object: nil)
+        try await Task.sleep(for: .milliseconds(300))
+        XCTAssertEqual(source.reads, 2, "A cover that's showing was read again")
+    }
+
     // MARK: Viewer
 
     func testViewerLabelsEachPhotoAndHasDone() throws {
@@ -139,6 +159,14 @@ final class RecipePhotoViewsTests: XCTestCase {
     }
 
     // MARK: helpers
+
+    private func waitUntil(_ condition: () -> Bool, timeout: Duration = .seconds(5)) async throws {
+        let deadline = ContinuousClock.now + timeout
+        while !condition() {
+            guard ContinuousClock.now < deadline else { return XCTFail("Timed out waiting") }
+            try await Task.sleep(for: .milliseconds(20))
+        }
+    }
 
     private func pages(in view: some View, identifier: String) throws -> [InspectableView<ViewType.ClassifiedView>] {
         try view.inspect().findAll(where: { try $0.accessibilityIdentifier() == identifier })
@@ -179,4 +207,16 @@ private struct NoOpFindOrCreateTag: FindOrCreateTagUseCase {
 
 private struct NoOpDelete: DeleteRecipeUseCase {
     func execute(id _: UUID) throws {}
+}
+
+/// The bytes a cover reads, which a test can make arrive later; counts the reads.
+@MainActor
+private final class CoverSource {
+    var data: Data?
+    private(set) var reads = 0
+
+    func read() -> Data? {
+        reads += 1
+        return data
+    }
 }
