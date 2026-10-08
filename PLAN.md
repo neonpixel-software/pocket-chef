@@ -246,6 +246,15 @@ Added 2026-10-07, before the first release, and done before Phase 12 despite its
 
 **Checkpoint:** Pocket Chef is publicly available on the App Store (macOS, iPadOS, iOS).
 
+### Phase 14: Welcome guide and About
+Added 2026-10-08, before the first release, and done before Phase 12 like Phase 13. Design: `app/docs/plans/2026-10-08-welcome-guide-and-about-design.md`.
+- [ ] **14.1 Welcome guide** — shown once per device on first launch (existing installs see it once after updating): what Pocket Chef is, the ways to add a recipe (adapted to Apple Intelligence availability), cooking from a recipe, and what can be changed in Settings. Skip on every page; reopened from Settings → Show Welcome Guide, and on the Mac from the Help menu.
+  Acceptance: the guide shows on a first launch and not after it's closed, reopens from Settings (and the Mac Help menu), page 2 matches capture availability, and all its text is in the five languages; UI tests never see it unless their scenario opens it.
+- [ ] **14.2 About** — the idea behind the app, that it's open source (MIT) and doesn't track anyone, the version, and links to the GitHub repository and to reporting an issue. Settings → About Pocket Chef on iPhone and iPad; Pocket Chef → About Pocket Chef on the Mac.
+  Acceptance: both links open the right GitHub pages, the version matches the build, the privacy text matches what the app does (and what 12.1's privacy labels will say), and all text is in the five languages.
+
+**Checkpoint:** a new user is introduced to the app once, and anyone can find out why it exists, check its code and report a problem.
+
 ## Risks and open questions
 
 | Risk | Impact | Mitigation |
