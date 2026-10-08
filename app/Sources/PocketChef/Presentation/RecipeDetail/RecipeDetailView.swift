@@ -155,12 +155,15 @@ struct RecipeDetailView: View {
             PCHeader(title: recipe.title)
         }
         .navigationTitle("")
+        .pcHeaderBar()
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Edit") { viewModel.isPresentingEdit = true }
+                    .pcHeaderToolbarButton()
             }
             ToolbarItem(placement: .destructiveAction) {
                 Button("Delete", role: .destructive) { viewModel.isPresentingDeleteConfirmation = true }
+                    .pcHeaderToolbarButton()
                     // On the button so the popover anchors to it, not mid-screen (#106).
                     .confirmationDialog(
                         "Delete this recipe?",
