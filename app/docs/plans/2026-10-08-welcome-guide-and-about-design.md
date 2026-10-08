@@ -36,8 +36,13 @@ code or report a problem.
 ### Presentation
 
 - **iPhone:** full screen.
-- **iPad and Mac:** a sheet, about 560 × 520 pt. The size is fixed so it doesn't
-  jump between pages; 520 pt fits the longest page (4) as a short list. A page
+- **iPad:** a sheet, about 560 × 520 pt.
+- **Mac:** its own window, 560 × 520 pt (changed while building 14.1). On the
+  Mac, Settings is a separate window, and the Help menu works with no recipe
+  window in front. A sheet on the recipe window would open behind Settings, or
+  not at all. The window is never opened by state restoration.
+- On iPad and Mac, the size is fixed so it doesn't jump between pages:
+  520 pt fits the longest page (4) as a short list. A page
   whose text still doesn't fit, with large Dynamic Type or a long translation,
   scrolls inside the page rather than being cut off.
 - One page at a time, in a paged horizontal scroll view like the photo gallery
@@ -135,13 +140,15 @@ and "Made by NeonPixel".
 
 ## Accessibility and localization
 
-- Headings carry the `.isHeader` trait. Each guide page reads as one element,
-  title then body. The page dots are hidden from VoiceOver, since each page
-  says its position ("Page 2 of 4").
+- Headings carry the `.isHeader` trait. Each guide page reads as one element:
+  all its text, then its position ("Page 2 of 4"). The position is part of the
+  label, not the accessibility value, because the Mac doesn't expose a value on
+  a group (found while building 14.1). The page dots are hidden from
+  VoiceOver.
 - All text is in the five languages (en, es, fr, de, nl), informal register.
   The About and guide texts are longer than earlier strings, so the drafts get
-  a native-speaker review of their own: 14.1 opens a new issue for de, es, fr
-  and nl, which 14.2 adds to. #65 only covers two capture-flow error strings in
+  a native-speaker review of their own: 14.1 opened #156 for de, es, fr and
+  nl, which 14.2 adds to. #65 only covers two capture-flow error strings in
   nl and es, so it isn't widened. Where the guide names capture-flow screens
   and buttons, it uses their existing translations.
 

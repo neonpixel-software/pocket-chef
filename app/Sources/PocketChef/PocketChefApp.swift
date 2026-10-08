@@ -11,6 +11,7 @@ struct PocketChefApp: App {
     private let webPageFetcher: WebPageFetcher
     private let captureRecipeUseCase: CaptureRecipeUseCase
     private let settingsViewModel: SettingsViewModel
+    private let welcomeGuideViewModel: WelcomeGuideViewModel
     /// The local-only density cache (Phase 10). Nil when the store couldn't open; the app
     /// works without it, since only unit conversion needs densities.
     private let densityContainer: ModelContainer?
@@ -36,7 +37,8 @@ struct PocketChefApp: App {
         recipeRepository = Self.recipeRepository(wrapping: SwiftDataRecipeRepository(modelContext: contextProvider.context))
         tagRepository = SwiftDataTagRepository(modelContext: contextProvider.context)
         photoRepository = SwiftDataRecipePhotoRepository(modelContext: contextProvider.context)
-        captureService = FoundationModelsRecipeCaptureService()
+        let captureService = FoundationModelsRecipeCaptureService()
+        self.captureService = captureService
         webPageFetcher = URLSessionWebPageFetcher()
         captureRecipeUseCase = DefaultCaptureRecipeUseCase(captureService: captureService)
         do {
@@ -67,6 +69,11 @@ struct PocketChefApp: App {
             isICloudAvailableInBuild: BuildConfiguration.isICloudEnabled,
             refreshDensityCacheUseCase: refreshDensityCacheUseCase
         )
+        let checkCaptureAvailabilityUseCase = DefaultCheckCaptureAvailabilityUseCase(captureService: captureService)
+        welcomeGuideViewModel = WelcomeGuideViewModel(
+            status: Self.makeWelcomeGuideStatus(),
+            isCaptureAvailable: checkCaptureAvailabilityUseCase.execute
+        )
     }
 
     // MARK: - UI test runs
@@ -90,6 +97,21 @@ struct PocketChefApp: App {
     private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
         uiTestScenario?.recipeRepository(wrapping: repository) ?? repository
     }
+
+    /// Whether this run is the host app of the unit tests, which start it like a normal launch.
+    static let isHostingUnitTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+
+    /// UI test runs and the unit tests' host app keep the seen flag in memory: a UI test only
+    /// sees the guide when its scenario asks for it, and neither touches the developer's flag.
+    private static func makeWelcomeGuideStatus() -> WelcomeGuideStatus {
+        if let uiTestScenario {
+            return InMemoryWelcomeGuideStatus(hasSeen: !uiTestScenario.showsWelcomeGuide)
+        }
+        if isHostingUnitTests {
+            return InMemoryWelcomeGuideStatus(hasSeen: true)
+        }
+        return UserDefaultsWelcomeGuideStatus()
+    }
     #else
     private static let seedsSampleData = false
     private static let usesDensityAPI = true
@@ -97,6 +119,10 @@ struct PocketChefApp: App {
 
     private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
         repository
+    }
+
+    private static func makeWelcomeGuideStatus() -> WelcomeGuideStatus {
+        UserDefaultsWelcomeGuideStatus()
     }
     #endif
 
@@ -146,7 +172,8 @@ struct PocketChefApp: App {
     private var recipeList: some View {
         RecipeListView(
             viewModel: makeRecipeListViewModel(),
-            settingsViewModel: settingsViewModel
+            settingsViewModel: settingsViewModel,
+            welcomeGuideViewModel: welcomeGuideViewModel
         )
     }
 
@@ -174,11 +201,24 @@ struct PocketChefApp: App {
         #if DEBUG && os(macOS)
         .windowResizability(Self.uiTestWindowSize == nil ? .automatic : .contentSize)
         #endif
+        #if os(macOS)
+        .commands { WelcomeGuideCommands() }
+        #endif
 
         #if os(macOS)
         Settings {
             SettingsView(viewModel: settingsViewModel)
         }
+
+        // Opened by the recipe window at launch, Settings and the Help menu; never by itself,
+        // and not reopened by state restoration once closed.
+        Window("Welcome Guide", id: WelcomeGuideView.windowID) {
+            WelcomeGuideWindow(viewModel: welcomeGuideViewModel)
+        }
+        .windowResizability(.contentSize)
+        .defaultPosition(.center)
+        .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
         #endif
     }
 }

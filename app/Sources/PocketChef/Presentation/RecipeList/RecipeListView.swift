@@ -17,9 +17,25 @@ struct RecipeListView: View {
     /// Shown from a toolbar button on iOS/iPadOS; macOS has its own Settings window (⌘,).
     private let settingsViewModel: SettingsViewModel?
 
-    init(viewModel: RecipeListViewModel, settingsViewModel: SettingsViewModel? = nil) {
+    /// Opens by itself at launch until it has been closed once (14.1). On iOS this screen
+    /// presents it; the Mac opens it in its own window.
+    private let welcomeGuideViewModel: WelcomeGuideViewModel?
+    @State private var isPresentingWelcomeGuide = false
+    /// Settings → Show Welcome Guide: staged until the Settings sheet has gone, so the two
+    /// presentations don't race (like pendingCaptureReview).
+    @State private var isWelcomeGuidePending = false
+    #if os(macOS)
+    @Environment(\.openWindow) private var openWindow
+    #endif
+
+    init(
+        viewModel: RecipeListViewModel,
+        settingsViewModel: SettingsViewModel? = nil,
+        welcomeGuideViewModel: WelcomeGuideViewModel? = nil
+    ) {
         _viewModel = State(initialValue: viewModel)
         self.settingsViewModel = settingsViewModel
+        self.welcomeGuideViewModel = welcomeGuideViewModel
     }
 
     var body: some View {
@@ -175,6 +191,9 @@ struct RecipeListView: View {
         .task {
             viewModel.load()
             viewModel.loadTags()
+            if welcomeGuideViewModel?.showsOnLaunch == true {
+                showWelcomeGuide()
+            }
         }
         // A storage switch or an iCloud import changed the recipes underneath this screen.
         .onReceive(NotificationCenter.default.publisher(for: .recipeStoreDidChange)) { _ in
@@ -182,14 +201,51 @@ struct RecipeListView: View {
             viewModel.loadTags()
         }
         #if os(iOS)
-        .sheet(isPresented: $isPresentingSettings) {
+        .sheet(isPresented: $isPresentingSettings, onDismiss: {
+            if isWelcomeGuidePending {
+                isWelcomeGuidePending = false
+                showWelcomeGuide()
+            }
+        }) {
             if let settingsViewModel {
-                SettingsView(viewModel: settingsViewModel)
+                SettingsView(
+                    viewModel: settingsViewModel,
+                    onShowWelcomeGuide: welcomeGuideViewModel == nil ? nil : {
+                        isWelcomeGuidePending = true
+                        isPresentingSettings = false
+                    }
+                )
             }
         }
+        .modifier(OptionalWelcomeGuide(isPresented: $isPresentingWelcomeGuide, viewModel: welcomeGuideViewModel))
+        #endif
+    }
+
+    private func showWelcomeGuide() {
+        #if os(macOS)
+        openWindow(id: WelcomeGuideView.windowID)
+        #else
+        isPresentingWelcomeGuide = true
         #endif
     }
 }
+
+#if os(iOS)
+/// The welcome guide's presentation, when the list was given a guide (the app always does;
+/// previews and tests may not).
+private struct OptionalWelcomeGuide: ViewModifier {
+    @Binding var isPresented: Bool
+    let viewModel: WelcomeGuideViewModel?
+
+    func body(content: Content) -> some View {
+        if let viewModel {
+            content.welcomeGuide(isPresented: $isPresented, viewModel: viewModel)
+        } else {
+            content
+        }
+    }
+}
+#endif
 
 private struct RecipeRow: View {
     let recipe: Recipe

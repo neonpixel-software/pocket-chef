@@ -3,12 +3,20 @@ import SwiftUI
 struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
+    #if os(macOS)
+    @Environment(\.openWindow) private var openWindow
+    #endif
     /// Read by the recipe screen's weight view; not part of the view model because nothing but
     /// this picker writes it.
     @AppStorage(VolumeStandard.storageKey) private var volumeStandard = VolumeStandard.regionDefault()
 
-    init(viewModel: SettingsViewModel) {
+    /// On iOS, opens the welcome guide: the list closes this sheet first and presents it.
+    /// The Mac opens the guide's window itself.
+    private let onShowWelcomeGuide: (() -> Void)?
+
+    init(viewModel: SettingsViewModel, onShowWelcomeGuide: (() -> Void)? = nil) {
         _viewModel = State(initialValue: viewModel)
+        self.onShowWelcomeGuide = onShowWelcomeGuide
     }
 
     var body: some View {
@@ -62,6 +70,12 @@ struct SettingsView: View {
             volumeStandardSection
 
             densitySection
+
+            if canShowWelcomeGuide {
+                Section("Help") {
+                    Button("Show Welcome Guide", action: showWelcomeGuide)
+                }
+            }
         }
         .formStyle(.grouped)
         .task { viewModel.reloadDensityStatus() }
@@ -110,6 +124,22 @@ struct SettingsView: View {
         } footer: {
             Text(densityFooterText)
         }
+    }
+
+    private var canShowWelcomeGuide: Bool {
+        #if os(macOS)
+        true
+        #else
+        onShowWelcomeGuide != nil
+        #endif
+    }
+
+    private func showWelcomeGuide() {
+        #if os(macOS)
+        openWindow(id: WelcomeGuideView.windowID)
+        #else
+        onShowWelcomeGuide?()
+        #endif
     }
 
     /// Resolves to the catalog key "Last updated %@"; LocalizedSettingsStringsTests checks that.

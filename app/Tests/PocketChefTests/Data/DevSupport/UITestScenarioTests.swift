@@ -19,12 +19,19 @@ final class UITestScenarioTests: XCTestCase {
     func testEachScenarioStartsWithItsRecipes() throws {
         let expectedCounts: [UITestScenario: Int] = [
             .empty: 0, .noMatchingTag: 1, .loadError: 0, .manyRecipes: 40, .recipeDetail: 1,
-            .recipeWithPhotos: 1, .recipeWithPhotosDetail: 1,
+            .recipeWithPhotos: 1, .recipeWithPhotosDetail: 1, .welcomeGuide: 0,
         ]
         for scenario in UITestScenario.allCases {
             let container = try scenario.makeContainer(for: .local)
             let count = try container.mainContext.fetchCount(FetchDescriptor<RecipeModel>())
             XCTAssertEqual(count, expectedCounts[scenario], "\(scenario)")
+        }
+    }
+
+    /// Only the welcomeGuide scenario opens the guide, or it would cover every other test's screen.
+    func testOnlyTheWelcomeGuideScenarioShowsTheGuide() {
+        for scenario in UITestScenario.allCases {
+            XCTAssertEqual(scenario.showsWelcomeGuide, scenario == .welcomeGuide, "\(scenario)")
         }
     }
 

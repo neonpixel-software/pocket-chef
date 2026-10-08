@@ -2884,6 +2884,846 @@
           }
         }
       }
+    },
+    "Welcome to Pocket Chef": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te damos la bienvenida a Pocket Chef"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bienvenue dans Pocket Chef"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Willkommen bei Pocket Chef"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welkom bij Pocket Chef"
+          }
+        }
+      }
+    },
+    "A recipe box without the fluff: no ads, no life stories, just the recipe. Here's a quick tour.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un recetario sin relleno: sin anuncios, sin historias de vida, solo la receta. Aquí tienes un recorrido rápido."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un livre de recettes sans superflu : pas de publicités, pas de récits de vie, juste la recette. Voici un petit tour."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Rezeptsammlung ohne Ballast: keine Werbung, keine Lebensgeschichten, nur das Rezept. Hier eine kurze Tour."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een receptenbox zonder franje: geen advertenties, geen levensverhalen, alleen het recept. Hier een korte rondleiding."
+          }
+        }
+      }
+    },
+    "Add a Recipe": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir una receta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter une recette"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Rezept hinzufügen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een recept toevoegen"
+          }
+        }
+      }
+    },
+    "Choose + and then one of three ways:": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige + y luego una de estas tres opciones:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez + puis l'une de ces trois options :"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle + und dann eine von drei Möglichkeiten:"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies + en dan een van drie manieren:"
+          }
+        }
+      }
+    },
+    "Type It: type or paste a recipe's text.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escribirlo: escribe o pega el texto de una receta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le taper : tapez ou collez le texte d'une recette."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eingeben: Tippe den Text eines Rezepts ein oder füge ihn ein."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Typen: typ of plak de tekst van een recept."
+          }
+        }
+      }
+    },
+    "Paste a Link: the address of a recipe's web page.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pegar un enlace: la dirección de la página web de una receta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coller un lien : l'adresse de la page web d'une recette."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link einfügen: die Adresse der Webseite eines Rezepts."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link plakken: het adres van de webpagina van een recept."
+          }
+        }
+      }
+    },
+    "Enter Manually: fill in the recipe yourself.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introducir manualmente: rellena tú la receta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir manuellement : remplissez la recette vous-même."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manuell eingeben: Füll das Rezept selbst aus."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Handmatig invoeren: vul het recept zelf in."
+          }
+        }
+      }
+    },
+    "For Type It and Paste a Link, Apple Intelligence reads the recipe on your device. You always check it before it's saved.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Con Escribirlo y Pegar un enlace, Apple Intelligence lee la receta en tu dispositivo. Siempre la revisas antes de guardarla."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avec Le taper et Coller un lien, Apple Intelligence lit la recette sur votre appareil. Vous la vérifiez toujours avant qu'elle soit enregistrée."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bei Eingeben und Link einfügen liest Apple Intelligence das Rezept auf deinem Gerät. Du prüfst es immer, bevor es gespeichert wird."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bij Typen en Link plakken leest Apple Intelligence het recept op je apparaat. Je controleert het altijd voordat het wordt bewaard."
+          }
+        }
+      }
+    },
+    "Choose + and then Enter Manually to fill in a recipe yourself.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige + y luego Introducir manualmente para rellenar tú la receta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez + puis Saisir manuellement pour remplir la recette vous-même."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle + und dann Manuell eingeben, um ein Rezept selbst auszufüllen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies + en dan Handmatig invoeren om zelf een recept in te vullen."
+          }
+        }
+      }
+    },
+    "Type It and Paste a Link read a recipe for you with Apple Intelligence, which isn't available on this device.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escribirlo y Pegar un enlace leen la receta por ti con Apple Intelligence, que no está disponible en este dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le taper et Coller un lien lisent la recette pour vous avec Apple Intelligence, qui n'est pas disponible sur cet appareil."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eingeben und Link einfügen lesen ein Rezept mit Apple Intelligence für dich ein, das auf diesem Gerät nicht verfügbar ist."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Typen en Link plakken lezen een recept voor je in met Apple Intelligence, dat op dit apparaat niet beschikbaar is."
+          }
+        }
+      }
+    },
+    "Cook From It": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cocina con ella"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuisinez avec"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Damit kochen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ermee koken"
+          }
+        }
+      }
+    },
+    "Open a recipe for a clean page with just the ingredients and steps.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre una receta para ver una página limpia con solo los ingredientes y los pasos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez une recette pour une page épurée avec seulement les ingrédients et les étapes."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne ein Rezept für eine aufgeräumte Seite mit nur den Zutaten und Schritten."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open een recept voor een rustige pagina met alleen de ingrediënten en stappen."
+          }
+        }
+      }
+    },
+    "Photos and tags: add them when you edit a recipe, and filter your list by tag.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fotos y etiquetas: añádelas al editar una receta y filtra tu lista por etiqueta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photos et étiquettes : ajoutez-les en modifiant une recette, et filtrez votre liste par étiquette."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fotos und Tags: Füge sie beim Bearbeiten eines Rezepts hinzu und filtere deine Liste nach Tag."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto's en tags: voeg ze toe als je een recept bewerkt, en filter je lijst op tag."
+          }
+        }
+      }
+    },
+    "Weight: switch the ingredients from As Written to Weight to see them in grams.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peso: cambia los ingredientes de Original a Peso para verlos en gramos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poids : passez les ingrédients de D'origine à Poids pour les voir en grammes."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gewicht: Stell die Zutaten von Original auf Gewicht um, um sie in Gramm zu sehen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gewicht: zet de ingrediënten van Origineel op Gewicht om ze in grammen te zien."
+          }
+        }
+      }
+    },
+    "Make It Yours": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A tu gusto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À votre goût"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach deinem Geschmack"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naar jouw smaak"
+          }
+        }
+      }
+    },
+    "In Settings you can change:": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En Ajustes puedes cambiar:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans Réglages, vous pouvez modifier :"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In den Einstellungen kannst du ändern:"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Instellingen kun je dit aanpassen:"
+          }
+        }
+      }
+    },
+    "Storage: keep your recipes on this device, or sync them with iCloud.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Almacenamiento: guarda tus recetas en este dispositivo o sincronízalas con iCloud."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockage : gardez vos recettes sur cet appareil, ou synchronisez-les avec iCloud."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speicher: Behalte deine Rezepte auf diesem Gerät oder synchronisiere sie mit iCloud."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opslag: bewaar je recepten op dit apparaat, of synchroniseer ze met iCloud."
+          }
+        }
+      }
+    },
+    "Cups and Spoons: US or metric sizes, used for weights.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tazas y cucharas: medidas estadounidenses o métricas, para los pesos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasses et cuillères : mesures américaines ou métriques, utilisées pour les poids."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tassen und Löffel: US- oder metrische Größen, für die Umrechnung in Gewicht."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopjes en lepels: Amerikaanse of metrische maten, gebruikt voor gewichten."
+          }
+        }
+      }
+    },
+    "Ingredient Densities: they update daily, and you can refresh them any time.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Densidades de ingredientes: se actualizan a diario y puedes actualizarlas cuando quieras."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Densités des ingrédients : elles se mettent à jour chaque jour, et vous pouvez les actualiser à tout moment."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zutatendichten: Sie werden täglich aktualisiert, und du kannst sie jederzeit neu laden."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingrediëntdichtheden: ze worden dagelijks bijgewerkt en je kunt ze altijd vernieuwen."
+          }
+        }
+      }
+    },
+    "Settings is the gear at the top of your recipes. You can open this guide again there too.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes es el engranaje en la parte superior de tus recetas. Ahí también puedes volver a abrir esta guía."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages, c'est la roue dentée en haut de vos recettes. Vous pouvez aussi y rouvrir ce guide."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Einstellungen findest du über das Zahnrad oben in deinen Rezepten. Dort kannst du diese Anleitung auch wieder öffnen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instellingen is het tandwiel boven je recepten. Daar kun je deze gids ook opnieuw openen."
+          }
+        }
+      }
+    },
+    "Settings is in the Pocket Chef menu (⌘,). You can open this guide again there, or from the Help menu.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes está en el menú Pocket Chef (⌘,). Ahí o en el menú Ayuda puedes volver a abrir esta guía."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages se trouve dans le menu Pocket Chef (⌘,). Vous pouvez y rouvrir ce guide, ou depuis le menu Aide."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Einstellungen findest du im Menü „Pocket Chef“ (⌘,). Dort oder im Menü „Hilfe“ kannst du diese Anleitung wieder öffnen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instellingen staat in het menu Pocket Chef (⌘,). Daar of in het menu Help kun je deze gids opnieuw openen."
+          }
+        }
+      }
+    },
+    "Skip": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omitir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passer"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überspringen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overslaan"
+          }
+        }
+      }
+    },
+    "Next": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siguiente"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suivant"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende"
+          }
+        }
+      }
+    },
+    "Get Started": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empezar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commencer"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los geht's"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aan de slag"
+          }
+        }
+      }
+    },
+    "Previous Page": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Página anterior"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page précédente"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorherige Seite"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorige pagina"
+          }
+        }
+      }
+    },
+    "Next Page": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Página siguiente"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page suivante"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste Seite"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende pagina"
+          }
+        }
+      }
+    },
+    "Page %lld of %lld": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Página %lld de %lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page %lld sur %lld"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seite %lld von %lld"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pagina %lld van %lld"
+          }
+        }
+      }
+    },
+    "Help": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayuda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aide"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hilfe"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help"
+          }
+        }
+      }
+    },
+    "Show Welcome Guide": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar la guía de bienvenida"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher le guide de bienvenue"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Willkommensanleitung anzeigen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welkomstgids tonen"
+          }
+        }
+      }
+    },
+    "Welcome Guide": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guía de bienvenida"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guide de bienvenue"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Willkommensanleitung"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welkomstgids"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
