@@ -19,8 +19,8 @@ enum PhotoPaging {
     }
 }
 
-/// One photo's image, read when the page appears. Shows a photo icon while the bytes aren't
-/// on this device, and reloads when a sync brings them.
+/// One photo's image, read when the page appears and decoded off the main actor. Shows a photo
+/// icon while the bytes aren't on this device, and tries again when a sync brings them.
 struct PhotoPageImage: View {
     let photoID: UUID
     let contentMode: ContentMode
@@ -42,12 +42,18 @@ struct PhotoPageImage: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipped()
-        .task(id: photoID) { reload() }
-        .onReceive(NotificationCenter.default.publisher(for: .recipeStoreDidChange)) { _ in reload() }
+        .task(id: photoID) { image = await PhotoPageImage.image(from: load) }
+        .onReceive(NotificationCenter.default.publisher(for: .recipeStoreDidChange)) { _ in
+            // A photo's bytes never change once stored, so only a missing one is read again.
+            guard image == nil else { return }
+            Task { image = await PhotoPageImage.image(from: load) }
+        }
     }
 
-    private func reload() {
-        image = load().flatMap(Image.init(photoData:))
+    /// Reads the bytes on the main actor (the store's context lives there) and decodes them off it.
+    static func image(from load: () -> Data?) async -> Image? {
+        guard let data = load(), let cgImage = await PhotoDecoder.decode(data) else { return nil }
+        return Image(decorative: cgImage, scale: 1)
     }
 }
 

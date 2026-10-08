@@ -103,6 +103,13 @@ final class RecipePhotoViewsTests: XCTestCase {
         XCTAssertEqual(reads, 1)
     }
 
+    func testDecoderDecodesPhotoBytesAndRejectsJunk() async throws {
+        let image = try await PhotoDecoder.decode(TestImages.png())
+        XCTAssertEqual(image?.width, 4)
+        let junk = await PhotoDecoder.decode(Data("not an image".utf8))
+        XCTAssertNil(junk)
+    }
+
     // MARK: Viewer
 
     func testViewerLabelsEachPhotoAndHasDone() throws {

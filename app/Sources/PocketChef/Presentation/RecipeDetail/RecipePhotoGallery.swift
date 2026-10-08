@@ -59,8 +59,13 @@ struct RecipePhotoGallery: View {
             }
         }
         .frame(maxWidth: Self.maxWidth)
-        // Saving the form can change the cover or remove the page that was showing.
-        .onChange(of: photos) { currentID = photos.first?.id }
+        // After the form saves: back to the cover when it changed or the page showing was
+        // removed; otherwise stay on the page.
+        .onChange(of: photos) { old, new in
+            if old.first?.id != new.first?.id || !new.contains(where: { $0.id == currentID }) {
+                currentID = new.first?.id
+            }
+        }
     }
 
     private func step(_ step: Int) {

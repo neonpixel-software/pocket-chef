@@ -101,6 +101,19 @@ struct PhotoViewer: View {
     }
 }
 
+/// Keeps a zoomed photo's pan within the page: the photo's edge can reach the page's edge, but
+/// not move past it into empty space.
+enum PhotoZoom {
+    static func clampedOffset(_ offset: CGSize, scale: CGFloat, in size: CGSize) -> CGSize {
+        let maxX = max(size.width * (scale - 1) / 2, 0)
+        let maxY = max(size.height * (scale - 1) / 2, 0)
+        return CGSize(
+            width: min(max(offset.width, -maxX), maxX),
+            height: min(max(offset.height, -maxY), maxY)
+        )
+    }
+}
+
 /// A photo fitted to the page that zooms up to 5× with a pinch, or 2.5× and back with a double
 /// tap, and pans with a drag while zoomed.
 private struct ZoomablePhoto: View {
@@ -114,12 +127,14 @@ private struct ZoomablePhoto: View {
     @State private var scaleAtGestureStart: CGFloat = 1
     @State private var offset: CGSize = .zero
     @State private var offsetAtGestureStart: CGSize = .zero
+    @State private var pageSize: CGSize = .zero
 
     var body: some View {
         PhotoPageImage(photoID: photoID, contentMode: .fit, load: load, placeholderStyle: .white.opacity(0.5))
             .scaleEffect(scale)
             .offset(offset)
             .contentShape(Rectangle())
+            .onGeometryChange(for: CGSize.self, of: \.size) { pageSize = $0 }
             .gesture(magnify)
             .gesture(pan, including: scale > 1 ? .all : .none)
             .onTapGesture(count: 2) {
@@ -144,9 +159,13 @@ private struct ZoomablePhoto: View {
     private var pan: some Gesture {
         DragGesture()
             .onChanged { value in
-                offset = CGSize(
-                    width: offsetAtGestureStart.width + value.translation.width,
-                    height: offsetAtGestureStart.height + value.translation.height
+                offset = PhotoZoom.clampedOffset(
+                    CGSize(
+                        width: offsetAtGestureStart.width + value.translation.width,
+                        height: offsetAtGestureStart.height + value.translation.height
+                    ),
+                    scale: scale,
+                    in: pageSize
                 )
             }
             .onEnded { _ in offsetAtGestureStart = offset }
@@ -155,10 +174,9 @@ private struct ZoomablePhoto: View {
     private func zoom(to newScale: CGFloat) {
         scale = newScale
         scaleAtGestureStart = newScale
-        if newScale <= 1 {
-            offset = .zero
-            offsetAtGestureStart = .zero
-        }
+        // Zooming out shrinks how far the photo may be panned (to nothing at 1×).
+        offset = PhotoZoom.clampedOffset(offset, scale: newScale, in: pageSize)
+        offsetAtGestureStart = offset
         isZoomed = newScale > 1
     }
 }

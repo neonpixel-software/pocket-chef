@@ -137,6 +137,12 @@ Rejected alternatives:
   again, since sync can still bring it. The UI test scenarios generate their
   three photos (solid red, green and blue) at launch rather than bundling
   images, so the app carries no test images.
+- Review of 13.3: the gallery and viewer read the full image (up to 2048 px), not
+  the 300 px thumbnail, which would look soft on a 560 pt page at 2× or 3×. Both
+  are CloudKit assets on the same record and arrive together, so falling back
+  to the thumbnail wouldn't bridge a sync gap. Photos decode off the main actor
+  (`PhotoDecoder`), and a page that has its photo doesn't read it again on a
+  store change. A zoomed photo pans only as far as its edges.
 
 ### Form
 

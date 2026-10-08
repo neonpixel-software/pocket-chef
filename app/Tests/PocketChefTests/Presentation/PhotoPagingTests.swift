@@ -23,4 +23,13 @@ final class PhotoPagingTests: XCTestCase {
         XCTAssertEqual(PhotoPaging.index(of: nil, steppedBy: 1, in: photos), 1)
         XCTAssertEqual(PhotoPaging.index(of: UUID(), steppedBy: 1, in: photos), 1)
     }
+
+    func testPanStaysWithinTheZoomedPhoto() {
+        let page = CGSize(width: 400, height: 300)
+
+        // At 2× the photo is 800 × 600, so it can move 200 pt sideways and 150 pt up or down.
+        XCTAssertEqual(PhotoZoom.clampedOffset(CGSize(width: 500, height: -500), scale: 2, in: page), CGSize(width: 200, height: -150))
+        XCTAssertEqual(PhotoZoom.clampedOffset(CGSize(width: -50, height: 20), scale: 2, in: page), CGSize(width: -50, height: 20))
+        XCTAssertEqual(PhotoZoom.clampedOffset(CGSize(width: 80, height: 80), scale: 1, in: page), .zero)
+    }
 }

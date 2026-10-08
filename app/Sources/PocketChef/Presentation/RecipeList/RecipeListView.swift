@@ -261,12 +261,12 @@ struct RecipeCoverThumbnail: View {
         .accessibilityHidden(true)
         .accessibilityIdentifier(Self.accessibilityIdentifier)
         // Keyed by the photo, so a new cover (Make Cover in the form) loads its own image.
-        .task(id: photoID) { reload() }
-        .onReceive(NotificationCenter.default.publisher(for: .recipeStoreDidChange)) { _ in reload() }
-    }
-
-    private func reload() {
-        image = load().flatMap(Image.init(photoData:))
+        .task(id: photoID) { image = await PhotoPageImage.image(from: load) }
+        .onReceive(NotificationCenter.default.publisher(for: .recipeStoreDidChange)) { _ in
+            // A photo's bytes never change once stored, so only a missing one is read again.
+            guard image == nil else { return }
+            Task { image = await PhotoPageImage.image(from: load) }
+        }
     }
 }
 
