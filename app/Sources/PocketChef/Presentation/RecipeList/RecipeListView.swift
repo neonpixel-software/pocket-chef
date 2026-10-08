@@ -81,6 +81,7 @@ struct RecipeListView: View {
                 PCHeader(title: String(localized: "Recipes"))
             }
             .navigationTitle("")
+            .pcHeaderBar()
             #if os(macOS)
             // macOS drew its own dark toolbar background over the header's pink here, while the
             // detail screen and iOS show the pink up to the window top (#104).
@@ -96,6 +97,7 @@ struct RecipeListView: View {
                             Image(systemName: "gearshape")
                         }
                         .accessibilityLabel("Settings")
+                        .pcHeaderToolbarButton()
                     }
                 }
                 #endif
@@ -105,6 +107,7 @@ struct RecipeListView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .pcHeaderToolbarButton()
                     // Attached to the button, not the whole view: the dialog presents as a popover
                     // anchored to the view it's attached to (iPad, and iPhone on iOS 26), so on the
                     // NavigationStack content it floated in the middle of the list (#106).

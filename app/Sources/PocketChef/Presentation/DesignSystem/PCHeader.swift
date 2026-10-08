@@ -93,3 +93,27 @@ private struct OutlinedText: View {
             .accessibilityLabel(Text(text))
     }
 }
+
+extension View {
+    /// For a toolbar button over the PCHeader's pink. On iOS the bar puts it on light glass and
+    /// gave it the app's pink tint: pink on pink, hard to see. Ink, like other content on pink
+    /// (PCColor.onPink). The Mac draws these buttons on its own dark-pink capsules, readable as is.
+    func pcHeaderToolbarButton() -> some View {
+        #if os(iOS)
+        tint(PCColor.onPink)
+        #else
+        self
+        #endif
+    }
+
+    /// For a screen under a PCHeader, on iOS: the bar keeps its light look in dark mode too.
+    /// Its glass otherwise turns deep pink there, and the system's own Back chevron, which no
+    /// tint reaches, came out light pink on it.
+    func pcHeaderBar() -> some View {
+        #if os(iOS)
+        toolbarColorScheme(.light, for: .navigationBar)
+        #else
+        self
+        #endif
+    }
+}
