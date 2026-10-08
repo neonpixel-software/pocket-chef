@@ -211,11 +211,8 @@ struct RecipeDetailView: View {
     return NavigationStack {
         RecipeDetailView(viewModel: RecipeDetailViewModel(
             recipe: SampleData.recipes[0],
-            createRecipeUseCase: DefaultCreateRecipeUseCase(repository: PreviewRecipeRepository()),
-            updateRecipeUseCase: DefaultUpdateRecipeUseCase(repository: PreviewRecipeRepository()),
-            deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: PreviewRecipeRepository()),
-            fetchTagsUseCase: DefaultFetchTagsUseCase(repository: PreviewTagRepository()),
-            findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: PreviewTagRepository())
+            formDependencies: .preview,
+            deleteRecipeUseCase: DefaultDeleteRecipeUseCase(repository: PreviewRecipeRepository())
         ))
     }
 }

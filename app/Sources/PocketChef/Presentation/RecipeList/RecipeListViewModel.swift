@@ -17,6 +17,19 @@ final class RecipeListViewModel {
         let captureRecipeUseCase: CaptureRecipeUseCase
         let checkCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase
         let captureRecipeFromURLUseCase: CaptureRecipeFromURLUseCase
+        let fetchPhotoThumbnailUseCase: FetchPhotoThumbnailUseCase
+        let photoProcessor: PhotoProcessor
+
+        var form: RecipeFormViewModel.Dependencies {
+            RecipeFormViewModel.Dependencies(
+                createRecipeUseCase: createRecipeUseCase,
+                updateRecipeUseCase: updateRecipeUseCase,
+                fetchTagsUseCase: fetchTagsUseCase,
+                findOrCreateTagUseCase: findOrCreateTagUseCase,
+                fetchPhotoThumbnailUseCase: fetchPhotoThumbnailUseCase,
+                photoProcessor: photoProcessor
+            )
+        }
     }
 
     private(set) var recipes: [Recipe] = []
@@ -75,34 +88,21 @@ final class RecipeListViewModel {
         }
     }
 
+    @MainActor
     func makeNewRecipeFormViewModel() -> RecipeFormViewModel {
-        RecipeFormViewModel(
-            mode: .create,
-            createRecipeUseCase: dependencies.createRecipeUseCase,
-            updateRecipeUseCase: dependencies.updateRecipeUseCase,
-            fetchTagsUseCase: dependencies.fetchTagsUseCase,
-            findOrCreateTagUseCase: dependencies.findOrCreateTagUseCase
-        )
+        RecipeFormViewModel(mode: .create, dependencies: dependencies.form)
     }
 
+    @MainActor
     func makeCaptureReviewFormViewModel(for recipe: Recipe) -> RecipeFormViewModel {
-        RecipeFormViewModel(
-            mode: .capture(recipe),
-            createRecipeUseCase: dependencies.createRecipeUseCase,
-            updateRecipeUseCase: dependencies.updateRecipeUseCase,
-            fetchTagsUseCase: dependencies.fetchTagsUseCase,
-            findOrCreateTagUseCase: dependencies.findOrCreateTagUseCase
-        )
+        RecipeFormViewModel(mode: .capture(recipe), dependencies: dependencies.form)
     }
 
     func makeDetailViewModel(for recipe: Recipe) -> RecipeDetailViewModel {
         RecipeDetailViewModel(
             recipe: recipe,
-            createRecipeUseCase: dependencies.createRecipeUseCase,
-            updateRecipeUseCase: dependencies.updateRecipeUseCase,
-            deleteRecipeUseCase: dependencies.deleteRecipeUseCase,
-            fetchTagsUseCase: dependencies.fetchTagsUseCase,
-            findOrCreateTagUseCase: dependencies.findOrCreateTagUseCase
+            formDependencies: dependencies.form,
+            deleteRecipeUseCase: dependencies.deleteRecipeUseCase
         )
     }
 

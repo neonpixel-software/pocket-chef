@@ -139,6 +139,13 @@ Rejected alternatives:
 - Picked photos are processed right away, each with its own spinner, and kept
   in memory until Save. Cancel discards them. Save is disabled while any
   photo is still processing.
+- Built in 13.2: photos are processed one at a time, in the order they were
+  picked, so a batch of camera originals isn't decoded all at once. A
+  photo deleted while it's processing stays deleted. Stored thumbnails load
+  through `FetchPhotoThumbnailUseCase`. The form's use cases and photo
+  services travel as one `RecipeFormViewModel.Dependencies` value (the list
+  and detail view models pass it on), and the form view model is
+  `@MainActor` now that it does async work.
 
 ### Accessibility and localization
 

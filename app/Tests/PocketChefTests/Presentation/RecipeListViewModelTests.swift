@@ -75,10 +75,13 @@ private func makeViewModel(
         findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase(),
         captureRecipeUseCase: NoOpCaptureRecipeUseCase(),
         checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(result: captureAvailable),
-        captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase()
+        captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase(),
+        fetchPhotoThumbnailUseCase: StubFetchPhotoThumbnailUseCase(),
+        photoProcessor: FakePhotoProcessor()
     ))
 }
 
+@MainActor
 final class RecipeListViewModelTests: XCTestCase {
     func testLoadPopulatesRecipesOnSuccess() {
         let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
@@ -116,7 +119,9 @@ final class RecipeListViewModelTests: XCTestCase {
             findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase(),
             captureRecipeUseCase: NoOpCaptureRecipeUseCase(),
             checkCaptureAvailabilityUseCase: FakeCheckCaptureAvailabilityUseCase(),
-            captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase()
+            captureRecipeFromURLUseCase: NoOpCaptureRecipeFromURLUseCase(),
+            fetchPhotoThumbnailUseCase: StubFetchPhotoThumbnailUseCase(),
+            photoProcessor: FakePhotoProcessor()
         ))
 
         viewModel.load()

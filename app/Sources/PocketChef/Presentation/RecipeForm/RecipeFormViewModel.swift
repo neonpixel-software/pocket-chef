@@ -73,8 +73,39 @@ struct StepDraft: Identifiable, Equatable {
     }
 }
 
+/// A photo in the form's strip. New photos stay in memory until Save; Cancel drops them.
+struct PhotoDraft: Identifiable, Equatable {
+    enum State: Equatable {
+        /// Already saved with the recipe; its thumbnail loads from the store.
+        case stored
+        /// Picked or taken, still being scaled down.
+        case processing
+        /// Picked or taken and ready to save.
+        case processed(ProcessedPhoto)
+    }
+
+    let id: UUID
+    fileprivate(set) var state: State
+}
+
+/// Main-actor isolated: photos are processed asynchronously and land back in the form's state.
+@MainActor
 @Observable
 final class RecipeFormViewModel {
+    /// Bundles the use cases and services the form needs, so the list and detail screens can
+    /// pass them along as one value and the initializer stays under SonarCloud's arity limit.
+    struct Dependencies {
+        let createRecipeUseCase: CreateRecipeUseCase
+        let updateRecipeUseCase: UpdateRecipeUseCase
+        let fetchTagsUseCase: FetchTagsUseCase
+        let findOrCreateTagUseCase: FindOrCreateTagUseCase
+        let fetchPhotoThumbnailUseCase: FetchPhotoThumbnailUseCase
+        let photoProcessor: PhotoProcessor
+    }
+
+    /// Loads a picked or taken photo's bytes; nil when there's nothing to load.
+    typealias PhotoLoader = @Sendable () async throws -> Data?
+
     var title: String
     var ingredients: [IngredientLineDraft]
     var equipment: [EquipmentDraft]
@@ -83,29 +114,20 @@ final class RecipeFormViewModel {
     var selectedTagIDs: Set<UUID>
     var newTagName: String = ""
     var isAddingNewTag: Bool = false
+    private(set) var photos: [PhotoDraft]
+    /// Shown in the Photos section when a picked or taken photo couldn't be added.
+    private(set) var photoErrorMessage: String?
     private(set) var errorMessage: String?
 
     private let mode: RecipeFormMode
-    private let createRecipeUseCase: CreateRecipeUseCase
-    private let updateRecipeUseCase: UpdateRecipeUseCase
-    private let fetchTagsUseCase: FetchTagsUseCase
-    private let findOrCreateTagUseCase: FindOrCreateTagUseCase
+    private let dependencies: Dependencies
     /// The recipe's own tags at load time (edit mode only) — merged into allTags
     /// defensively in loadTags(), in case a fetch races ahead of a just-created tag.
     private let initialTags: [Tag]
 
-    init(
-        mode: RecipeFormMode,
-        createRecipeUseCase: CreateRecipeUseCase,
-        updateRecipeUseCase: UpdateRecipeUseCase,
-        fetchTagsUseCase: FetchTagsUseCase,
-        findOrCreateTagUseCase: FindOrCreateTagUseCase
-    ) {
+    init(mode: RecipeFormMode, dependencies: Dependencies) {
         self.mode = mode
-        self.createRecipeUseCase = createRecipeUseCase
-        self.updateRecipeUseCase = updateRecipeUseCase
-        self.fetchTagsUseCase = fetchTagsUseCase
-        self.findOrCreateTagUseCase = findOrCreateTagUseCase
+        self.dependencies = dependencies
 
         switch mode {
         case .create:
@@ -114,18 +136,24 @@ final class RecipeFormViewModel {
             equipment = []
             steps = []
             initialTags = []
+            photos = []
         case let .edit(recipe), let .capture(recipe):
             title = recipe.title
             ingredients = recipe.ingredients.map { IngredientLineDraft(ingredientLine: $0) }
             equipment = recipe.equipment.map { EquipmentDraft(name: $0) }
             steps = recipe.steps.map { StepDraft(text: $0) }
             initialTags = recipe.tags
+            photos = recipe.photos.map { PhotoDraft(id: $0.id, state: .stored) }
         }
         selectedTagIDs = Set(initialTags.map(\.id))
     }
 
     var canSave: Bool {
-        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isProcessingPhotos
+    }
+
+    var isProcessingPhotos: Bool {
+        photos.contains { $0.state == .processing }
     }
 
     func addIngredient() {
@@ -185,9 +213,70 @@ final class RecipeFormViewModel {
         steps.swapAt(index, index + 1)
     }
 
+    /// Adds one photo per loader to the end of the strip, each with its own spinner, then
+    /// loads and scales them down one at a time (a camera original can be 48 MP). A photo that
+    /// fails is dropped and reported in the Photos section; the others are unaffected.
+    func addPhotos(_ loaders: [PhotoLoader]) async {
+        guard !loaders.isEmpty else { return }
+        photoErrorMessage = nil
+        let ids = loaders.map { _ in UUID() }
+        photos += ids.map { PhotoDraft(id: $0, state: .processing) }
+
+        for (id, load) in zip(ids, loaders) {
+            let processed: ProcessedPhoto?
+            do {
+                if let data = try await load() {
+                    processed = try await dependencies.photoProcessor.process(data)
+                } else {
+                    processed = nil
+                }
+            } catch {
+                processed = nil
+            }
+            // The photo may have been deleted while it was processing.
+            guard let index = photos.firstIndex(where: { $0.id == id }) else { continue }
+            if let processed {
+                photos[index].state = .processed(processed)
+            } else {
+                photos.remove(at: index)
+                photoErrorMessage = String(localized: "A photo couldn't be added.")
+            }
+        }
+    }
+
+    /// The thumbnail to show for a photo: in memory for a new one, from the store for a saved
+    /// one. Nil while processing, or when a saved photo's bytes aren't on this device yet.
+    func thumbnailData(for photo: PhotoDraft) -> Data? {
+        switch photo.state {
+        case .stored: try? dependencies.fetchPhotoThumbnailUseCase.execute(id: photo.id)
+        case .processing: nil
+        case let .processed(processed): processed.thumbnailData
+        }
+    }
+
+    func removePhoto(at index: Int) {
+        guard photos.indices.contains(index) else { return }
+        photos.remove(at: index)
+    }
+
+    func makeCover(at index: Int) {
+        guard photos.indices.contains(index), index > 0 else { return }
+        photos.insert(photos.remove(at: index), at: 0)
+    }
+
+    func movePhotoLeft(at index: Int) {
+        guard photos.indices.contains(index), index > 0 else { return }
+        photos.swapAt(index, index - 1)
+    }
+
+    func movePhotoRight(at index: Int) {
+        guard photos.indices.contains(index), index < photos.count - 1 else { return }
+        photos.swapAt(index, index + 1)
+    }
+
     func loadTags() {
         do {
-            var tags = try fetchTagsUseCase.execute()
+            var tags = try dependencies.fetchTagsUseCase.execute()
             for tag in initialTags where !tags.contains(where: { $0.id == tag.id }) {
                 tags.append(tag)
             }
@@ -217,7 +306,7 @@ final class RecipeFormViewModel {
         guard !trimmed.isEmpty else { return }
 
         do {
-            let tag = try findOrCreateTagUseCase.execute(name: trimmed)
+            let tag = try dependencies.findOrCreateTagUseCase.execute(name: trimmed)
             if !allTags.contains(where: { $0.id == tag.id }) {
                 allTags.append(tag)
             }
@@ -233,13 +322,18 @@ final class RecipeFormViewModel {
         guard canSave else { return nil }
 
         let recipe = buildRecipe()
+        let newPhotos = photos.reduce(into: [UUID: ProcessedPhoto]()) { newPhotos, photo in
+            if case let .processed(processed) = photo.state {
+                newPhotos[photo.id] = processed
+            }
+        }
 
         do {
             switch mode {
             case .create, .capture:
-                try createRecipeUseCase.execute(recipe)
+                try dependencies.createRecipeUseCase.execute(recipe, newPhotos: newPhotos)
             case .edit:
-                try updateRecipeUseCase.execute(recipe)
+                try dependencies.updateRecipeUseCase.execute(recipe, newPhotos: newPhotos)
             }
             errorMessage = nil
             return recipe
@@ -314,7 +408,8 @@ final class RecipeFormViewModel {
             equipment: builtEquipment,
             steps: builtSteps,
             source: source,
-            tags: selectedTags
+            tags: selectedTags,
+            photos: photos.map { RecipePhoto(id: $0.id) }
         )
     }
 }

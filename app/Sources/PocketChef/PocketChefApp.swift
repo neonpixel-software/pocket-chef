@@ -6,6 +6,7 @@ struct PocketChefApp: App {
     private let persistence: PersistenceController
     private let recipeRepository: RecipeRepository
     private let tagRepository: TagRepository
+    private let photoRepository: RecipePhotoRepository
     private let captureService: RecipeCaptureService
     private let webPageFetcher: WebPageFetcher
     private let captureRecipeUseCase: CaptureRecipeUseCase
@@ -34,6 +35,7 @@ struct PocketChefApp: App {
         let contextProvider = persistence.contextProvider
         recipeRepository = Self.recipeRepository(wrapping: SwiftDataRecipeRepository(modelContext: contextProvider.context))
         tagRepository = SwiftDataTagRepository(modelContext: contextProvider.context)
+        photoRepository = SwiftDataRecipePhotoRepository(modelContext: contextProvider.context)
         captureService = FoundationModelsRecipeCaptureService()
         webPageFetcher = URLSessionWebPageFetcher()
         captureRecipeUseCase = DefaultCaptureRecipeUseCase(captureService: captureService)
@@ -111,7 +113,9 @@ struct PocketChefApp: App {
             captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
                 webPageFetcher: webPageFetcher,
                 captureRecipeUseCase: captureRecipeUseCase
-            )
+            ),
+            fetchPhotoThumbnailUseCase: DefaultFetchPhotoThumbnailUseCase(repository: photoRepository),
+            photoProcessor: ImageIOPhotoProcessor()
         ))
         #if DEBUG
         // Tapping a chip doesn't reach the app on GitHub's macOS runner, so the scenario

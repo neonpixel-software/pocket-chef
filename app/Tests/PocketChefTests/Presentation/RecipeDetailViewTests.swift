@@ -35,11 +35,13 @@ private func makeViewModel(
 ) -> RecipeDetailViewModel {
     RecipeDetailViewModel(
         recipe: recipe,
-        createRecipeUseCase: NoOpCreateRecipeUseCase(),
-        updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-        deleteRecipeUseCase: deleteRecipeUseCase,
-        fetchTagsUseCase: NoOpFetchTagsUseCase(),
-        findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
+        formDependencies: .testing(
+            createRecipeUseCase: NoOpCreateRecipeUseCase(),
+            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
+            fetchTagsUseCase: NoOpFetchTagsUseCase(),
+            findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
+        ),
+        deleteRecipeUseCase: deleteRecipeUseCase
     )
 }
 

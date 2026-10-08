@@ -34,6 +34,7 @@ private struct UseCaseFailure: LocalizedError {
     var errorDescription: String? { "Something went wrong" }
 }
 
+@MainActor
 private func makeViewModel(
     mode: RecipeFormMode = .create,
     createUseCase: CreateRecipeUseCase = NoOpCreateRecipeUseCase(),
@@ -41,13 +42,12 @@ private func makeViewModel(
     fetchTagsUseCase: FetchTagsUseCase = FakeFetchTagsUseCase(),
     findOrCreateTagUseCase: FindOrCreateTagUseCase = FakeFindOrCreateTagUseCase()
 ) -> RecipeFormViewModel {
-    RecipeFormViewModel(
-        mode: mode,
+    RecipeFormViewModel(mode: mode, dependencies: .testing(
         createRecipeUseCase: createUseCase,
         updateRecipeUseCase: updateUseCase,
         fetchTagsUseCase: fetchTagsUseCase,
         findOrCreateTagUseCase: findOrCreateTagUseCase
-    )
+    ))
 }
 
 @MainActor
@@ -233,11 +233,13 @@ final class RecipeFormViewTests: XCTestCase {
         let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [presets[0]])
         let detailViewModel = RecipeDetailViewModel(
             recipe: recipe,
-            createRecipeUseCase: NoOpCreateRecipeUseCase(),
-            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-            deleteRecipeUseCase: NoOpDeleteRecipeUseCase(),
-            fetchTagsUseCase: FakeFetchTagsUseCase(result: .success(presets)),
-            findOrCreateTagUseCase: FakeFindOrCreateTagUseCase()
+            formDependencies: .testing(
+                createRecipeUseCase: NoOpCreateRecipeUseCase(),
+                updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
+                fetchTagsUseCase: FakeFetchTagsUseCase(result: .success(presets)),
+                findOrCreateTagUseCase: FakeFindOrCreateTagUseCase()
+            ),
+            deleteRecipeUseCase: NoOpDeleteRecipeUseCase()
         )
         let viewModel = detailViewModel.makeEditFormViewModel()
         viewModel.loadTags() // .task doesn't run without real hosting; call directly

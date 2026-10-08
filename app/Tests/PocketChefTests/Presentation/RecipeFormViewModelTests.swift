@@ -40,6 +40,7 @@ private struct UseCaseFailure: LocalizedError {
     var errorDescription: String? { "Something went wrong" }
 }
 
+@MainActor
 final class RecipeFormViewModelTests: XCTestCase {
     // MARK: canSave
 
@@ -452,12 +453,11 @@ final class RecipeFormViewModelTests: XCTestCase {
         fetchTagsUseCase: FakeFetchTagsUseCase = FakeFetchTagsUseCase(),
         findOrCreateTagUseCase: FakeFindOrCreateTagUseCase = FakeFindOrCreateTagUseCase()
     ) -> RecipeFormViewModel {
-        RecipeFormViewModel(
-            mode: mode,
+        RecipeFormViewModel(mode: mode, dependencies: .testing(
             createRecipeUseCase: createUseCase,
             updateRecipeUseCase: updateUseCase,
             fetchTagsUseCase: fetchTagsUseCase,
             findOrCreateTagUseCase: findOrCreateTagUseCase
-        )
+        ))
     }
 }

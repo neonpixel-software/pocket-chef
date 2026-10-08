@@ -44,14 +44,17 @@ private func makeViewModel(
 ) -> RecipeDetailViewModel {
     RecipeDetailViewModel(
         recipe: recipe,
-        createRecipeUseCase: NoOpCreateRecipeUseCase(),
-        updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
-        deleteRecipeUseCase: deleteRecipeUseCase,
-        fetchTagsUseCase: NoOpFetchTagsUseCase(),
-        findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
+        formDependencies: .testing(
+            createRecipeUseCase: NoOpCreateRecipeUseCase(),
+            updateRecipeUseCase: NoOpUpdateRecipeUseCase(),
+            fetchTagsUseCase: NoOpFetchTagsUseCase(),
+            findOrCreateTagUseCase: NoOpFindOrCreateTagUseCase()
+        ),
+        deleteRecipeUseCase: deleteRecipeUseCase
     )
 }
 
+@MainActor
 final class RecipeDetailViewModelTests: XCTestCase {
     func testDeleteSetsIsDeletedOnSuccess() {
         let recipe = Recipe(id: UUID(), title: "Pancakes", ingredients: [], steps: [], source: .typed, tags: [])
