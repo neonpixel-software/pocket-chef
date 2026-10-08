@@ -68,11 +68,23 @@ final class RecipeListHeaderUITests: XCTestCase {
             #else
             list.swipeUp()
             #endif
-            scrolled = laterRecipe.waitForExistence(timeout: 3) && laterRecipe.wait(for: \.isHittable, toEqual: true, timeout: 3)
+            scrolled = waitUntilFullyInside(laterRecipe, window: app.windows.firstMatch.frame, timeout: 3)
         }
         let where12 = laterRecipe.exists ? "at \(laterRecipe.frame), window bottom \(windowBottom)" : "not loaded"
         XCTAssertTrue(scrolled, "The recipe list didn't scroll: after 4 scrolls Recipe 12 is \(where12), so this checked nothing")
         let headerAfter = assertHeaderIsAtTop(in: app)
         XCTAssertEqual(headerAfter.minY, headerBefore.minY, accuracy: 1, "The header moved while the list scrolled")
+    }
+
+    /// Waits until the element's frame lies within the window. Not isHittable: on the GitHub
+    /// iOS runner, asking that of a row still settling after a swipe failed the test outright
+    /// ("Activation point invalid") instead of returning false.
+    @MainActor
+    private func waitUntilFullyInside(_ element: XCUIElement, window: CGRect, timeout: TimeInterval) -> Bool {
+        let inside = NSPredicate { _, _ in
+            element.exists && window.contains(element.frame)
+        }
+        let expectation = XCTNSPredicateExpectation(predicate: inside, object: nil)
+        return XCTWaiter().wait(for: [expectation], timeout: timeout) == .completed
     }
 }

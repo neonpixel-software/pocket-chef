@@ -59,6 +59,8 @@ struct RecipePhotoGallery: View {
             }
         }
         .frame(maxWidth: Self.maxWidth)
+        // Centered in a wider window or on an iPad, where it doesn't fill the width.
+        .frame(maxWidth: .infinity)
         // After the form saves: back to the cover when it changed or the page showing was
         // removed; otherwise stay on the page.
         .onChange(of: photos) { old, new in
