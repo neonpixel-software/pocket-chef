@@ -95,6 +95,8 @@ code or report a problem.
 - **Mac:** Pocket Chef → About Pocket Chef in the app menu opens it in its own
   window, replacing the standard About panel. That panel can only show the
   icon, the version and a credits file, and the links wouldn't fit there.
+  The window is 540 × 760 pt, which fits the English and German page without
+  scrolling (set while building 14.2).
 
 ### Content
 
@@ -123,7 +125,8 @@ Checked against the code on 2026-10-08: the app's only network code is
 `CloudKitAccountStatusProvider`). Its one `openURL` opens the system Settings.
 The About links open in the browser, which the user starts.
 
-**Links.** Both open in the browser:
+**Links.** Both open in the browser. They're pink buttons with ink text, like
+the guide's, because pink text on cream is too faint to read (14.2):
 - **View the Code on GitHub:** https://github.com/neonpixel-software/pocket-chef
 - **Report an Issue:** https://github.com/neonpixel-software/pocket-chef/issues/new
   A footnote says that reporting needs a free GitHub account.

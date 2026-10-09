@@ -203,7 +203,10 @@ struct PocketChefApp: App {
         .windowResizability(Self.uiTestWindowSize == nil ? .automatic : .contentSize)
         #endif
         #if os(macOS)
-        .commands { WelcomeGuideCommands() }
+        .commands {
+            AboutCommands()
+            WelcomeGuideCommands()
+        }
         #endif
 
         #if os(macOS)
@@ -215,6 +218,15 @@ struct PocketChefApp: App {
         // and not reopened by state restoration once closed.
         Window("Welcome Guide", id: WelcomeGuideView.windowID) {
             WelcomeGuideWindow(viewModel: welcomeGuideViewModel)
+        }
+        .windowResizability(.contentSize)
+        .defaultPosition(.center)
+        .defaultLaunchBehavior(.suppressed)
+        .restorationBehavior(.disabled)
+
+        Window("About Pocket Chef", id: AboutView.windowID) {
+            AboutView()
+                .frame(width: AboutView.macSize.width, height: AboutView.macSize.height)
         }
         .windowResizability(.contentSize)
         .defaultPosition(.center)
