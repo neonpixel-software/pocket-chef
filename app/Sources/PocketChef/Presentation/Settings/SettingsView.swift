@@ -76,6 +76,13 @@ struct SettingsView: View {
                     Button("Show Welcome Guide", action: showWelcomeGuide)
                 }
             }
+
+            // The Mac has About Pocket Chef in its app menu instead.
+            #if os(iOS)
+            Section {
+                NavigationLink("About Pocket Chef") { AboutView() }
+            }
+            #endif
         }
         .formStyle(.grouped)
         .task { viewModel.reloadDensityStatus() }

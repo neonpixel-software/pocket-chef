@@ -275,6 +275,8 @@ jobs:
           #                        DensityAPI.xcconfig.
           #   e3      swift:S107   RecipeModel.init maps one-to-one to the SwiftData model's stored
           #                        properties, and most parameters have defaults.
+          #   e4      swift:S1075  the About page's GitHub links are fixed on purpose: kept in code,
+          #                        not the strings catalog, so a translation can't break them.
           $HOME/.dotnet/tools/dotnet-sonarscanner begin \
             /k:"neonpixel-software_pocket-chef" \
             /o:"neonpixel-software" \
@@ -286,13 +288,15 @@ jobs:
             /d:sonar.cs.opencover.reportsPaths="api/**/coverage.opencover.xml" \
             /d:sonar.cs.vstest.reportsPaths="api/**/*.trx" \
             /d:sonar.coverage.exclusions="$COVERAGE_EXCLUSIONS" \
-            /d:sonar.issue.ignore.multicriteria="e1,e2,e3" \
+            /d:sonar.issue.ignore.multicriteria="e1,e2,e3,e4" \
             /d:sonar.issue.ignore.multicriteria.e1.ruleKey="swift:S1075" \
             /d:sonar.issue.ignore.multicriteria.e1.resourceKey="app/Sources/PocketChef/Presentation/RecipeCapture/RecipeURLCaptureView.swift" \
             /d:sonar.issue.ignore.multicriteria.e2.ruleKey="swift:S1075" \
             /d:sonar.issue.ignore.multicriteria.e2.resourceKey="app/Sources/PocketChef/Data/Density/DensityAPIConfiguration.swift" \
             /d:sonar.issue.ignore.multicriteria.e3.ruleKey="swift:S107" \
-            /d:sonar.issue.ignore.multicriteria.e3.resourceKey="app/Sources/PocketChef/Data/Models/RecipeModel.swift"
+            /d:sonar.issue.ignore.multicriteria.e3.resourceKey="app/Sources/PocketChef/Data/Models/RecipeModel.swift" \
+            /d:sonar.issue.ignore.multicriteria.e4.ruleKey="swift:S1075" \
+            /d:sonar.issue.ignore.multicriteria.e4.resourceKey="app/Sources/PocketChef/Presentation/About/AboutInfo.swift"
       - name: Build .NET API (captures C# semantic data for the scanner)
         run: dotnet build api/PocketChef.DensityApi.slnx --configuration Release
       - name: Add the Swift sources to the analysis

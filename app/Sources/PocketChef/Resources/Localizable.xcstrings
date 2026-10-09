@@ -3724,6 +3724,510 @@
           }
         }
       }
+    },
+    "About Pocket Chef": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acerca de Pocket Chef"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À propos de Pocket Chef"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Über Pocket Chef"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Over Pocket Chef"
+          }
+        }
+      }
+    },
+    "The Idea": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La idea"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'idée"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Idee"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het idee"
+          }
+        }
+      }
+    },
+    "Recipe sites bury the recipe under ads, pop-ups and life stories. Pocket Chef keeps just the recipe: type it, paste it or link it, check it once, and cook from a clean page.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las webs de recetas entierran la receta bajo anuncios, ventanas emergentes e historias de vida. Pocket Chef se queda solo con la receta: escríbela, pégala o enlázala, revísala una vez y cocina desde una página limpia."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les sites de recettes enfouissent la recette sous les publicités, les pop-ups et les récits de vie. Pocket Chef ne garde que la recette : tapez-la, collez-la ou donnez son lien, vérifiez-la une fois, et cuisinez depuis une page épurée."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rezeptseiten verstecken das Rezept unter Werbung, Pop-ups und Lebensgeschichten. Pocket Chef behält nur das Rezept: Tipp es ein, füg es ein oder verlinke es, prüf es einmal und koch von einer aufgeräumten Seite."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receptensites verstoppen het recept onder advertenties, pop-ups en levensverhalen. Pocket Chef houdt alleen het recept over: typ het, plak het of link ernaar, controleer het één keer en kook vanaf een rustige pagina."
+          }
+        }
+      }
+    },
+    "Open Source": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código abierto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open source"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Source"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open source"
+          }
+        }
+      }
+    },
+    "Pocket Chef is open source under the MIT license. Anyone can read the code, check what the app does, and build it themselves.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pocket Chef es de código abierto con licencia MIT. Cualquiera puede leer el código, comprobar qué hace la app y compilarla por su cuenta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pocket Chef est open source sous licence MIT. Tout le monde peut lire le code, vérifier ce que fait l'app et la compiler soi-même."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pocket Chef ist Open Source unter der MIT-Lizenz. Alle können den Code lesen, prüfen, was die App macht, und sie selbst bauen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pocket Chef is open source onder de MIT-licentie. Iedereen kan de code lezen, controleren wat de app doet en hem zelf bouwen."
+          }
+        }
+      }
+    },
+    "No Tracking": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin rastreo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun pistage"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Tracking"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen tracking"
+          }
+        }
+      }
+    },
+    "No account, no ads, no analytics, no tracking.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin cuenta, sin anuncios, sin analíticas, sin rastreo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas de compte, pas de publicités, pas de statistiques d'utilisation, pas de pistage."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Konto, keine Werbung, keine Analysen, kein Tracking."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen account, geen advertenties, geen analytics, geen tracking."
+          }
+        }
+      }
+    },
+    "Your recipes stay on this device, or in your own iCloud if you turn on sync.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus recetas se quedan en este dispositivo, o en tu propio iCloud si activas la sincronización."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos recettes restent sur cet appareil, ou dans votre propre iCloud si vous activez la synchronisation."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Rezepte bleiben auf diesem Gerät oder in deiner eigenen iCloud, wenn du die Synchronisierung einschaltest."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je recepten blijven op dit apparaat, of in je eigen iCloud als je synchronisatie aanzet."
+          }
+        }
+      }
+    },
+    "Recipe capture runs on your device.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La captura de recetas se hace en tu dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La capture des recettes se fait sur votre appareil."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Erfassen von Rezepten läuft auf deinem Gerät."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het inlezen van recepten gebeurt op je apparaat."
+          }
+        }
+      }
+    },
+    "The app only goes online to:": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La app solo se conecta a internet para:"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'app ne se connecte à Internet que pour :"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die App geht nur für Folgendes online:"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De app gaat alleen online om:"
+          }
+        }
+      }
+    },
+    "Fetch the recipe from a link you paste. That website sees the visit, as it would in a browser.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obtener la receta de un enlace que pegas. Esa web ve la visita, como la vería en un navegador."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Récupérer la recette d'un lien que vous collez. Ce site voit la visite, comme dans un navigateur."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Rezept von einem Link abrufen, den du einfügst. Diese Website sieht den Besuch wie in einem Browser."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het recept ophalen van een link die je plakt. Die website ziet het bezoek, net als in een browser."
+          }
+        }
+      }
+    },
+    "Sync your recipes through your own iCloud, if you turn it on.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizar tus recetas con tu propio iCloud, si lo activas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchroniser vos recettes via votre propre iCloud, si vous l'activez."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Rezepte über deine eigene iCloud synchronisieren, wenn du das einschaltest."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je recepten synchroniseren via je eigen iCloud, als je dat aanzet."
+          }
+        }
+      }
+    },
+    "Download ingredient densities from Pocket Chef's server. The app sends it nothing about you or your recipes.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Descargar las densidades de ingredientes del servidor de Pocket Chef. La app no le envía nada sobre ti ni sobre tus recetas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Télécharger les densités des ingrédients depuis le serveur de Pocket Chef. L'app ne lui envoie rien sur vous ni sur vos recettes."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zutatendichten vom Server von Pocket Chef laden. Die App schickt ihm nichts über dich oder deine Rezepte."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingrediëntdichtheden downloaden van de server van Pocket Chef. De app stuurt die niets over jou of je recepten."
+          }
+        }
+      }
+    },
+    "View the Code on GitHub": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver el código en GitHub"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voir le code sur GitHub"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code auf GitHub ansehen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code bekijken op GitHub"
+          }
+        }
+      }
+    },
+    "Report an Issue": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Informar de un problema"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signaler un problème"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Problem melden"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Probleem melden"
+          }
+        }
+      }
+    },
+    "Reporting an issue needs a free GitHub account.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para informar de un problema necesitas una cuenta gratuita de GitHub."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour signaler un problème, il faut un compte GitHub gratuit."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zum Melden eines Problems brauchst du ein kostenloses GitHub-Konto."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voor het melden van een probleem heb je een gratis GitHub-account nodig."
+          }
+        }
+      }
+    },
+    "Version %@ (%@)": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versión %@ (%@)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@ (%@)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@ (%@)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versie %@ (%@)"
+          }
+        }
+      }
+    },
+    "Made by NeonPixel": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hecho por NeonPixel"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Créé par NeonPixel"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von NeonPixel"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gemaakt door NeonPixel"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
