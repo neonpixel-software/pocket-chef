@@ -89,6 +89,29 @@ jobs:
         working-directory: app
     steps:
       - uses: actions/checkout@v7
+      - name: Start booting the simulator
+        if: matrix.platform == 'iOS'
+        # Booting the simulator and installing the app took 2-5 minutes after the build on the
+        # xcode-27 image. Starting the boot here lets it run during the steps up to the tests.
+        # Picks the iPhone 17 on the newest iOS, as -destination name=iPhone 17 would, and
+        # passes its id to the test step. If anything fails, the tests boot it themselves.
+        working-directory: .
+        run: |
+          udid=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          devices = json.load(sys.stdin)["devices"]
+          version = lambda runtime: [int(n) for n in runtime.rsplit("iOS-", 1)[1].split("-")]
+          for runtime in sorted((r for r in devices if ".SimRuntime.iOS-" in r), key=version, reverse=True):
+              match = [d["udid"] for d in devices[runtime] if d["name"] == "iPhone 17"]
+              if match:
+                  print(match[0])
+                  break
+          ') || true
+          if [ -n "$udid" ] && xcrun simctl boot "$udid"; then
+            echo "SIMULATOR_UDID=$udid" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Couldn't start booting an iPhone 17 simulator; the tests will boot one"
+          fi
       - name: Install xcodegen
         run: brew install xcodegen
       - name: Generate Xcode project
@@ -132,14 +155,20 @@ jobs:
           xcodebuild -project PocketChef.xcodeproj -scheme "$SCHEME" \
             -configuration Release -destination "$RELEASE_DESTINATION" \
             CODE_SIGNING_ALLOWED=NO build
+      - name: Wait for the simulator
+        if: env.SIMULATOR_UDID != ''
+        # Shows in the step's time how much of the boot the earlier steps didn't cover.
+        run: xcrun simctl bootstatus "$SIMULATOR_UDID" -b
       - name: Build & test
         # -collect-test-diagnostics never: on the xcode-27 image, xcodebuild otherwise spends
         # 10 minutes after the iOS tests trying to collect simulator diagnostics, until it
         # times out ("Failure collecting diagnostics from simulator: Timed out after 600.0
         # seconds"), on every run, passing or not. Failures still come with full logs.
         run: |
+          destination="$TEST_DESTINATION"
+          if [ -n "$SIMULATOR_UDID" ]; then destination="platform=iOS Simulator,id=$SIMULATOR_UDID"; fi
           xcodebuild -project PocketChef.xcodeproj -scheme "$SCHEME" \
-            -destination "$TEST_DESTINATION" \
+            -destination "$destination" \
             -enableCodeCoverage YES -resultBundlePath "$COVERAGE.xcresult" \
             -collect-test-diagnostics never \
             clean test
