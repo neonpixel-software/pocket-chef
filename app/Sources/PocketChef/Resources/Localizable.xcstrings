@@ -1916,7 +1916,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dernière mise à jour : %@"
+            "value": "Dernière mise à jour : %@"
           }
         },
         "de": {
@@ -2392,7 +2392,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sert à afficher les ingrédients au poids. Une tasse américaine fait 237 ml ; une tasse métrique, 250 ml."
+            "value": "Sert à afficher les ingrédients au poids. Une tasse américaine fait 237 ml ; une tasse métrique, 250 ml."
           }
         },
         "de": {
@@ -2924,7 +2924,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un livre de recettes sans superflu : pas de publicités, pas de récits de vie, juste la recette. Voici un petit tour."
+            "value": "Un livre de recettes sans superflu : pas de publicités, pas de récits de vie, juste la recette. Voici un aperçu rapide."
           }
         },
         "de": {
@@ -3092,7 +3092,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Avec Le taper et Coller un lien, Apple Intelligence lit la recette sur votre appareil. Vous la vérifiez toujours avant qu'elle soit enregistrée."
+            "value": "Avec « Le taper » et « Coller un lien », Apple Intelligence lit la recette sur votre appareil. Vous la vérifiez toujours avant qu'elle soit enregistrée."
           }
         },
         "de": {
@@ -3148,19 +3148,19 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le taper et Coller un lien lisent la recette pour vous avec Apple Intelligence, qui n'est pas disponible sur cet appareil."
+            "value": "« Le taper » et « Coller un lien » lisent la recette pour vous avec Apple Intelligence, qui n'est pas disponible sur cet appareil."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eingeben und Link einfügen lesen ein Rezept mit Apple Intelligence für dich ein, das auf diesem Gerät nicht verfügbar ist."
+            "value": "Eingeben und Link einfügen lesen ein Rezept mit Apple Intelligence für dich ein. Apple Intelligence ist auf diesem Gerät aber nicht verfügbar."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Typen en Link plakken lezen een recept voor je in met Apple Intelligence, dat op dit apparaat niet beschikbaar is."
+            "value": "Typen en Link plakken lezen een recept voor je in met Apple Intelligence. Apple Intelligence is op dit apparaat echter niet beschikbaar."
           }
         }
       }
@@ -3176,7 +3176,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cuisinez avec"
+            "value": "Cuisinez avec la recette"
           }
         },
         "de": {
@@ -3216,7 +3216,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open een recept voor een rustige pagina met alleen de ingrediënten en stappen."
+            "value": "Open een recept voor een overzichtelijke pagina met alleen de ingrediënten en stappen."
           }
         }
       }
@@ -3406,7 +3406,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zutatendichten: Sie werden täglich aktualisiert, und du kannst sie jederzeit neu laden."
+            "value": "Zutatendichten: Diese werden täglich aktualisiert und du kannst sie jederzeit neu laden."
           }
         },
         "nl": {
@@ -3792,7 +3792,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les sites de recettes enfouissent la recette sous les publicités, les pop-ups et les récits de vie. Pocket Chef ne garde que la recette : tapez-la, collez-la ou donnez son lien, vérifiez-la une fois, et cuisinez depuis une page épurée."
+            "value": "Les sites de recettes enfouissent la recette sous les publicités, les pop-ups et les récits de vie. Pocket Chef ne garde que la recette : tapez-la, collez-la ou importez-la depuis un lien, vérifiez-la une fois, et cuisinez depuis une page épurée."
           }
         },
         "de": {
@@ -3804,7 +3804,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Receptensites verstoppen het recept onder advertenties, pop-ups en levensverhalen. Pocket Chef houdt alleen het recept over: typ het, plak het of link ernaar, controleer het één keer en kook vanaf een rustige pagina."
+            "value": "Receptensites verstoppen het recept onder advertenties, pop-ups en levensverhalen. Pocket Chef houdt alleen het recept over: typ het, plak het of link ernaar, controleer het één keer en kook vanaf een overzichtelijke pagina."
           }
         }
       }
@@ -3876,7 +3876,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aucun pistage"
+            "value": "Aucun suivi"
           }
         },
         "de": {
@@ -3904,7 +3904,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pas de compte, pas de publicités, pas de statistiques d'utilisation, pas de pistage."
+            "value": "Pas de compte, pas de publicités, pas de statistiques d'utilisation, pas de suivi."
           }
         },
         "de": {
@@ -4084,7 +4084,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ingrediëntdichtheden downloaden van de server van Pocket Chef. De app stuurt die niets over jou of je recepten."
+            "value": "Ingrediëntdichtheden downloaden van de server van Pocket Chef. De app stuurt de server niets over jou of je recepten."
           }
         }
       }

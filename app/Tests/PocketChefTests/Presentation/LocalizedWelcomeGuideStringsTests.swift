@@ -13,7 +13,7 @@ final class LocalizedWelcomeGuideStringsTests: XCTestCase {
             "nl": "Welkom bij Pocket Chef",
         ],
         "Add a Recipe": ["es": "Añadir una receta", "fr": "Ajouter une recette", "de": "Ein Rezept hinzufügen", "nl": "Een recept toevoegen"],
-        "Cook From It": ["es": "Cocina con ella", "fr": "Cuisinez avec", "de": "Damit kochen", "nl": "Ermee koken"],
+        "Cook From It": ["es": "Cocina con ella", "fr": "Cuisinez avec la recette", "de": "Damit kochen", "nl": "Ermee koken"],
         "Make It Yours": ["es": "A tu gusto", "fr": "À votre goût", "de": "Nach deinem Geschmack", "nl": "Naar jouw smaak"],
         "Choose + and then Enter Manually to fill in a recipe yourself.": [
             "es": "Elige + y luego Introducir manualmente para rellenar tú la receta.",

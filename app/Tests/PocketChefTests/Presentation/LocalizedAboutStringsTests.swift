@@ -7,7 +7,7 @@ import XCTest
 final class LocalizedAboutStringsTests: XCTestCase {
     private let strings: [String: [String: String]] = [
         "About Pocket Chef": ["es": "Acerca de Pocket Chef", "fr": "À propos de Pocket Chef", "de": "Über Pocket Chef", "nl": "Over Pocket Chef"],
-        "No Tracking": ["es": "Sin rastreo", "fr": "Aucun pistage", "de": "Kein Tracking", "nl": "Geen tracking"],
+        "No Tracking": ["es": "Sin rastreo", "fr": "Aucun suivi", "de": "Kein Tracking", "nl": "Geen tracking"],
         "View the Code on GitHub": ["es": "Ver el código en GitHub", "fr": "Voir le code sur GitHub", "de": "Code auf GitHub ansehen", "nl": "Code bekijken op GitHub"],
         "Report an Issue": ["es": "Informar de un problema", "fr": "Signaler un problème", "de": "Problem melden", "nl": "Probleem melden"],
         // French puts a no-break space before a colon, so the colon never starts a line.
