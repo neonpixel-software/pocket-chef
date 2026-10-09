@@ -27,7 +27,7 @@ struct PocketChefApp: App {
 
         do {
             persistence = try PersistenceController(
-                isICloudEnabledInBuild: BuildConfiguration.isICloudEnabled,
+                isICloudEnabledInBuild: Self.isICloudEnabled,
                 seedsSampleData: Self.seedsSampleData,
                 makeContainer: Self.makeContainer
             )
@@ -81,11 +81,15 @@ struct PocketChefApp: App {
 
     // A UI test run (-UITestScenario, Debug only) gets an in-memory store in a fixed state,
     // no sample recipes, no density API and a fixed-size Mac window; see
-    // Data/DevSupport/UITestScenario.swift.
+    // Data/DevSupport/UITestScenario.swift. The unit tests' host app gets an empty in-memory
+    // store without iCloud: CloudKit imports into the developer's real store post
+    // recipeStoreDidChange, which the views under test react to (#160).
     #if DEBUG
     private static let uiTestScenario = UITestScenario.current()
-    private static let seedsSampleData = uiTestScenario == nil
-    private static let usesDensityAPI = uiTestScenario == nil
+    private static let usesRealStore = uiTestScenario == nil && !isHostingUnitTests
+    private static let seedsSampleData = usesRealStore
+    private static let usesDensityAPI = usesRealStore
+    private static let isICloudEnabled = BuildConfiguration.isICloudEnabled && !isHostingUnitTests
     #if os(macOS)
     private static let uiTestWindowSize = uiTestScenario.map { _ in UITestScenario.macContentSize }
     #else
@@ -93,7 +97,8 @@ struct PocketChefApp: App {
     private static let uiTestWindowSize: CGSize? = nil
     #endif
     private static let makeContainer: PersistenceController.ContainerFactory =
-        uiTestScenario?.makeContainer(for:) ?? RecipeStore.makeContainer(for:)
+        uiTestScenario?.makeContainer(for:)
+            ?? (isHostingUnitTests ? RecipeStore.makeInMemoryContainer(for:) : RecipeStore.makeContainer(for:))
 
     private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
         uiTestScenario?.recipeRepository(wrapping: repository) ?? repository
@@ -116,6 +121,7 @@ struct PocketChefApp: App {
     #else
     private static let seedsSampleData = false
     private static let usesDensityAPI = true
+    private static let isICloudEnabled = BuildConfiguration.isICloudEnabled
     private static let makeContainer: PersistenceController.ContainerFactory = RecipeStore.makeContainer(for:)
 
     private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
