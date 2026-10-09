@@ -60,18 +60,21 @@ final class RecipeListHeaderUITests: XCTestCase {
         XCTAssertTrue(list.exists, "The recipe list is missing")
         // A synthesized scroll on GitHub's macOS runner sometimes moves the list less, or not at
         // all, so scroll in steps until Recipe 12 is on screen. However far it goes, the header
-        // has to stay put.
+        // has to stay put. On iOS each step is a slow drag over a third of the list: a swipe's
+        // momentum could carry Recipe 12 past the top while the runner was still settling it,
+        // and the lazy list then unloads the row, so no later check can find it (#164).
         var scrolled = false
-        for _ in 0..<4 where !scrolled {
+        for _ in 0..<8 where !scrolled {
             #if os(macOS)
             list.scroll(byDeltaX: 0, deltaY: -600)
             #else
-            list.swipeUp()
+            list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.7))
+                .press(forDuration: 0.1, thenDragTo: list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.35)))
             #endif
             scrolled = waitUntilFullyInside(laterRecipe, window: app.windows.firstMatch.frame, timeout: 3)
         }
         let where12 = laterRecipe.exists ? "at \(laterRecipe.frame), window bottom \(windowBottom)" : "not loaded"
-        XCTAssertTrue(scrolled, "The recipe list didn't scroll: after 4 scrolls Recipe 12 is \(where12), so this checked nothing")
+        XCTAssertTrue(scrolled, "The recipe list didn't scroll: after 8 scrolls Recipe 12 is \(where12), so this checked nothing")
         let headerAfter = assertHeaderIsAtTop(in: app)
         XCTAssertEqual(headerAfter.minY, headerBefore.minY, accuracy: 1, "The header moved while the list scrolled")
     }
