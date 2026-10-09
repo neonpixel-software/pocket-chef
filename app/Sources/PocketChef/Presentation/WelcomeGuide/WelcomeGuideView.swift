@@ -175,6 +175,9 @@ private struct WelcomeGuidePresentation: ViewModifier {
         WelcomeGuideView(viewModel: viewModel) { isPresented = false }
     }
 
+    /// If the size class changes while the guide is open (an iPad resized in multitasking), one
+    /// presentation closes and the other opens: the guide is marked seen and starts again from
+    /// page 1. Left as is; it's rare and the guide still works.
     private func presented(fullScreen: Bool) -> Binding<Bool> {
         Binding(
             get: { isPresented && (sizeClass == .compact) == fullScreen },

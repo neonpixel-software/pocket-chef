@@ -72,7 +72,7 @@ final class WelcomeGuideViewTests: XCTestCase {
         let labels = try sut.inspect().findAll(WelcomeGuidePageView.self).map { try $0.accessibilityLabel().string() }
 
         XCTAssertEqual(labels, viewModel.pages.enumerated().map { $1.accessibilityLabel(at: $0, of: 4) })
-        XCTAssertEqual(labels.first, "Welcome to Pocket Chef, A recipe box without the fluff: no ads, no life stories, just the recipe. Here's a quick tour., Page 1 of 4")
+        XCTAssertEqual(labels.first, "Welcome to Pocket Chef, A recipe box without the fluff: no ads, no life stories, just the recipe. Here's a quick tour. Page 1 of 4")
     }
 
     func testAPageShowsItsTitleTextPointsAndNote() throws {

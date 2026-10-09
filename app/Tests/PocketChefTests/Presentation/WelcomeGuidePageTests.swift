@@ -49,8 +49,8 @@ final class WelcomeGuidePageTests: XCTestCase {
 
         XCTAssertEqual(
             page.accessibilityLabel(at: 1, of: 4),
-            "Add a Recipe, Choose + and then Enter Manually to fill in a recipe yourself., "
-                + "Type It and Paste a Link read a recipe for you with Apple Intelligence, which isn't available on this device., Page 2 of 4"
+            "Add a Recipe, Choose + and then Enter Manually to fill in a recipe yourself. "
+                + "Type It and Paste a Link read a recipe for you with Apple Intelligence, which isn't available on this device. Page 2 of 4"
         )
     }
 

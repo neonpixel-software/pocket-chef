@@ -140,11 +140,12 @@ and "Made by NeonPixel".
 
 ## Accessibility and localization
 
-- Headings carry the `.isHeader` trait. Each guide page reads as one element:
-  all its text, then its position ("Page 2 of 4"). The position is part of the
-  label, not the accessibility value, because the Mac doesn't expose a value on
-  a group (found while building 14.1). The page dots are hidden from
-  VoiceOver.
+- Each guide page reads as one element: all its text, then its position
+  ("Page 2 of 4"). The position is part of the label, not the accessibility
+  value, because the Mac doesn't expose a value on a group (found while
+  building 14.1). Headings aren't separate elements, so they carry no
+  `.isHeader` trait: the page-as-one-element design takes their place. The
+  page dots are hidden from VoiceOver.
 - All text is in the five languages (en, es, fr, de, nl), informal register.
   The About and guide texts are longer than earlier strings, so the drafts get
   a native-speaker review of their own: 14.1 opened #156 for de, es, fr and

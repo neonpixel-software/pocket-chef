@@ -10,6 +10,7 @@ struct PocketChefApp: App {
     private let captureService: RecipeCaptureService
     private let webPageFetcher: WebPageFetcher
     private let captureRecipeUseCase: CaptureRecipeUseCase
+    private let checkCaptureAvailabilityUseCase: CheckCaptureAvailabilityUseCase
     private let settingsViewModel: SettingsViewModel
     private let welcomeGuideViewModel: WelcomeGuideViewModel
     /// The local-only density cache (Phase 10). Nil when the store couldn't open; the app
@@ -41,6 +42,8 @@ struct PocketChefApp: App {
         self.captureService = captureService
         webPageFetcher = URLSessionWebPageFetcher()
         captureRecipeUseCase = DefaultCaptureRecipeUseCase(captureService: captureService)
+        let checkCaptureAvailabilityUseCase = DefaultCheckCaptureAvailabilityUseCase(captureService: captureService)
+        self.checkCaptureAvailabilityUseCase = checkCaptureAvailabilityUseCase
         do {
             densityContainer = try DensityStore.makeContainer()
         } catch {
@@ -69,7 +72,6 @@ struct PocketChefApp: App {
             isICloudAvailableInBuild: BuildConfiguration.isICloudEnabled,
             refreshDensityCacheUseCase: refreshDensityCacheUseCase
         )
-        let checkCaptureAvailabilityUseCase = DefaultCheckCaptureAvailabilityUseCase(captureService: captureService)
         welcomeGuideViewModel = WelcomeGuideViewModel(
             status: Self.makeWelcomeGuideStatus(),
             isCaptureAvailable: checkCaptureAvailabilityUseCase.execute
@@ -135,7 +137,7 @@ struct PocketChefApp: App {
             fetchTagsUseCase: DefaultFetchTagsUseCase(repository: tagRepository),
             findOrCreateTagUseCase: DefaultFindOrCreateTagUseCase(repository: tagRepository),
             captureRecipeUseCase: captureRecipeUseCase,
-            checkCaptureAvailabilityUseCase: DefaultCheckCaptureAvailabilityUseCase(captureService: captureService),
+            checkCaptureAvailabilityUseCase: checkCaptureAvailabilityUseCase,
             captureRecipeFromURLUseCase: DefaultCaptureRecipeFromURLUseCase(
                 webPageFetcher: webPageFetcher,
                 captureRecipeUseCase: captureRecipeUseCase

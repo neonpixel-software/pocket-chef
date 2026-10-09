@@ -17,10 +17,13 @@ struct WelcomeGuidePage: Identifiable, Equatable {
 
     /// What VoiceOver reads for the page, which is one element: all its text, then where it is
     /// ("Page 2 of 4"). The position goes in the label, not the value: the Mac doesn't read a
-    /// value on a group.
+    /// value on a group. A comma follows only text that doesn't end in punctuation already, so
+    /// VoiceOver doesn't read "yourself., Page 2 of 4".
     func accessibilityLabel(at index: Int, of count: Int) -> String {
-        ([title, body] + items + [note].compactMap(\.self) + [String(localized: "Page \(index + 1) of \(count)")])
-            .joined(separator: ", ")
+        let parts = [title, body] + items + [note].compactMap(\.self) + [String(localized: "Page \(index + 1) of \(count)")]
+        return parts.dropFirst().reduce(parts[0]) { label, part in
+            label + (label.last?.isPunctuation == true ? " " : ", ") + part
+        }
     }
 
     /// The guide's four pages. Page 2 only offers the ways to add a recipe this device has:
