@@ -65,10 +65,7 @@ enum UITestScenario: String, CaseIterable {
     /// Ignores the storage mode: there is no iCloud in a UI test run.
     @MainActor
     func makeContainer(for _: StorageMode) throws -> ModelContainer {
-        let container = try ModelContainer(
-            for: RecipeStore.schema,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
-        )
+        let container = try RecipeStore.makeInMemoryContainer()
         for title in recipeTitles {
             container.mainContext.insert(Recipe(
                 id: UUID(),

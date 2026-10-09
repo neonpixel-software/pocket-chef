@@ -42,6 +42,12 @@ enum RecipeStore {
         return try ModelContainer(for: schema, configurations: configuration(for: mode))
     }
 
+    /// An empty store that's never written to disk or synced, for UI test runs and the unit
+    /// tests' host app. Ignores the storage mode.
+    static func makeInMemoryContainer(for _: StorageMode = .local) throws -> ModelContainer {
+        try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
+    }
+
     private static var storeDirectory: URL {
         URL.applicationSupportDirectory
     }
