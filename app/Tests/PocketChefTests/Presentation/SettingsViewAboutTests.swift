@@ -10,15 +10,17 @@ final class SettingsViewAboutTests: XCTestCase {
 
     #if os(iOS)
     func testSettingsLinksToAbout() throws {
-        let link = try sut.inspect().find(ViewType.NavigationLink.self) { try $0.labelView().text().string() == "About Pocket Chef" }
-
-        XCTAssertNoThrow(try link.find(AboutView.self))
+        XCTAssertNoThrow(try aboutLink().find(AboutView.self))
     }
     #else
     func testTheMacSettingsHaveNoAboutRow() {
-        XCTAssertThrowsError(try sut.inspect().find(ViewType.NavigationLink.self))
+        XCTAssertThrowsError(try aboutLink())
     }
     #endif
+
+    private func aboutLink() throws -> InspectableView<ViewType.NavigationLink> {
+        try sut.inspect().find(ViewType.NavigationLink.self) { try $0.labelView().text().string() == "About Pocket Chef" }
+    }
 }
 
 @MainActor

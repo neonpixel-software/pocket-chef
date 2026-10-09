@@ -9,7 +9,11 @@ struct AboutView: View {
     static let windowID = "about"
     static let macSize = CGSize(width: 540, height: 760)
 
-    var info = AboutInfo()
+    let info: AboutInfo
+
+    init(info: AboutInfo = AboutInfo()) {
+        self.info = info
+    }
 
     var body: some View {
         ScrollView {
