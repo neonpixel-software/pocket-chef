@@ -29,6 +29,8 @@ jobs:
     outputs:
       app: ${{ steps.filter.outputs.app == 'true' || steps.filter.outputs.workflow == 'true' || steps.filter.outputs.coverage-gate == 'true' }}
       api: ${{ steps.filter.outputs.api == 'true' || steps.filter.outputs.workflow == 'true' || steps.filter.outputs.coverage-gate == 'true' }}
+      # Whether a PR runs the UI tests (pushes to main always do): see the ui-* filters.
+      ui: ${{ steps.filter.outputs.ui-sources == 'true' || steps.filter.outputs.ui-entry == 'true' || steps.filter.outputs.ui-tests == 'true' || steps.filter.outputs.workflow == 'true' }}
     steps:
       - uses: actions/checkout@v7
       - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
@@ -52,6 +54,19 @@ jobs:
             # A separate filter: "every" would require one file to match both paths.
             coverage-gate:
               - '.github/{scripts/check-coverage.py,coverage-exclusions.txt}'
+            # What the UI tests exercise: the screens and their strings, assets and fonts, the
+            # app's entry point and its -UITestScenario setup, the project, and the tests
+            # themselves. A PR that changes none of these (domain or data logic, unit tests,
+            # CI scripts) skips the UI tests, which take 3-5 of the iOS job's minutes; unit
+            # tests still cover the app above COVERAGE_MIN without them (91% on 2026-10-09,
+            # against 94% with them). Every push to main runs them, so a UI break from a change
+            # outside these paths shows up there.
+            ui-sources:
+              - 'app/Sources/PocketChef/{Presentation,Resources,Data/DevSupport}/**'
+            ui-entry:
+              - 'app/{Sources/PocketChef/PocketChefApp.swift,project.yml}'
+            ui-tests:
+              - 'app/Tests/PocketChefUITests/**'
 
   build-apple:
     needs: changes
@@ -137,12 +152,19 @@ jobs:
         # 10 minutes after the iOS tests trying to collect simulator diagnostics, until it
         # times out ("Failure collecting diagnostics from simulator: Timed out after 600.0
         # seconds"), on every run, passing or not. Failures still come with full logs.
+        env:
+          RUNS_UI_TESTS: ${{ github.event_name == 'push' || needs.changes.outputs.ui == 'true' }}
         run: |
+          skip=()
+          if [ "$RUNS_UI_TESTS" != true ]; then
+            skip=(-skip-testing:"${SCHEME}UITests")
+            echo "::notice::UI tests skipped: this PR changes nothing they exercise (see the ui-* filters)"
+          fi
           xcodebuild -project PocketChef.xcodeproj -scheme "$SCHEME" \
             -destination "$TEST_DESTINATION" \
             -enableCodeCoverage YES -resultBundlePath "$COVERAGE.xcresult" \
             -collect-test-diagnostics never \
-            clean test
+            "${skip[@]}" clean test
       - name: Convert coverage to SonarCloud's generic format
         # xccov writes absolute paths on this macOS runner, which the Ubuntu sonarcloud job
         # can't match to its checkout, so make them relative to the repository root. Fails if
