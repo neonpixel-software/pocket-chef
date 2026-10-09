@@ -25,6 +25,8 @@ enum UITestScenario: String, CaseIterable {
     case recipeWithPhotos
     /// The recipeWithPhotos recipe, opened on its detail screen like recipeDetail.
     case recipeWithPhotosDetail
+    /// No recipes, and the welcome guide opens as on a first launch. No other scenario shows it.
+    case welcomeGuide
 
     static let launchArgument = "-UITestScenario"
 
@@ -48,6 +50,11 @@ enum UITestScenario: String, CaseIterable {
     /// Whether the app opens on the first recipe's detail screen instead of the list.
     var opensRecipeDetail: Bool {
         self == .recipeDetail || self == .recipeWithPhotosDetail
+    }
+
+    /// Whether the welcome guide opens at launch.
+    var showsWelcomeGuide: Bool {
+        self == .welcomeGuide
     }
 
     /// The preset tag the list starts filtered by, if any.
@@ -136,7 +143,7 @@ enum UITestScenario: String, CaseIterable {
 
     private var recipeTitles: [String] {
         switch self {
-        case .empty, .loadError: []
+        case .empty, .loadError, .welcomeGuide: []
         case .noMatchingTag: ["Plain Toast"]
         case .manyRecipes: (1...40).map { String(format: "Recipe %02d", $0) }
         case .recipeDetail: ["Plain Toast"]

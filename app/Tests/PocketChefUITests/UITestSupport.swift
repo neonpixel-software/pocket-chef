@@ -2,9 +2,10 @@ import XCTest
 
 /// Shared by the UI tests: launching a UITestScenario and checking the PCHeader.
 extension XCTestCase {
-    /// Launches the app in a UITestScenario (Data/DevSupport/UITestScenario.swift).
+    /// The app set up for a UITestScenario (Data/DevSupport/UITestScenario.swift), not launched
+    /// yet. Most tests use `launch(scenario:)`.
     @MainActor
-    func launch(scenario: String) -> XCUIApplication {
+    func makeApp(scenario: String) -> XCUIApplication {
         let app = XCUIApplication()
         // English, so the texts the tests look for match whatever the test machine's language.
         // Ignoring the saved window state, or macOS reopens no window when the last run ended
@@ -15,6 +16,13 @@ extension XCTestCase {
             "-AppleLocale", "en_US",
             "-ApplePersistenceIgnoreState", "YES",
         ]
+        return app
+    }
+
+    /// Launches the app in a UITestScenario and checks the recipe window came up at the test size.
+    @MainActor
+    func launch(scenario: String) -> XCUIApplication {
+        let app = makeApp(scenario: scenario)
         app.launch()
         #if os(macOS)
         // The app pins its content to 900 × 600 under the toolbar in a UI test run

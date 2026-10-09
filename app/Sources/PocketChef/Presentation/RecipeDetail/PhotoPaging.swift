@@ -79,22 +79,27 @@ struct PhotoPageDots: View {
 }
 
 #if os(macOS)
-/// Previous and next buttons over a paged scroll view: a Mac has no swipe on a mouse.
+/// Previous and next buttons over a paged scroll view: a Mac has no swipe on a mouse. The
+/// welcome guide uses them too, with its own labels.
 struct PhotoPagingArrows: View {
     let canGoBack: Bool
     let canGoForward: Bool
+    var previousLabel: LocalizedStringKey = "Previous Photo"
+    var nextLabel: LocalizedStringKey = "Next Photo"
+    /// ← and → as well. Off in the recipe gallery: its edit sheet's text fields need the keys.
+    var usesArrowKeys = false
     let onStep: (Int) -> Void
 
     var body: some View {
         HStack {
-            arrow("chevron.left", label: "Previous Photo", isEnabled: canGoBack, step: -1)
+            arrow("chevron.left", label: previousLabel, isEnabled: canGoBack, key: .leftArrow, step: -1)
             Spacer()
-            arrow("chevron.right", label: "Next Photo", isEnabled: canGoForward, step: 1)
+            arrow("chevron.right", label: nextLabel, isEnabled: canGoForward, key: .rightArrow, step: 1)
         }
         .padding(12)
     }
 
-    private func arrow(_ systemImage: String, label: LocalizedStringKey, isEnabled: Bool, step: Int) -> some View {
+    private func arrow(_ systemImage: String, label: LocalizedStringKey, isEnabled: Bool, key: KeyEquivalent, step: Int) -> some View {
         Button { onStep(step) } label: {
             Image(systemName: systemImage)
                 .font(.system(size: 15, weight: .bold))
@@ -102,6 +107,7 @@ struct PhotoPagingArrows: View {
                 .background(.regularMaterial, in: Circle())
         }
         .buttonStyle(.plain)
+        .keyboardShortcut(usesArrowKeys ? KeyboardShortcut(key, modifiers: []) : nil)
         .accessibilityLabel(label)
         .opacity(isEnabled ? 1 : 0)
         .disabled(!isEnabled)
