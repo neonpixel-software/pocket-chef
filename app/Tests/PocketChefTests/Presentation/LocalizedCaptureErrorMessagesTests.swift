@@ -20,10 +20,10 @@ final class LocalizedCaptureErrorMessagesTests: XCTestCase {
             "nl": "Die pagina kon niet worden geladen. Controleer de link en probeer het opnieuw.",
         ],
         "That page is too large to read. Try a link to just the recipe.": [
-            "es": "Esa página es demasiado grande para leerla. Prueba con un enlace solo a la receta.",
+            "es": "Esa página es demasiado grande para leerla. Prueba con un enlace directo a la receta.",
             "fr": "Cette page est trop volumineuse pour être lue. Essayez un lien vers la recette seule.",
-            "de": "Diese Seite ist zu groß zum Lesen. Versuche einen Link nur zum Rezept.",
-            "nl": "Die pagina is te groot om te lezen. Probeer een link naar alleen het recept.",
+            "de": "Diese Seite ist zu groß zum Lesen. Versuche einen Link, der nur zum Rezept führt.",
+            "nl": "Die pagina is te groot om te lezen. Probeer een link die alleen naar het recept verwijst.",
         ],
         "That site doesn't use a secure connection (https), so it can't be opened.": [
             "es": "Ese sitio no usa una conexión segura (https), por lo que no se puede abrir.",
