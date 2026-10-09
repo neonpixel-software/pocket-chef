@@ -89,14 +89,15 @@ struct PocketChefApp: App {
     private static let usesRealStore = uiTestScenario == nil && !isHostingUnitTests
     private static let seedsSampleData = usesRealStore
     private static let usesDensityAPI = usesRealStore
-    private static let isICloudEnabled = BuildConfiguration.isICloudEnabled && !isHostingUnitTests
+    /// Internal so a test can check the unit tests' host app runs without iCloud (#160).
+    static let isICloudEnabled = BuildConfiguration.isICloudEnabled && !isHostingUnitTests
     #if os(macOS)
     private static let uiTestWindowSize = uiTestScenario.map { _ in UITestScenario.macContentSize }
     #else
     /// iOS windows always fill the screen.
     private static let uiTestWindowSize: CGSize? = nil
     #endif
-    private static let makeContainer: PersistenceController.ContainerFactory =
+    static let makeContainer: PersistenceController.ContainerFactory =
         uiTestScenario?.makeContainer(for:)
             ?? (isHostingUnitTests ? RecipeStore.makeInMemoryContainer(for:) : RecipeStore.makeContainer(for:))
 
@@ -119,6 +120,8 @@ struct PocketChefApp: App {
         return UserDefaultsWelcomeGuideStatus()
     }
     #else
+    // What the Debug values are for a normal launch. Neither test kind runs against Release:
+    // unit tests need @testable (Debug), and -UITestScenario is Debug only.
     private static let seedsSampleData = false
     private static let usesDensityAPI = true
     private static let isICloudEnabled = BuildConfiguration.isICloudEnabled
