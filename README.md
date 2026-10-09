@@ -19,7 +19,7 @@ A NeonPixel app for macOS, iPadOS, and iOS. Gather recipes with zero friction: t
 
 ## Privacy
 
-Pocket Chef collects **no** user data, shows **no** ads, and is completely anonymous. Recipe capture runs on-device via Apple Intelligence — a pasted URL is fetched directly from its source site, never proxied through our servers — and the only other planned network activity is the density-data API. The App Store privacy declaration will be "data not collected".
+Pocket Chef collects **no** user data, shows **no** ads, and is completely anonymous. Recipe capture runs on-device via Apple Intelligence — a pasted URL is fetched directly from its source site, never proxied through our servers — and the only other network activity is the user's own iCloud sync and the density-data API. The App Store privacy declaration is "Data Not Collected": see the [privacy policy](PRIVACY.md) and [what's entered in App Store Connect](app/docs/app-store-connect.md).
 
 ## Repository layout
 

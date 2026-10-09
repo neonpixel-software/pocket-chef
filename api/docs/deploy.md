@@ -181,6 +181,7 @@ Point `<api-hostname>`'s DNS at the VPS first.
 server {
     listen 80;
     server_name <api-hostname>;
+    access_log off;
 
     location / {
         proxy_pass http://127.0.0.1:<port>;
@@ -196,6 +197,14 @@ sent. The rate limiter (§10) counts requests per address using the first
 value of that header. nginx's usual `$proxy_add_x_forwarded_for` appends to
 the client's header instead, so a client could send a different fake address
 on every request and never be limited.
+
+`access_log off` keeps the app's privacy promise. Pocket Chef's App Store
+privacy label says "Data Not Collected", and nginx's default access log would
+keep every caller's IP address and User-Agent on disk for weeks. The API logs
+no requests itself (`Microsoft.AspNetCore` logs at Warning), and the rate
+limiter keeps addresses in memory for one window only. nginx's error log can
+still name a client address when a request fails; it's kept for diagnosing
+outages and rotated away with the system's logs.
 
 ```sh
 sudo ln -s /etc/nginx/sites-available/<api-hostname> /etc/nginx/sites-enabled/
@@ -368,7 +377,8 @@ running, compare `ss -ltnp | grep dotnet` with the `proxy_pass` port.
 - [ ] `<deploy-path>/releases` owned by the deploy user; `<env-file>` written,
       root-owned, mode 600 (§4)
 - [ ] systemd unit installed and enabled, not started (§5)
-- [ ] DNS points at the VPS; nginx site enabled; certbot certificate issued (§6)
+- [ ] DNS points at the VPS; nginx site enabled with `access_log off`; certbot
+      certificate issued (§6)
 - [ ] Migrations applied and the table seeded from the Mac (§8)
 - [ ] Deploy workflow run on `main`, smoke test passed (§7)
 - [ ] From outside the VPS: `GET https://<api-hostname>/density-entries` with
