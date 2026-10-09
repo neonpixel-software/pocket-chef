@@ -42,8 +42,7 @@ struct PocketChefApp: App {
         self.captureService = captureService
         webPageFetcher = URLSessionWebPageFetcher()
         captureRecipeUseCase = DefaultCaptureRecipeUseCase(captureService: captureService)
-        let checkCaptureAvailabilityUseCase = DefaultCheckCaptureAvailabilityUseCase(captureService: captureService)
-        self.checkCaptureAvailabilityUseCase = checkCaptureAvailabilityUseCase
+        checkCaptureAvailabilityUseCase = DefaultCheckCaptureAvailabilityUseCase(captureService: captureService)
         do {
             densityContainer = try DensityStore.makeContainer()
         } catch {
