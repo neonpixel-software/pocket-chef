@@ -1916,7 +1916,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dernière mise à jour : %@"
+            "value": "Dernière mise à jour : %@"
           }
         },
         "de": {
@@ -2392,7 +2392,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sert à afficher les ingrédients au poids. Une tasse américaine fait 237 ml ; une tasse métrique, 250 ml."
+            "value": "Sert à afficher les ingrédients au poids. Une tasse américaine fait 237 ml ; une tasse métrique, 250 ml."
           }
         },
         "de": {
