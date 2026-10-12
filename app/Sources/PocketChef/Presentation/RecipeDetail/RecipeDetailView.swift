@@ -29,126 +29,43 @@ struct RecipeDetailView: View {
 
     private var recipe: Recipe { viewModel.recipe }
 
+    /// From this width on (a Mac window, an iPad, an iPhone in landscape) a recipe with photos
+    /// shows them in a column beside it. Narrower, a full-width photo sits on top, as on an
+    /// iPhone held upright, where it doesn't push the recipe far down.
+    static let twoColumnMinWidth: CGFloat = 700
+    /// The photo column's share of the width, up to the gallery's own limit.
+    private static let photoColumnFraction: CGFloat = 0.42
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 32) {
-                // Recipes without photos look as they did before photos existed.
-                if !recipe.photos.isEmpty {
-                    RecipePhotoGallery(
-                        photos: recipe.photos,
-                        loadImage: viewModel.imageData(for:),
-                        onOpen: { viewerStart = PhotoViewerStart(index: $0) }
-                    )
+        GeometryReader { geometry in
+            if !recipe.photos.isEmpty, geometry.size.width >= Self.twoColumnMinWidth {
+                // The photos stay in view beside the recipe while it scrolls.
+                HStack(alignment: .top, spacing: 0) {
+                    ScrollView {
+                        recipeSections
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(20)
+                    }
+                    gallery
+                        .frame(width: min(RecipePhotoGallery.maxWidth, geometry.size.width * Self.photoColumnFraction))
+                        .padding([.top, .trailing], 20)
                 }
-
-                if !recipe.tags.isEmpty {
-                    FlowLayout(spacing: 8) {
-                        ForEach(recipe.tags) { tag in
-                            Text(tag.localizedDisplayName())
-                                .font(PCFont.body(12, weight: .bold))
-                                .foregroundStyle(PCColor.ink)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 4)
-                                .background(PCColor.teal, in: Capsule())
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 32) {
+                        // Recipes without photos look as they did before photos existed.
+                        if !recipe.photos.isEmpty {
+                            gallery
                         }
+                        recipeSections
                     }
-                }
-
-                section(title: String(localized: "Ingredients"), accent: PCColor.teal) {
-                    if !recipe.ingredients.isEmpty {
-                        Picker("Measurements", selection: $showsWeights) {
-                            Text("As Written").tag(false)
-                            Text("Weight").tag(true)
-                        }
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
-                    }
-                    Group {
-                        if recipe.ingredients.isEmpty {
-                            Text("No ingredients listed")
-                                .font(PCFont.body(15))
-                                .foregroundStyle(PCColor.textPrimary.opacity(0.55))
-                                .padding(16)
-                        } else {
-                            VStack(spacing: 0) {
-                                ForEach(Array(recipe.ingredients.enumerated()), id: \.element.id) { index, ingredient in
-                                    HStack(spacing: 12) {
-                                        Circle()
-                                            .fill(PCColor.teal)
-                                            .frame(width: 8, height: 8)
-                                        IngredientLineText(ingredient: ingredient, weight: showsWeights ? weights[ingredient.id] : nil)
-                                        Spacer()
-                                    }
-                                    .padding(.vertical, 12)
-
-                                    if index < recipe.ingredients.count - 1 {
-                                        Divider().opacity(0.3)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                        }
-                    }
-                    .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 14))
-                    .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
-                }
-
-                // Hidden when empty: most recipes, including every one saved before #82, have none.
-                if !recipe.equipment.isEmpty {
-                    section(title: String(localized: "Equipment"), accent: PCColor.deepTeal) {
-                        VStack(spacing: 0) {
-                            ForEach(Array(recipe.equipment.enumerated()), id: \.offset) { index, item in
-                                HStack(spacing: 12) {
-                                    Circle()
-                                        .fill(PCColor.deepTeal)
-                                        .frame(width: 8, height: 8)
-                                    Text(item)
-                                        .font(PCFont.body(15))
-                                        .foregroundStyle(PCColor.textPrimary)
-                                    Spacer()
-                                }
-                                .padding(.vertical, 12)
-
-                                if index < recipe.equipment.count - 1 {
-                                    Divider().opacity(0.3)
-                                }
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 14))
-                        .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
-                    }
-                }
-
-                section(title: String(localized: "Steps"), accent: PCColor.pink) {
-                    if recipe.steps.isEmpty {
-                        Text("No steps listed")
-                            .font(PCFont.body(15))
-                            .foregroundStyle(PCColor.textPrimary.opacity(0.55))
-                    } else {
-                        VStack(alignment: .leading, spacing: 16) {
-                            ForEach(Array(recipe.steps.enumerated()), id: \.offset) { index, step in
-                                HStack(alignment: .top, spacing: 14) {
-                                    Text("\(index + 1)")
-                                        .font(PCFont.body(13, weight: .bold))
-                                        .foregroundStyle(PCColor.ink)
-                                        .frame(width: 26, height: 26)
-                                        .background(PCColor.pink, in: Circle())
-                                    Text(step)
-                                        .font(PCFont.body(15))
-                                        .foregroundStyle(PCColor.textPrimary)
-                                        .padding(.top, 3)
-                                }
-                            }
-                        }
-                    }
+                    // Full width, leading: a short recipe otherwise sized the scroll view to its content,
+                    // centered in the window, with the window's own background on both sides and, on
+                    // macOS, no pink under the toolbar (#104).
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(20)
                 }
             }
-            // Full width, leading: a short recipe otherwise sized the scroll view to its content,
-            // centered in the window, with the window's own background on both sides and, on
-            // macOS, no pink under the toolbar (#104).
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(20)
         }
         .background(PCColor.background)
         .safeAreaInset(edge: .top, spacing: 0) {
@@ -156,6 +73,12 @@ struct RecipeDetailView: View {
         }
         .navigationTitle("")
         .pcHeaderBar()
+        #if os(macOS)
+        // As on the list (#104): the pink reached up under the toolbar while the scroll view was
+        // this screen's outermost view; inside the column layout macOS draws its own toolbar
+        // background there instead.
+        .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
+        #endif
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Edit") { viewModel.isPresentingEdit = true }
@@ -202,6 +125,122 @@ struct RecipeDetailView: View {
         .onChange(of: showsWeights, initial: true) { updateWeights() }
         .onChange(of: recipe.ingredients) { updateWeights() }
         .onChange(of: volumeStandard) { updateWeights() }
+    }
+
+    private var gallery: some View {
+        RecipePhotoGallery(
+            photos: recipe.photos,
+            loadImage: viewModel.imageData(for:),
+            onOpen: { viewerStart = PhotoViewerStart(index: $0) }
+        )
+    }
+
+    /// Tags, ingredients, equipment and steps: everything but the photos.
+    private var recipeSections: some View {
+        VStack(alignment: .leading, spacing: 32) {
+            if !recipe.tags.isEmpty {
+                FlowLayout(spacing: 8) {
+                    ForEach(recipe.tags) { tag in
+                        Text(tag.localizedDisplayName())
+                            .font(PCFont.body(12, weight: .bold))
+                            .foregroundStyle(PCColor.ink)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(PCColor.teal, in: Capsule())
+                    }
+                }
+            }
+
+            section(title: String(localized: "Ingredients"), accent: PCColor.teal) {
+                if !recipe.ingredients.isEmpty {
+                    Picker("Measurements", selection: $showsWeights) {
+                        Text("As Written").tag(false)
+                        Text("Weight").tag(true)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                }
+                Group {
+                    if recipe.ingredients.isEmpty {
+                        Text("No ingredients listed")
+                            .font(PCFont.body(15))
+                            .foregroundStyle(PCColor.textPrimary.opacity(0.55))
+                            .padding(16)
+                    } else {
+                        VStack(spacing: 0) {
+                            ForEach(Array(recipe.ingredients.enumerated()), id: \.element.id) { index, ingredient in
+                                HStack(spacing: 12) {
+                                    Circle()
+                                        .fill(PCColor.teal)
+                                        .frame(width: 8, height: 8)
+                                    IngredientLineText(ingredient: ingredient, weight: showsWeights ? weights[ingredient.id] : nil)
+                                    Spacer()
+                                }
+                                .padding(.vertical, 12)
+
+                                if index < recipe.ingredients.count - 1 {
+                                    Divider().opacity(0.3)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                    }
+                }
+                .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 14))
+                .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
+            }
+
+            // Hidden when empty: most recipes, including every one saved before #82, have none.
+            if !recipe.equipment.isEmpty {
+                section(title: String(localized: "Equipment"), accent: PCColor.deepTeal) {
+                    VStack(spacing: 0) {
+                        ForEach(Array(recipe.equipment.enumerated()), id: \.offset) { index, item in
+                            HStack(spacing: 12) {
+                                Circle()
+                                    .fill(PCColor.deepTeal)
+                                    .frame(width: 8, height: 8)
+                                Text(item)
+                                    .font(PCFont.body(15))
+                                    .foregroundStyle(PCColor.textPrimary)
+                                Spacer()
+                            }
+                            .padding(.vertical, 12)
+
+                            if index < recipe.equipment.count - 1 {
+                                Divider().opacity(0.3)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 14))
+                    .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
+                }
+            }
+
+            section(title: String(localized: "Steps"), accent: PCColor.pink) {
+                if recipe.steps.isEmpty {
+                    Text("No steps listed")
+                        .font(PCFont.body(15))
+                        .foregroundStyle(PCColor.textPrimary.opacity(0.55))
+                } else {
+                    VStack(alignment: .leading, spacing: 16) {
+                        ForEach(Array(recipe.steps.enumerated()), id: \.offset) { index, step in
+                            HStack(alignment: .top, spacing: 14) {
+                                Text("\(index + 1)")
+                                    .font(PCFont.body(13, weight: .bold))
+                                    .foregroundStyle(PCColor.ink)
+                                    .frame(width: 26, height: 26)
+                                    .background(PCColor.pink, in: Circle())
+                                Text(step)
+                                    .font(PCFont.body(15))
+                                    .foregroundStyle(PCColor.textPrimary)
+                                    .padding(.top, 3)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private func updateWeights() {
