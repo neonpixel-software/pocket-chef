@@ -15,6 +15,9 @@ on:
   push:
     branches: [main]
 
+# The GITHUB_TOKEN only needs to read the repo: the jobs check out, build and pass artifacts
+# within the run, and paths-filter lists a PR's files, which a public repo allows with this
+# scope. Sonar uses its own token. A job that needs more gets its own permissions block.
 permissions:
   contents: read
 
