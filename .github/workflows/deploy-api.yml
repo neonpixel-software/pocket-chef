@@ -14,6 +14,11 @@ name: Deploy density API
 on:
   workflow_dispatch:
 
+# The GITHUB_TOKEN only needs to read the repo: the jobs check out and pass artifacts within
+# the run, and the deploy reaches the VPS with its own SSH key from the secrets.
+permissions:
+  contents: read
+
 concurrency:
   group: deploy-api
   cancel-in-progress: false
