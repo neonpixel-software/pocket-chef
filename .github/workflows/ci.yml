@@ -15,6 +15,9 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 env:
   # PLAN.md's coverage target (issue #135). A build fails below it: each Apple platform's line
   # coverage of app/Sources, and the API's of api/src, minus .github/coverage-exclusions.txt.
