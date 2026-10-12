@@ -152,4 +152,17 @@ final class RecipeDetailViewTests: XCTestCase {
         let storage = Mirror(reflecting: sut).children.first { $0.label == "_viewModel" }?.value
         XCTAssertTrue(storage is State<RecipeDetailViewModel>)
     }
+
+    func testPhotoColumnTakesItsShareOfAWideWindowUpToTheGalleryLimit() {
+        XCTAssertEqual(RecipeDetailView.photoColumnWidth(in: CGSize(width: 1000, height: 800), photoCount: 2), 420)
+        XCTAssertEqual(RecipeDetailView.photoColumnWidth(in: CGSize(width: 1600, height: 800), photoCount: 2), RecipePhotoGallery.maxWidth)
+    }
+
+    func testPhotoColumnNarrowsSoThePhotoFitsAShortWindow() {
+        // 300 pt tall: 40 pt of margins and 17 pt of dots leave 243 pt for a 4:3 page.
+        XCTAssertEqual(RecipeDetailView.photoColumnWidth(in: CGSize(width: 1000, height: 300), photoCount: 2), 324)
+        // A single photo has no dots: 250 pt tall leaves 210 pt.
+        XCTAssertEqual(RecipeDetailView.photoColumnWidth(in: CGSize(width: 1000, height: 250), photoCount: 1), 280)
+        XCTAssertEqual(RecipeDetailView.photoColumnWidth(in: CGSize(width: 1000, height: 30), photoCount: 1), 0)
+    }
 }
