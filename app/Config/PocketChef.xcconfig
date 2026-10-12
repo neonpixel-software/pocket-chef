@@ -15,3 +15,7 @@ CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = Config/PocketChef-macOS.entitlements
 // the app (DensityAPIConfiguration). Without this file the app never fetches densities.
 // Copy DensityAPI.xcconfig.example to DensityAPI.xcconfig to use the API locally.
 #include? "DensityAPI.xcconfig"
+
+// The App Store screenshots' stock photos (Data/DevSupport/ScreenshotPhotos) are for Debug
+// runs of UITestScenario.screenshots only; Release builds leave them out of the app.
+EXCLUDED_SOURCE_FILE_NAMES[config=Release] = screenshot-*.jpg

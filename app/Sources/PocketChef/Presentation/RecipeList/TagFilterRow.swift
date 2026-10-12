@@ -16,6 +16,8 @@ struct TagFilterRow: View {
                     TagChip(title: tag.localizedDisplayName(), isSelected: selectedTagID == tag.id) {
                         onSelect(tag.id)
                     }
+                    // By the stored name, which for a preset is English in every language.
+                    .accessibilityIdentifier("TagChip.\(tag.name)")
                 }
             }
             .padding(.horizontal, 16)

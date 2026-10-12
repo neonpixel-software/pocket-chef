@@ -38,13 +38,13 @@ struct PocketChefApp: App {
         recipeRepository = Self.recipeRepository(wrapping: SwiftDataRecipeRepository(modelContext: contextProvider.context))
         tagRepository = SwiftDataTagRepository(modelContext: contextProvider.context)
         photoRepository = SwiftDataRecipePhotoRepository(modelContext: contextProvider.context)
-        let captureService = FoundationModelsRecipeCaptureService()
+        let captureService = Self.makeCaptureService()
         self.captureService = captureService
         webPageFetcher = URLSessionWebPageFetcher()
         captureRecipeUseCase = DefaultCaptureRecipeUseCase(captureService: captureService)
         checkCaptureAvailabilityUseCase = DefaultCheckCaptureAvailabilityUseCase(captureService: captureService)
         do {
-            densityContainer = try DensityStore.makeContainer()
+            densityContainer = try Self.makeDensityContainer()
         } catch {
             print("Failed to open the density cache: \(error)")
             densityContainer = nil
@@ -92,7 +92,7 @@ struct PocketChefApp: App {
     /// Internal so a test can check the unit tests' host app runs without iCloud (#160).
     static let isICloudEnabled = BuildConfiguration.isICloudEnabled && !isHostingUnitTests
     #if os(macOS)
-    private static let uiTestWindowSize = uiTestScenario.map { _ in UITestScenario.macContentSize }
+    private static let uiTestWindowSize = uiTestScenario?.macWindowContentSize
     #else
     /// iOS windows always fill the screen.
     private static let uiTestWindowSize: CGSize? = nil
@@ -103,6 +103,15 @@ struct PocketChefApp: App {
 
     private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
         uiTestScenario?.recipeRepository(wrapping: repository) ?? repository
+    }
+
+    private static func makeCaptureService() -> RecipeCaptureService {
+        uiTestScenario?.treatsCaptureAsAvailable == true ? PreviewRecipeCaptureService() : FoundationModelsRecipeCaptureService()
+    }
+
+    @MainActor
+    private static func makeDensityContainer() throws -> ModelContainer {
+        try uiTestScenario?.makeDensityContainer() ?? DensityStore.makeContainer()
     }
 
     /// Whether this run is the host app of the unit tests, which start it like a normal launch.
@@ -129,6 +138,14 @@ struct PocketChefApp: App {
 
     private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
         repository
+    }
+
+    private static func makeCaptureService() -> RecipeCaptureService {
+        FoundationModelsRecipeCaptureService()
+    }
+
+    private static func makeDensityContainer() throws -> ModelContainer {
+        try DensityStore.makeContainer()
     }
 
     private static func makeWelcomeGuideStatus() -> WelcomeGuideStatus {
@@ -206,6 +223,11 @@ struct PocketChefApp: App {
                 // Only UI test runs fix the window size; Release builds leave both modifiers out.
                 #if DEBUG
                 .frame(width: Self.uiTestWindowSize?.width, height: Self.uiTestWindowSize?.height)
+                #if os(macOS)
+                .onAppear {
+                    if Self.uiTestScenario == .screenshots { UITestScenario.prepareScreenshotWindow() }
+                }
+                #endif
                 #endif
         }
         #if DEBUG && os(macOS)

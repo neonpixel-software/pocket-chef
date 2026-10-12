@@ -29,6 +29,7 @@ struct RecipeURLCaptureView: View {
                     .padding(16)
                     .background(PCColor.surface, in: RoundedRectangle(cornerRadius: 14))
                     .disabled(viewModel.isCapturing)
+                    .accessibilityIdentifier("RecipeURLCapture.urlField")
                     #if !os(macOS)
                     .keyboardType(.URL)
                     .textInputAutocapitalization(.never)
