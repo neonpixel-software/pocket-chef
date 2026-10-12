@@ -6,9 +6,11 @@
 set -euo pipefail
 
 here=${0:A:h}
-icon="$here/../../Sources/PocketChef/Resources/AppIcon.icon"
+icon=${here:h:h}/Sources/PocketChef/Resources/AppIcon.icon
 previews=${1:-$(mktemp -d)}
 ictool="$(xcode-select -p)/../Applications/Icon Composer.app/Contents/Executables/ictool"
+# :a resolves the ".." so the messages show plain paths.
+ictool=${ictool:a}
 if [[ ! -x $ictool ]]; then
   echo "Icon Composer's ictool isn't at $ictool." >&2
   echo "It ships inside Xcode 26 or later; point xcode-select at that Xcode (sudo xcode-select -s /path/to/Xcode.app)." >&2

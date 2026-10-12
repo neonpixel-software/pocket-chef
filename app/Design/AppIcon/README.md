@@ -10,8 +10,11 @@ iPadOS and macOS 26 draw it with Liquid Glass and generate the tinted and clear 
   appearance, and hides the dot texture in dark mode. Tinted and clear modes use the cream
   raccoon and the white hat, because tinting follows brightness and an ink raccoon would vanish.
   Only the `tinted` entries say so: clear has no appearance of its own in `icon.json` (ictool
-  rejects `"clear"` as unreadable) and uses the tinted images. Without them the clear raccoon
-  is a faint glass outline.
+  rejects `"clear"` as unreadable) and uses the tinted images. Without `tinted` entries, the
+  fallback depends on the Icon Composer version: Xcode 26's `ictool` falls back to the `dark`
+  images (the same cream raccoon here), Xcode 27's goes straight to the default ink raccoon,
+  which clear mode draws as a faint glass outline. The explicit `tinted` entries give the same
+  icon with either.
 - `Assets/` holds the layers as 1024 × 1024 PNGs: `head-*`, `hat-*` and `dots`. Don't edit them
   by hand; they're generated.
 
