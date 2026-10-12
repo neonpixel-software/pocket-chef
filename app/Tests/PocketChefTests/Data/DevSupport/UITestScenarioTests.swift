@@ -19,7 +19,7 @@ final class UITestScenarioTests: XCTestCase {
     func testEachScenarioStartsWithItsRecipes() throws {
         let expectedCounts: [UITestScenario: Int] = [
             .empty: 0, .noMatchingTag: 1, .loadError: 0, .manyRecipes: 40, .recipeDetail: 1,
-            .recipeWithPhotos: 1, .recipeWithPhotosDetail: 1, .welcomeGuide: 0,
+            .recipeWithPhotos: 1, .recipeWithPhotosDetail: 1, .welcomeGuide: 0, .screenshots: 6,
         ]
         for scenario in UITestScenario.allCases {
             let container = try scenario.makeContainer(for: .local)
