@@ -9,6 +9,11 @@ here=${0:A:h}
 icon="$here/../../Sources/PocketChef/Resources/AppIcon.icon"
 previews=${1:-$(mktemp -d)}
 ictool="$(xcode-select -p)/../Applications/Icon Composer.app/Contents/Executables/ictool"
+if [[ ! -x $ictool ]]; then
+  echo "Icon Composer's ictool isn't at $ictool." >&2
+  echo "It ships inside Xcode 26 or later; point xcode-select at that Xcode (sudo xcode-select -s /path/to/Xcode.app)." >&2
+  exit 1
+fi
 
 swift "$here/make-icon-layers.swift" "$icon/Assets"
 

@@ -9,6 +9,9 @@ iPadOS and macOS 26 draw it with Liquid Glass and generate the tinted and clear 
 - `icon.json` sets the background (pink, or ink in dark mode), picks each layer's image per
   appearance, and hides the dot texture in dark mode. Tinted and clear modes use the cream
   raccoon and the white hat, because tinting follows brightness and an ink raccoon would vanish.
+  Only the `tinted` entries say so: clear has no appearance of its own in `icon.json` (ictool
+  rejects `"clear"` as unreadable) and uses the tinted images. Without them the clear raccoon
+  is a faint glass outline.
 - `Assets/` holds the layers as 1024 × 1024 PNGs: `head-*`, `hat-*` and `dots`. Don't edit them
   by hand; they're generated.
 

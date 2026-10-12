@@ -96,8 +96,11 @@ func color(_ hex: String, alpha: Double = 1) -> NSColor {
 
 /// Renders the steps as one transparent layer filled with `hex`, and writes it as a PNG.
 func writeLayer(_ steps: [Step], hex: String, alpha: Double = 1, to url: URL) throws {
+    // Tagged sRGB, like the palette's hex values, so the PNGs come out the same on any Mac
+    // whatever its display profile.
     let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size, bitsPerSample: 8, samplesPerPixel: 4,
                                hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+        .retagging(with: .sRGB)!
     let canvas = NSRect(x: 0, y: 0, width: size, height: size)
     NSGraphicsContext.saveGraphicsState()
     NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
