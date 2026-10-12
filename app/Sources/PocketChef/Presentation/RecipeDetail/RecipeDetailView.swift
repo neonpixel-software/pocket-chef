@@ -35,6 +35,17 @@ struct RecipeDetailView: View {
     static let twoColumnMinWidth: CGFloat = 700
     /// The photo column's share of the width, up to the gallery's own limit.
     private static let photoColumnFraction: CGFloat = 0.42
+    /// The margin around the photo column, as around the recipe.
+    private static let columnMargin: CGFloat = 20
+
+    /// The photo column's width in a `size` window: its share of the width, up to the gallery's
+    /// limit, and narrower in a short window, so the 4:3 page and its dots (17 pt, with two or
+    /// more photos) fit the height. The column doesn't scroll, so anything taller was clipped.
+    static func photoColumnWidth(in size: CGSize, photoCount: Int) -> CGFloat {
+        let dotsHeight: CGFloat = photoCount > 1 ? 17 : 0
+        let fittingWidth = (size.height - 2 * columnMargin - dotsHeight) * 4 / 3
+        return max(0, min(RecipePhotoGallery.maxWidth, size.width * photoColumnFraction, fittingWidth))
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -47,8 +58,8 @@ struct RecipeDetailView: View {
                             .padding(20)
                     }
                     gallery
-                        .frame(width: min(RecipePhotoGallery.maxWidth, geometry.size.width * Self.photoColumnFraction))
-                        .padding([.top, .trailing], 20)
+                        .frame(width: Self.photoColumnWidth(in: geometry.size, photoCount: recipe.photos.count))
+                        .padding([.top, .trailing], Self.columnMargin)
                 }
             } else {
                 ScrollView {
