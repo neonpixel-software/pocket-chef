@@ -123,6 +123,7 @@ struct RecipeListView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .accessibilityIdentifier("RecipeList.add")
                     .pcHeaderToolbarButton()
                     // Attached to the button, not the whole view: the dialog presents as a popover
                     // anchored to the view it's attached to (iPad, and iPhone on iOS 26), so on the
@@ -142,6 +143,7 @@ struct RecipeListView: View {
                                 isPresentingCaptureUnavailableAlert = true
                             }
                         }
+                        .accessibilityIdentifier("AddRecipe.pasteLink")
                         Button("Enter Manually") { isPresentingNewRecipe = true }
                         Button("Cancel", role: .cancel) { /* no-op: the dialog dismisses on its own */ }
                     }
