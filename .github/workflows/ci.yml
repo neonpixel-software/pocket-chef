@@ -247,11 +247,18 @@ jobs:
     # outright — a job that didn't need to run reports "skipped", which is fine here; only
     # an actual "failure" should block this). Dependabot PRs get no repo secrets, so
     # SONAR_TOKEN is unavailable — skipped for those, matching the build jobs' own behavior.
+    # Pushes to main additionally need the Apple build: there the quality gate grades every
+    # line since the previous-version baseline, including Swift code from earlier merges,
+    # and Swift coverage only exists when build-apple ran. Without it an api-only merge
+    # (e.g. a dependabot bump, whose own PR skips this job) failed the gate on new_coverage
+    # for lines it didn't touch (50f4aa4, e8f79c6). PRs don't need this: their new-code
+    # window is the diff itself, so an api-only PR scans fairly on C# coverage alone.
     if: |
       always() &&
       (needs.changes.outputs.app == 'true' || needs.changes.outputs.api == 'true') &&
       needs.build.result != 'failure' && needs.build-api.result != 'failure' &&
-      github.actor != 'dependabot[bot]'
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name != 'push' || needs.build-apple.result == 'success')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
