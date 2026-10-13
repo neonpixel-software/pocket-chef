@@ -258,6 +258,7 @@ Added 2026-10-08, before the first release, and done before Phase 12 like Phase 
   Redo 2026-10-13: with the new bundle ID and App Store Connect record, register the App ID and iCloud container, set up Xcode Cloud's product and Release workflow again (`app/docs/release.md`), and push a tag to check that both builds reach TestFlight. Tick again once they do.
 - [ ] **12.4 TestFlight → production rollout** — internal testing, then beta, then public release, with a short runbook for what to verify at each stage.
   Acceptance: v1 live in the public App Store on all three platforms.
+  Runbook: `app/docs/rollout.md` (2026-10-13): Stage 0 before tagging (including the one-time CloudKit production schema deploy, with every synced field filled in once first), Stage 1 internal TestFlight checks on iPhone, iPad and Mac (including the 4.1 push check below), Stage 2 external beta, Stage 3 App Review, Stage 4 release.
   Order: deploy the CloudKit schema to production only after Phase 13 (recipe photos) has merged, because the production schema can't drop or rename what's deployed.
   Blocking for 4.1: with the TestFlight builds on a Mac and an iPhone, an iPhone edit must appear in a Mac window that's already open and in front, within about a minute, without clicking it (see 4.1: development pushes to the Mac only arrive every 13–24 minutes). Check off 4.1 when this passes.
 
