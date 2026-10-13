@@ -14,9 +14,10 @@ Weight is in the English listing only, like the weight screenshot (`screenshots.
 data names ingredients in English, so a recipe written in another language gets no weights.
 
 Apple's limits: subtitle 30 characters, promotional text 170, description 4,000, keywords 100
-bytes (an accented letter counts as two), separated by commas without spaces. Keywords shouldn't
-repeat the name or subtitle, which are already searched. Promotional text can change at any time
-without a new version; the rest only with a version.
+bytes, so an accented letter counts as two (Apple's "Platform version information" reference),
+separated by commas without spaces. Keywords shouldn't repeat the name or subtitle, which are
+already searched. Promotional text can change at any time without a new version; the rest only
+with a version. The French subtitle is exactly 30 characters, so recount it after any change.
 
 When the app changes, check the listing against it, like the privacy answers
 (`app-store-connect.md`): every feature named here must work as described.
@@ -87,13 +88,13 @@ Pega un enlace o escribe una receta, y Apple Intelligence la convierte en una re
 
 Description
 ```
-Pocket Chef mantiene tus recetas limpias: los ingredientes y los pasos, sin los anuncios, las ventanas emergentes y la historia de la abuela que aparecen antes de la primera taza de harina.
+Pocket Chef mantiene tus recetas limpias: los ingredientes y los pasos, sin los anuncios, las ventanas emergentes y las historias de vida que aparecen antes de la primera taza de harina.
 
 AÑADE RECETAS A TU MANERA
 • Pegar un enlace: pega la dirección de la página web de una receta, y Apple Intelligence extrae el título, los ingredientes, los utensilios y los pasos.
 • Escribirlo: escribe o pega una receta como texto, y Apple Intelligence la ordena en ingredientes y pasos.
 • O rellena la receta tú mismo.
-No se guarda nada hasta que lo hayas revisado, así que puedes corregir lo que quieras antes.
+No se guarda nada hasta que lo hayas revisado, así que puedes corregir lo que quieras primero.
 
 COCINA CON ELLAS
 • Ingredientes, utensilios y pasos numerados, bien presentados en iPhone, iPad y Mac.
@@ -133,15 +134,15 @@ Collez un lien ou tapez une recette : Apple Intelligence en fait une recette cla
 
 Description
 ```
-Pocket Chef garde vos recettes claires : les ingrédients et les étapes, sans les publicités, les fenêtres surgissantes et l'histoire de famille qui précèdent la première tasse de farine.
+Pocket Chef garde vos recettes claires : les ingrédients et les étapes, sans les publicités, les pop-ups et les récits de vie qui précèdent la première tasse de farine.
 
 AJOUTEZ UNE RECETTE COMME VOUS VOULEZ
 • « Coller un lien » : collez l'adresse de la page web d'une recette, et Apple Intelligence en extrait le titre, les ingrédients, les ustensiles et les étapes.
 • « Le taper » : tapez ou collez une recette en texte simple, et Apple Intelligence la range en ingrédients et en étapes.
 • Ou remplissez la recette vous-même.
-Rien n'est enregistré avant que vous l'ayez relu, vous pouvez donc tout corriger avant.
+Rien n'est enregistré avant que vous l'ayez vérifié : vous pouvez donc tout corriger d'abord.
 
-CUISINEZ AVEC
+CUISINEZ AVEC VOS RECETTES
 • Ingrédients, ustensiles et étapes numérotées, clairement présentés sur iPhone, iPad et Mac.
 • Photos : ajoutez les vôtres depuis la photothèque, ou prenez-les avec l'appareil photo sur iPhone et iPad.
 • Étiquettes : petit-déjeuner, déjeuner, dîner, dessert et collation, plus celles que vous créez. Filtrez votre liste par étiquette.
