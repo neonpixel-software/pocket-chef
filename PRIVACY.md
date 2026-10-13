@@ -1,8 +1,8 @@
-# Pocket Chef Privacy Policy
+# Recipe Raccoon Privacy Policy
 
 Last updated: 9 October 2026
 
-Pocket Chef is a recipe app for iPhone, iPad and Mac, made by NeonPixel. It collects no data
+Recipe Raccoon is a recipe app for iPhone, iPad and Mac, made by NeonPixel. It collects no data
 about you. There's no account, no ads, no analytics and no tracking, and nothing you do in the
 app is sent to NeonPixel.
 
@@ -25,7 +25,7 @@ The app only connects to the internet to:
   It isn't routed through NeonPixel.
 - **Sync through iCloud,** if you turn it on. Apple handles this under
   [Apple's privacy policy](https://www.apple.com/legal/privacy/).
-- **Download ingredient densities** from Pocket Chef's server, used to convert between cups and
+- **Download ingredient densities** from Recipe Raccoon's server, used to convert between cups and
   grams. The request carries no information about you or your recipes, and the server doesn't
   log requests. It holds the address a request came from in memory for about a minute, to stop
   one caller from overloading it. If a request fails on the server, its error log may note that
@@ -39,7 +39,7 @@ Storage on iPhone and iPad (System Settings → [your name] → iCloud on a Mac)
 
 ## Children
 
-Pocket Chef doesn't collect data from anyone, including children.
+Recipe Raccoon doesn't collect data from anyone, including children.
 
 ## Changes
 

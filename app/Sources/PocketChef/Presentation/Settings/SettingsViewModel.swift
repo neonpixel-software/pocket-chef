@@ -149,7 +149,7 @@ enum DensityRefreshFailure: Equatable {
         case .connection:
             String(localized: "Couldn't refresh ingredient densities. Check your connection and try again.")
         case .rejected:
-            String(localized: "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again.")
+            String(localized: "The ingredient density service didn't accept this version of Recipe Raccoon. Update the app and try again.")
         case .serviceUnavailable:
             String(localized: "The ingredient density service isn't responding properly right now. Try again later.")
         case .couldNotSave:

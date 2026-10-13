@@ -9,7 +9,7 @@ options:
 settings:
   base:
     GENERATE_INFOPLIST_FILE: YES
-    INFOPLIST_KEY_CFBundleDisplayName: Pocket Chef
+    INFOPLIST_KEY_CFBundleDisplayName: Recipe Raccoon
     SWIFT_VERSION: "6.0"
     # The release version; a release tag must be v<MARKETING_VERSION> (app/docs/release.md).
     # Xcode Cloud replaces the build number with its own, so CURRENT_PROJECT_VERSION stays 1.
@@ -84,7 +84,7 @@ targets:
     # which otherwise is the target name, PocketChef-macOS. Xcode builds with PRODUCT_NAME
     # below; XcodeGen derives the unit tests' TEST_HOST (and so BUNDLE_LOADER) from this key.
     # Keep the two the same.
-    productName: Pocket Chef
+    productName: Recipe Raccoon
     sources:
       - Sources/PocketChef
     configFiles:
@@ -92,7 +92,7 @@ targets:
       Release: Config/PocketChef.xcconfig
     settings:
       PRODUCT_MODULE_NAME: PocketChef
-      PRODUCT_NAME: Pocket Chef
+      PRODUCT_NAME: Recipe Raccoon
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
       # Merged with the generated Info.plist: carries the density API settings.
       INFOPLIST_FILE: Config/Info-macOS.plist

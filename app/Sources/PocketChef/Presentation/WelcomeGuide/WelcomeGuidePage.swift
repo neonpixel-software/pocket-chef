@@ -33,7 +33,7 @@ struct WelcomeGuidePage: Identifiable, Equatable {
             WelcomeGuidePage(
                 id: .welcome,
                 systemImage: "fork.knife",
-                title: String(localized: "Welcome to Pocket Chef"),
+                title: String(localized: "Welcome to Recipe Raccoon"),
                 body: String(localized: "A recipe box without the fluff: no ads, no life stories, just the recipe. Here's a quick tour.")
             ),
             isCaptureAvailable ? addRecipeWithCapture : addRecipeByHand,
@@ -90,7 +90,7 @@ struct WelcomeGuidePage: Identifiable, Equatable {
     /// Where Settings is, which differs per platform, and that the guide can be opened again.
     private static var settingsLocation: String {
         #if os(macOS)
-        String(localized: "Settings is in the Pocket Chef menu (⌘,). You can open this guide again there, or from the Help menu.")
+        String(localized: "Settings is in the Recipe Raccoon menu (⌘,). You can open this guide again there, or from the Help menu.")
         #else
         String(localized: "Settings is the gear at the top of your recipes. You can open this guide again there too.")
         #endif

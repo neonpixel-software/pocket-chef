@@ -1,6 +1,6 @@
 # Release builds
 
-Pocket Chef ships through the App Store only, on iOS, iPadOS and macOS. So there's no Developer ID
+Recipe Raccoon ships through the App Store only, on iOS, iPadOS and macOS. So there's no Developer ID
 signing and no notarization: App Store Connect signs and checks what it distributes. Xcode Cloud
 does the build. Pushing a `vX.Y.Z` tag is the one step that archives the iOS and macOS apps and
 uploads both to App Store Connect and TestFlight. Nothing for releases runs on a Mac, so no

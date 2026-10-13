@@ -15,7 +15,7 @@ They land in `app/build/screenshots/<platform>/<language>/` (gitignored), named 
 The whole set takes about 20 minutes. A failed run leaves `app/build/screenshots/failed.xcresult`;
 open it in Xcode to see the failure, the UI hierarchy and a screen recording.
 
-- **iPhone and iPad** run on simulators the script creates on first use, "Pocket Chef Screenshots
+- **iPhone and iPad** run on simulators the script creates on first use, "Recipe Raccoon Screenshots
   iPhone" (iPhone 17) and "… iPad" (iPad Pro 13-inch). They're new, so no Apple Account, recipes or
   notifications show. The script sets them to US English (a 12-hour clock) and Apple's usual status
   bar: 9:41, full signal and battery. It also sets iPad multitasking to Full Screen Apps; in the

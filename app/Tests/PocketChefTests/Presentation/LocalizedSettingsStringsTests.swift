@@ -27,9 +27,9 @@ final class LocalizedSettingsStringsTests: XCTestCase {
         "Ingredient densities are up to date.",
         "Ingredient densities updated.",
         "Couldn't refresh ingredient densities. Check your connection and try again.",
-        "Pocket Chef uses ingredient densities to convert between volume and weight. It checks for updates once a day.",
+        "Recipe Raccoon uses ingredient densities to convert between volume and weight. It checks for updates once a day.",
         "Ingredient densities aren't available in this build.",
-        "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again.",
+        "The ingredient density service didn't accept this version of Recipe Raccoon. Update the app and try again.",
         "The ingredient density service isn't responding properly right now. Try again later.",
         "Couldn't save ingredient densities on this device. Try again.",
         // The cup and spoon size setting.

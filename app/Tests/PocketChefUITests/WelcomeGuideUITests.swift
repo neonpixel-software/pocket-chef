@@ -26,8 +26,8 @@ final class WelcomeGuideUITests: XCTestCase {
         let app = makeApp(scenario: "welcomeGuide")
         app.launch()
 
-        XCTAssertTrue(page("Welcome to Pocket Chef", in: app).waitForExistence(timeout: 10))
-        let label = page("Welcome to Pocket Chef", in: app).label
+        XCTAssertTrue(page("Welcome to Recipe Raccoon", in: app).waitForExistence(timeout: 10))
+        let label = page("Welcome to Recipe Raccoon", in: app).label
         XCTAssertTrue(label.hasSuffix("Page 1 of 4"), "The page doesn't say where it is: \(label)")
         for title in ["Add a Recipe", "Cook From It", "Make It Yours"] {
             app.buttons["Next"].tap()
@@ -45,7 +45,7 @@ final class WelcomeGuideUITests: XCTestCase {
     func testSwipingTurnsThePageAndSkipCloses() {
         let app = makeApp(scenario: "welcomeGuide")
         app.launch()
-        let first = page("Welcome to Pocket Chef", in: app)
+        let first = page("Welcome to Recipe Raccoon", in: app)
         XCTAssertTrue(first.waitForExistence(timeout: 10))
 
         first.swipeLeft()
@@ -68,7 +68,7 @@ final class WelcomeGuideUITests: XCTestCase {
 
         show.tap()
 
-        XCTAssertTrue(page("Welcome to Pocket Chef", in: app).waitForExistence(timeout: 10), "The guide didn't open from Settings")
+        XCTAssertTrue(page("Welcome to Recipe Raccoon", in: app).waitForExistence(timeout: 10), "The guide didn't open from Settings")
         XCTAssertFalse(app.navigationBars["Settings"].exists, "Settings is still open")
     }
     #else
@@ -79,7 +79,7 @@ final class WelcomeGuideUITests: XCTestCase {
 
         let window = app.windows[Self.windowTitle]
         XCTAssertTrue(window.waitForExistence(timeout: 10), "The guide's window didn't open")
-        let first = page("Welcome to Pocket Chef", in: app)
+        let first = page("Welcome to Recipe Raccoon", in: app)
         XCTAssertTrue(first.waitForExistence(timeout: 5))
         XCTAssertTrue(first.label.hasSuffix("Page 1 of 4"), "The page doesn't say where it is: \(first.label)")
         // 560 pt wide; its content 520 pt tall under the title bar.

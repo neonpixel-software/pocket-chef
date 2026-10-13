@@ -105,7 +105,7 @@ final class SettingsViewModelDensityTests: XCTestCase {
 
     func testEachFailureGetsItsOwnExplanation() async {
         let connection = "Couldn't refresh ingredient densities. Check your connection and try again."
-        let rejected = "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again."
+        let rejected = "The ingredient density service didn't accept this version of Recipe Raccoon. Update the app and try again."
         let unavailable = "The ingredient density service isn't responding properly right now. Try again later."
         let cases = [
             FailureCase(error: DensityEntryFetchError.requestFailed(underlying: URLError(.timedOut)), failure: .connection, message: connection),

@@ -3,7 +3,7 @@ import SwiftUI
 import ViewInspector
 import XCTest
 
-/// Settings → About Pocket Chef (14.2). The Mac has it in the app menu instead.
+/// Settings → About Recipe Raccoon (14.2). The Mac has it in the app menu instead.
 @MainActor
 final class SettingsViewAboutTests: XCTestCase {
     private let sut = SettingsView(viewModel: SettingsViewModel(changeStorageModeUseCase: StubStorageModeUseCase(), isICloudAvailableInBuild: false))
@@ -19,7 +19,7 @@ final class SettingsViewAboutTests: XCTestCase {
     #endif
 
     private func aboutLink() throws -> InspectableView<ViewType.NavigationLink> {
-        try sut.inspect().find(ViewType.NavigationLink.self) { try $0.labelView().text().string() == "About Pocket Chef" }
+        try sut.inspect().find(ViewType.NavigationLink.self) { try $0.labelView().text().string() == "About Recipe Raccoon" }
     }
 }
 

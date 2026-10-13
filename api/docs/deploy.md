@@ -198,7 +198,7 @@ value of that header. nginx's usual `$proxy_add_x_forwarded_for` appends to
 the client's header instead, so a client could send a different fake address
 on every request and never be limited.
 
-`access_log off` keeps the app's privacy promise. Pocket Chef's App Store
+`access_log off` keeps the app's privacy promise. Recipe Raccoon's App Store
 privacy label says "Data Not Collected", and nginx's default access log would
 keep every caller's IP address and User-Agent on disk for weeks. The API logs
 no requests itself (`Microsoft.AspNetCore` logs at Warning), and the rate
