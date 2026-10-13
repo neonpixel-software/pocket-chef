@@ -60,7 +60,8 @@ the device, such as a new SDK, crash reporting, or logging on the server, change
 | Marketing URL | `https://github.com/neonpixel-software/pocket-chef` (optional) |
 | Copyright | `2026 NeonPixel` |
 
-Screenshots, the description and keywords come with 12.2.
+The subtitle, promotional text, description and keywords for each language are in
+`app-store-listing.md`; the screenshots and where they go are in `screenshots.md`.
 
 ## Export compliance
 
