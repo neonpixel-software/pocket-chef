@@ -29,7 +29,8 @@ trap 'rm -rf "$work"' EXIT
 runtime=$(xcrun simctl list runtimes iOS -j | python3 -I -c 'import json, sys; print([r["identifier"] for r in json.load(sys.stdin)["runtimes"] if r["isAvailable"]][-1])')
 
 # The UDID of the named screenshot simulator, created on first use, booted, set to US English
-# (a 12-hour clock in the status bar) and showing Apple's usual status bar.
+# (a 12-hour clock in the status bar), with iPad multitasking set to Full Screen Apps (Windowed
+# Apps, the default, draws a resize handle in the corner) and showing Apple's usual status bar.
 simulator() {
   local name="Pocket Chef Screenshots $1" type=$2 udid
   udid=$(xcrun simctl list devices -j | python3 -I -c "import json, sys
@@ -41,9 +42,14 @@ for devices in json.load(sys.stdin)['devices'].values():
   fi
   xcrun simctl boot "$udid" 2>/dev/null || true
   xcrun simctl bootstatus "$udid" -b >/dev/null
-  if [[ $(xcrun simctl spawn "$udid" defaults read -g AppleLocale 2>/dev/null) != en_US ]]; then
+  if [[ $(xcrun simctl spawn "$udid" defaults read -g AppleLocale 2>/dev/null) != en_US ||
+        $(xcrun simctl spawn "$udid" defaults read com.apple.springboard SBChamoisWindowingEnabled 2>/dev/null) != 0 ||
+        $(xcrun simctl spawn "$udid" defaults read com.apple.springboard SBMedusaMultitaskingEnabled 2>/dev/null) != 0 ]]; then
     xcrun simctl spawn "$udid" defaults write -g AppleLocale en_US
     xcrun simctl spawn "$udid" defaults write -g AppleLanguages -array en
+    # What Settings → Multitasking & Gestures → Full Screen Apps writes.
+    xcrun simctl spawn "$udid" defaults write com.apple.springboard SBChamoisWindowingEnabled -bool false
+    xcrun simctl spawn "$udid" defaults write com.apple.springboard SBMedusaMultitaskingEnabled -bool false
     xcrun simctl shutdown "$udid"
     xcrun simctl boot "$udid"
     xcrun simctl bootstatus "$udid" -b >/dev/null
