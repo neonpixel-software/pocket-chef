@@ -1,9 +1,15 @@
 # App Store Connect
 
-What to enter in App Store Connect for Recipe Raccoon (PLAN 12.1), and why each answer is true. The
-app record (bundle ID `com.neonpixel.pocketchef`) already exists: the `v0.1.0` build reached
-TestFlight on iOS and macOS (12.3). iOS and macOS share it, so the record must list both
-platforms (App Information → add macOS if it's missing); iPadOS comes with iOS.
+What to enter in App Store Connect for Recipe Raccoon (PLAN 12.1), and why each answer is true.
+The app record has bundle ID `com.neonpixel.reciperaccoon`. iOS and macOS share it, so the record
+must list both platforms (App Information → add macOS if it's missing); iPadOS comes with iOS.
+
+The app was first set up as Pocket Chef, bundle ID `com.neonpixel.pocketchef`. That name was
+taken on the App Store, and a record's bundle ID can't change, so on 2026-10-13 the app moved to a
+new record. Before that, register the App ID `com.neonpixel.reciperaccoon` with iCloud (container
+`iCloud.com.neonpixel.reciperaccoon`) and Push Notifications in the developer portal, and set up
+Xcode Cloud's product and Release workflow for the new record again (`release.md`). The old record
+stays unused; it can't be deleted once a build was uploaded.
 
 ## App Privacy
 

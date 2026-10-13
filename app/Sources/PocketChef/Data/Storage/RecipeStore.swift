@@ -3,7 +3,7 @@ import SwiftData
 
 /// Builds the SwiftData container for each storage mode.
 enum RecipeStore {
-    static let cloudKitContainerIdentifier = "iCloud.com.neonpixel.pocketchef"
+    static let cloudKitContainerIdentifier = "iCloud.com.neonpixel.reciperaccoon"
 
     /// The models that sync. DensityEntryModel is a local cache (PLAN.md "Storage & sync")
     /// and gets its own local-only container in Phase 10.

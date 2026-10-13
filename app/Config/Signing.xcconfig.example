@@ -9,7 +9,7 @@
 DEVELOPMENT_TEAM = ABCDE12345
 CODE_SIGN_STYLE = Automatic
 
-// iCloud (CloudKit) container iCloud.com.neonpixel.pocketchef plus push for sync.
+// iCloud (CloudKit) container iCloud.com.neonpixel.reciperaccoon plus push for sync.
 CODE_SIGN_ENTITLEMENTS[sdk=iphone*] = Config/PocketChef-iOS-iCloud.entitlements
 CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = Config/PocketChef-macOS-iCloud.entitlements
 

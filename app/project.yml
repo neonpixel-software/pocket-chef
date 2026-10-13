@@ -1,6 +1,6 @@
 name: PocketChef
 options:
-  bundleIdPrefix: com.neonpixel.pocketchef
+  bundleIdPrefix: com.neonpixel.reciperaccoon
   deploymentTarget:
     iOS: "26.0"
     macOS: "26.0"
@@ -36,7 +36,7 @@ targets:
       Release: Config/PocketChef.xcconfig
     settings:
       PRODUCT_MODULE_NAME: PocketChef
-      PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
+      PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.reciperaccoon
       # Merged with the generated Info.plist: UIBackgroundModes has no INFOPLIST_KEY_ setting.
       # CloudKit sync wakes the app with silent pushes (remote-notification).
       INFOPLIST_FILE: Config/Info-iOS.plist
@@ -93,7 +93,7 @@ targets:
     settings:
       PRODUCT_MODULE_NAME: PocketChef
       PRODUCT_NAME: Recipe Raccoon
-      PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.pocketchef
+      PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.reciperaccoon
       # Merged with the generated Info.plist: carries the density API settings.
       INFOPLIST_FILE: Config/Info-macOS.plist
       COMBINE_HIDPI_IMAGES: YES
