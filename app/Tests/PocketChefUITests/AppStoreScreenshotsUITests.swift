@@ -119,15 +119,24 @@ final class AppStoreScreenshotsUITests: XCTestCase {
         #if os(macOS)
         // The window cut out of a screenshot of the screen: the window's own screenshot()
         // failed every few runs ("Image creation failed").
-        let screen = XCUIScreen.main.screenshot().image
         let window = app.windows.firstMatch.frame
-        let scale = screen.representations.first.map { CGFloat($0.pixelsWide) / screen.size.width } ?? 1
-        // Window frames are in points from the main screen's top left, like the screenshot.
+        guard let screenPixels = XCUIScreen.main.screenshot().image.cgImage(forProposedRect: nil, context: nil, hints: nil),
+              let screenPoints = NSScreen.screens.first?.frame.size else {
+            return XCTFail("Couldn't take a screenshot of the main screen")
+        }
+        // XCUIScreen.main is the main screen (the one with the menu bar), so the window must be
+        // all on it; cropping would otherwise quietly cut it short or take another screen's pixels.
+        guard CGRect(origin: .zero, size: screenPoints).contains(window) else {
+            return XCTFail("The window \(window) isn't all on the main screen (\(screenPoints))")
+        }
+        // The screenshot is in pixels; window frames are in points from the main screen's top left.
+        // (The screenshot's NSImage size is in pixels too, so it can't give the scale.)
+        let scale = CGFloat(screenPixels.width) / screenPoints.width
         let pixels = CGRect(x: window.minX * scale, y: window.minY * scale, width: window.width * scale, height: window.height * scale)
-        guard let image = screen.cgImage(forProposedRect: nil, context: nil, hints: nil)?.cropping(to: pixels) else {
+        guard let windowPixels = screenPixels.cropping(to: pixels) else {
             return XCTFail("Couldn't cut the window \(window) out of the screen")
         }
-        guard let png = NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:]) else {
+        guard let png = NSBitmapImageRep(cgImage: windowPixels).representation(using: .png, properties: [:]) else {
             return XCTFail("Couldn't encode the window as PNG")
         }
         let attachment = XCTAttachment(data: png, uniformTypeIdentifier: "public.png")
