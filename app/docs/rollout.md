@@ -16,25 +16,31 @@ schema is deployed there. Once it's deployed, fields can only be added, never re
 CloudKit adds a field to the development schema only when a record with that field filled in
 syncs. So first fill in every field once:
 
-1. Run a development build with iCloud on (`icloud-sync-testing` notes: `Signing.xcconfig`, a real
-   device) and add one recipe that sets every synced field:
+1. Run a development build with iCloud on (README: copy `Signing.xcconfig.example` to
+   `Signing.xcconfig`) on a real device: PLAN 4.1 explains why the simulator can't sync while the
+   Apple Account has Advanced Data Protection. Add one recipe that sets every synced field:
    - from **Paste a Link**, so it has a `sourceURL`
    - with an ingredient that has an amount, a unit and a name (e.g. "2 cups flour")
    - with equipment, steps, a preset tag and a custom tag
-   - with two photos, so the image and thumbnail assets and positions sync
+   - with two photos, so the image and thumbnail data and positions sync
 2. In the [CloudKit console](https://icloud.developer.apple.com), container
-   `iCloud.com.neonpixel.pocketchef`, Development → Schema → Record Types, check that these have
-   all their fields (SwiftData prefixes them `CD_`):
+   `iCloud.com.neonpixel.pocketchef`, Development → Schema → Record Types, check that these exist
+   with all their fields. Core Data's CloudKit mirroring, which SwiftData uses, prefixes both the
+   record types and the fields with `CD_`:
 
    | Record type | Fields |
    |---|---|
-   | `CD_RecipeModel` | id, title, steps, equipment, isTypedSource, sourceURL, ingredients, tags, photos |
-   | `CD_IngredientLineModel` | id, rawText, amount, unit, ingredientName, position, recipe |
-   | `CD_TagModel` | id, name, isPreset, recipes |
-   | `CD_RecipePhotoModel` | id, position, imageData, thumbnailData, recipe |
+   | `CD_RecipeModel` | `CD_id`, `CD_title`, `CD_steps`, `CD_equipment`, `CD_isTypedSource`, `CD_sourceURL` |
+   | `CD_IngredientLineModel` | `CD_id`, `CD_rawText`, `CD_amount`, `CD_unit`, `CD_ingredientName`, `CD_position`, `CD_recipe` |
+   | `CD_TagModel` | `CD_id`, `CD_name`, `CD_isPreset` |
+   | `CD_RecipePhotoModel` | `CD_id`, `CD_position`, `CD_imageData`, `CD_thumbnailData`, `CD_recipe` |
+   | `CDMR` | `CD_entityNames`, `CD_recordNames`, `CD_relationships` |
 
-   Relationships and large data may show as differently named fields (for example `_ckAsset`), but
-   each property needs one.
+   A relationship is a field only on its to-one side (`CD_recipe`), so the recipe has no
+   ingredients, tags or photos fields. The recipe–tag links are many-to-many, and those sync as
+   `CDMR` records, which is why a tagged recipe is part of step 1. Large data can also get a
+   second field ending in `_ckAsset` (for example `CD_imageData_ckAsset`). Extra fields like that
+   are fine; what matters is that every field in the table is there.
 3. **Deploy Schema Changes…** to production, and check that the production record types match.
 
 `DensityEntryModel` isn't listed: it's a local cache and never syncs.
