@@ -26,7 +26,7 @@ signing certificates or App Store Connect keys are needed locally.
    git push origin v1.0.0
    ```
 3. Xcode Cloud's **Release** workflow builds both platforms. When it's green, both builds are in
-   TestFlight for internal testers. From there, follow the 12.4 rollout.
+   TestFlight for internal testers. From there, follow the rollout in `rollout.md`.
 
 If no build starts, check that the Release workflow was saved before the tag was pushed: Xcode
 Cloud ignores tags pushed before the workflow existed. Start the build by hand with Xcode (⌘9 →
@@ -67,7 +67,7 @@ App Store Connect app record must list macOS as a platform.
 Before the first release, check that:
 - **Signing:** Xcode Cloud signs with cloud-managed certificates. The App Store archives get the
   production iCloud environment, which needs the CloudKit schema deployed to production in the
-  CloudKit console (PLAN 12.4).
+  CloudKit console (`rollout.md`, Stage 0).
 - **Upload keys:** `project.yml` sets `ITSAppUsesNonExemptEncryption = NO`, since the app only
   uses HTTPS, which is exempt. It also sets the Mac category (`LSApplicationCategoryType`, Food &
   Drink), which a Mac App Store upload requires.
