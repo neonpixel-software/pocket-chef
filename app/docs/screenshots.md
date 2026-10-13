@@ -18,7 +18,10 @@ open it in Xcode to see the failure, the UI hierarchy and a screen recording.
 - **iPhone and iPad** run on simulators the script creates on first use, "Pocket Chef Screenshots
   iPhone" (iPhone 17) and "… iPad" (iPad Pro 13-inch). They're new, so no Apple Account, recipes or
   notifications show. The script sets them to US English (a 12-hour clock) and Apple's usual status
-  bar: 9:41, full signal and battery.
+  bar: 9:41, full signal and battery. It also sets iPad multitasking to Full Screen Apps; in the
+  default Windowed Apps mode a resize handle shows in the bottom-right corner. It does this with
+  two private SpringBoard defaults (what Settings → Multitasking & Gestures writes), which a future
+  iPadOS could ignore without any error, so check the bottom-right corners of the iPad shots.
 - **Mac** is the app's window on this Mac, moved to the main screen, in light mode. The window is
   1440 × 900 pt, so a Retina main screen gives 2880 × 1800 and a 1× screen 1440 × 900. App Store
   Connect takes both, but use a Retina screen for the final set: it's sharper. Don't touch the

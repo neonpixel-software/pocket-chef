@@ -43,6 +43,7 @@ for devices in json.load(sys.stdin)['devices'].values():
   xcrun simctl boot "$udid" 2>/dev/null || true
   xcrun simctl bootstatus "$udid" -b >/dev/null
   if [[ $(xcrun simctl spawn "$udid" defaults read -g AppleLocale 2>/dev/null) != en_US ||
+        $(xcrun simctl spawn "$udid" defaults read com.apple.springboard SBChamoisWindowingEnabled 2>/dev/null) != 0 ||
         $(xcrun simctl spawn "$udid" defaults read com.apple.springboard SBMedusaMultitaskingEnabled 2>/dev/null) != 0 ]]; then
     xcrun simctl spawn "$udid" defaults write -g AppleLocale en_US
     xcrun simctl spawn "$udid" defaults write -g AppleLanguages -array en
