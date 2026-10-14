@@ -1,6 +1,6 @@
 # App Store listing
 
-The store text for Pocket Chef (PLAN 12.2) in all five languages, ready to paste into App Store
+The store text for Recipe Raccoon (PLAN 12.2) in all five languages, ready to paste into App Store
 Connect: the app → each language → App Information (name, subtitle) and the version's page
 (promotional text, description, keywords). iOS and macOS take the same text; enter it for both
 platforms' versions.
@@ -26,7 +26,7 @@ When the app changes, check the listing against it, like the privacy answers
 
 Name
 ```
-Pocket Chef
+Recipe Raccoon
 ```
 
 Subtitle
@@ -41,7 +41,7 @@ Paste a link or type a recipe in, and Apple Intelligence turns it into a clean r
 
 Description
 ```
-Pocket Chef keeps your recipes clean: the ingredients and the steps, without the ads, pop-ups and life story that come before the first cup of flour.
+Recipe Raccoon keeps your recipes clean: the ingredients and the steps, without the ads, pop-ups and life story that come before the first cup of flour.
 
 ADD A RECIPE YOUR WAY
 • Paste a Link: paste the address of a recipe's web page, and Apple Intelligence pulls out the title, ingredients, equipment and steps.
@@ -59,7 +59,7 @@ YOUR RECIPES, YOUR DEVICES
 Your recipes stay on your device. Turn on iCloud sync to see them on your other iPhone, iPad and Mac, through your own private iCloud.
 
 PRIVATE BY DESIGN
-No account, no ads, no tracking: Pocket Chef collects no data. Apple Intelligence reads recipes on your device, and a pasted link is fetched straight from the recipe's website.
+No account, no ads, no tracking: Recipe Raccoon collects no data. Apple Intelligence reads recipes on your device, and a pasted link is fetched straight from the recipe's website.
 
 Paste a Link and Type It need a device that supports Apple Intelligence, with Apple Intelligence turned on. On other devices, you add recipes by filling them in.
 ```
@@ -73,7 +73,7 @@ cookbook,cooking,kitchen,ingredients,grams,baking,meal,food,organizer,save,impor
 
 Name
 ```
-Pocket Chef
+Recipe Raccoon
 ```
 
 Subtitle
@@ -88,7 +88,7 @@ Pega un enlace o escribe una receta, y Apple Intelligence la convierte en una re
 
 Description
 ```
-Pocket Chef mantiene tus recetas limpias: los ingredientes y los pasos, sin los anuncios, las ventanas emergentes y las historias de vida que aparecen antes de la primera taza de harina.
+Recipe Raccoon mantiene tus recetas limpias: los ingredientes y los pasos, sin los anuncios, las ventanas emergentes y las historias de vida que aparecen antes de la primera taza de harina.
 
 AÑADE RECETAS A TU MANERA
 • Pegar un enlace: pega la dirección de la página web de una receta, y Apple Intelligence extrae el título, los ingredientes, los utensilios y los pasos.
@@ -105,7 +105,7 @@ TUS RECETAS, TUS DISPOSITIVOS
 Tus recetas se quedan en tu dispositivo. Activa la sincronización con iCloud para verlas en tus otros iPhone, iPad y Mac, a través de tu propio iCloud privado.
 
 PRIVACIDAD DESDE EL DISEÑO
-Sin cuenta, sin anuncios, sin rastreo: Pocket Chef no recopila ningún dato. Apple Intelligence lee las recetas en tu dispositivo, y un enlace pegado se descarga directamente del sitio web de la receta.
+Sin cuenta, sin anuncios, sin rastreo: Recipe Raccoon no recopila ningún dato. Apple Intelligence lee las recetas en tu dispositivo, y un enlace pegado se descarga directamente del sitio web de la receta.
 
 Pegar un enlace y Escribirlo necesitan un dispositivo compatible con Apple Intelligence, con Apple Intelligence activado. En otros dispositivos, añades las recetas rellenándolas tú mismo.
 ```
@@ -119,7 +119,7 @@ recetario,cocina,cocinar,ingredientes,repostería,comida,organizar,guardar,impor
 
 Name
 ```
-Pocket Chef
+Recipe Raccoon
 ```
 
 Subtitle
@@ -134,7 +134,7 @@ Collez un lien ou tapez une recette : Apple Intelligence en fait une recette cla
 
 Description
 ```
-Pocket Chef garde vos recettes claires : les ingrédients et les étapes, sans les publicités, les pop-ups et les récits de vie qui précèdent la première tasse de farine.
+Recipe Raccoon garde vos recettes claires : les ingrédients et les étapes, sans les publicités, les pop-ups et les récits de vie qui précèdent la première tasse de farine.
 
 AJOUTEZ UNE RECETTE COMME VOUS VOULEZ
 • « Coller un lien » : collez l'adresse de la page web d'une recette, et Apple Intelligence en extrait le titre, les ingrédients, les ustensiles et les étapes.
@@ -151,7 +151,7 @@ VOS RECETTES, VOS APPAREILS
 Vos recettes restent sur votre appareil. Activez la synchronisation iCloud pour les retrouver sur vos autres iPhone, iPad et Mac, via votre propre iCloud privé.
 
 LA CONFIDENTIALITÉ D'ABORD
-Sans compte, sans publicité, sans suivi : Pocket Chef ne collecte aucune donnée. Apple Intelligence lit les recettes sur votre appareil, et un lien collé est récupéré directement sur le site de la recette.
+Sans compte, sans publicité, sans suivi : Recipe Raccoon ne collecte aucune donnée. Apple Intelligence lit les recettes sur votre appareil, et un lien collé est récupéré directement sur le site de la recette.
 
 « Coller un lien » et « Le taper » nécessitent un appareil compatible avec Apple Intelligence, avec Apple Intelligence activé. Sur les autres appareils, vous ajoutez les recettes en les remplissant vous-même.
 ```
@@ -165,7 +165,7 @@ livre de cuisine,cuisiner,ingrédients,pâtisserie,repas,organiser,enregistrer,i
 
 Name
 ```
-Pocket Chef
+Recipe Raccoon
 ```
 
 Subtitle
@@ -180,7 +180,7 @@ Füge einen Link ein oder tippe ein Rezept ein, und Apple Intelligence macht dar
 
 Description
 ```
-Pocket Chef hält deine Rezepte übersichtlich: die Zutaten und die Schritte, ohne die Werbung, Pop-ups und Lebensgeschichten, die vor der ersten Tasse Mehl kommen.
+Recipe Raccoon hält deine Rezepte übersichtlich: die Zutaten und die Schritte, ohne die Werbung, Pop-ups und Lebensgeschichten, die vor der ersten Tasse Mehl kommen.
 
 REZEPTE HINZUFÜGEN, WIE DU WILLST
 • Link einfügen: Füge die Adresse der Webseite eines Rezepts ein, und Apple Intelligence holt Titel, Zutaten, Utensilien und Schritte heraus.
@@ -197,7 +197,7 @@ DEINE REZEPTE, DEINE GERÄTE
 Deine Rezepte bleiben auf deinem Gerät. Schalte die iCloud-Synchronisierung ein, um sie auf deinen anderen iPhones, iPads und Macs zu sehen, über deine eigene private iCloud.
 
 DATENSCHUTZ VON ANFANG AN
-Kein Konto, keine Werbung, kein Tracking: Pocket Chef sammelt keine Daten. Apple Intelligence liest Rezepte auf deinem Gerät, und ein eingefügter Link wird direkt von der Website des Rezepts geladen.
+Kein Konto, keine Werbung, kein Tracking: Recipe Raccoon sammelt keine Daten. Apple Intelligence liest Rezepte auf deinem Gerät, und ein eingefügter Link wird direkt von der Website des Rezepts geladen.
 
 Link einfügen und Eingeben brauchen ein Gerät, das Apple Intelligence unterstützt, mit eingeschaltetem Apple Intelligence. Auf anderen Geräten fügst du Rezepte hinzu, indem du sie selbst ausfüllst.
 ```
@@ -211,7 +211,7 @@ Kochbuch,kochen,Zutaten,backen,Küche,Essen,Rezeptbuch,organisieren,speichern,im
 
 Name
 ```
-Pocket Chef
+Recipe Raccoon
 ```
 
 Subtitle
@@ -226,7 +226,7 @@ Plak een link of typ een recept in, en Apple Intelligence maakt er een overzicht
 
 Description
 ```
-Pocket Chef houdt je recepten overzichtelijk: de ingrediënten en de stappen, zonder de advertenties, pop-ups en levensverhalen die voor het eerste kopje bloem komen.
+Recipe Raccoon houdt je recepten overzichtelijk: de ingrediënten en de stappen, zonder de advertenties, pop-ups en levensverhalen die voor het eerste kopje bloem komen.
 
 VOEG RECEPTEN TOE ZOALS JIJ WILT
 • Link plakken: plak het adres van de webpagina van een recept, en Apple Intelligence haalt de titel, ingrediënten, benodigdheden en stappen eruit.
@@ -243,7 +243,7 @@ JOUW RECEPTEN, JOUW APPARATEN
 Je recepten blijven op je apparaat. Zet iCloud-synchronisatie aan om ze op je andere iPhone, iPad en Mac te zien, via je eigen privé-iCloud.
 
 PRIVACY VOOROP
-Geen account, geen advertenties, geen tracking: Pocket Chef verzamelt geen gegevens. Apple Intelligence leest recepten op je apparaat, en een geplakte link wordt rechtstreeks van de website van het recept opgehaald.
+Geen account, geen advertenties, geen tracking: Recipe Raccoon verzamelt geen gegevens. Apple Intelligence leest recepten op je apparaat, en een geplakte link wordt rechtstreeks van de website van het recept opgehaald.
 
 Link plakken en Typen hebben een apparaat nodig dat Apple Intelligence ondersteunt, met Apple Intelligence aangezet. Op andere apparaten voeg je recepten toe door ze zelf in te vullen.
 ```

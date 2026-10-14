@@ -255,7 +255,7 @@ struct PocketChefApp: App {
         .defaultLaunchBehavior(.suppressed)
         .restorationBehavior(.disabled)
 
-        Window("About Pocket Chef", id: AboutView.windowID) {
+        Window("About Recipe Raccoon", id: AboutView.windowID) {
             AboutView()
                 .frame(width: AboutView.macSize.width, height: AboutView.macSize.height)
         }

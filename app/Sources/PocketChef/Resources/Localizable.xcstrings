@@ -2045,30 +2045,30 @@
         }
       }
     },
-    "Pocket Chef uses ingredient densities to convert between volume and weight. It checks for updates once a day.": {
+    "Recipe Raccoon uses ingredient densities to convert between volume and weight. It checks for updates once a day.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pocket Chef usa las densidades de los ingredientes para convertir entre volumen y peso. Busca actualizaciones una vez al día."
+            "value": "Recipe Raccoon usa las densidades de los ingredientes para convertir entre volumen y peso. Busca actualizaciones una vez al día."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pocket Chef utilise les densités des ingrédients pour convertir entre volume et poids. Il recherche des mises à jour une fois par jour."
+            "value": "Recipe Raccoon utilise les densités des ingrédients pour convertir entre volume et poids. Il recherche des mises à jour une fois par jour."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pocket Chef nutzt Zutatendichten, um zwischen Volumen und Gewicht umzurechnen. Es sucht einmal täglich nach Aktualisierungen."
+            "value": "Recipe Raccoon nutzt Zutatendichten, um zwischen Volumen und Gewicht umzurechnen. Es sucht einmal täglich nach Aktualisierungen."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pocket Chef gebruikt ingrediëntdichtheden om tussen volume en gewicht om te rekenen. Het controleert één keer per dag op updates."
+            "value": "Recipe Raccoon gebruikt ingrediëntdichtheden om tussen volume en gewicht om te rekenen. Het controleert één keer per dag op updates."
           }
         }
       }
@@ -2101,30 +2101,30 @@
         }
       }
     },
-    "The ingredient density service didn't accept this version of Pocket Chef. Update the app and try again.": {
+    "The ingredient density service didn't accept this version of Recipe Raccoon. Update the app and try again.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "El servicio de densidades de ingredientes no aceptó esta versión de Pocket Chef. Actualiza la app e inténtalo de nuevo."
+            "value": "El servicio de densidades de ingredientes no aceptó esta versión de Recipe Raccoon. Actualiza la app e inténtalo de nuevo."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le service des densités des ingrédients n'a pas accepté cette version de Pocket Chef. Mettez l'app à jour et réessayez."
+            "value": "Le service des densités des ingrédients n'a pas accepté cette version de Recipe Raccoon. Mettez l'app à jour et réessayez."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Der Dienst für Zutatendichten hat diese Version von Pocket Chef nicht akzeptiert. Aktualisiere die App und versuche es erneut."
+            "value": "Der Dienst für Zutatendichten hat diese Version von Recipe Raccoon nicht akzeptiert. Aktualisiere die App und versuche es erneut."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "De dienst voor ingrediëntdichtheden heeft deze versie van Pocket Chef niet geaccepteerd. Werk de app bij en probeer het opnieuw."
+            "value": "De dienst voor ingrediëntdichtheden heeft deze versie van Recipe Raccoon niet geaccepteerd. Werk de app bij en probeer het opnieuw."
           }
         }
       }
@@ -2885,30 +2885,30 @@
         }
       }
     },
-    "Welcome to Pocket Chef": {
+    "Welcome to Recipe Raccoon": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Te damos la bienvenida a Pocket Chef"
+            "value": "Te damos la bienvenida a Recipe Raccoon"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bienvenue dans Pocket Chef"
+            "value": "Bienvenue dans Recipe Raccoon"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Willkommen bei Pocket Chef"
+            "value": "Willkommen bei Recipe Raccoon"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Welkom bij Pocket Chef"
+            "value": "Welkom bij Recipe Raccoon"
           }
         }
       }
@@ -3445,30 +3445,30 @@
         }
       }
     },
-    "Settings is in the Pocket Chef menu (⌘,). You can open this guide again there, or from the Help menu.": {
+    "Settings is in the Recipe Raccoon menu (⌘,). You can open this guide again there, or from the Help menu.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ajustes está en el menú Pocket Chef (⌘,). Ahí o en el menú Ayuda puedes volver a abrir esta guía."
+            "value": "Ajustes está en el menú Recipe Raccoon (⌘,). Ahí o en el menú Ayuda puedes volver a abrir esta guía."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Réglages se trouve dans le menu Pocket Chef (⌘,). Vous pouvez y rouvrir ce guide, ou depuis le menu Aide."
+            "value": "Réglages se trouve dans le menu Recipe Raccoon (⌘,). Vous pouvez y rouvrir ce guide, ou depuis le menu Aide."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Die Einstellungen findest du im Menü „Pocket Chef“ (⌘,). Dort oder im Menü „Hilfe“ kannst du diese Anleitung wieder öffnen."
+            "value": "Die Einstellungen findest du im Menü „Recipe Raccoon“ (⌘,). Dort oder im Menü „Hilfe“ kannst du diese Anleitung wieder öffnen."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Instellingen staat in het menu Pocket Chef (⌘,). Daar of in het menu Help kun je deze gids opnieuw openen."
+            "value": "Instellingen staat in het menu Recipe Raccoon (⌘,). Daar of in het menu Help kun je deze gids opnieuw openen."
           }
         }
       }
@@ -3725,30 +3725,30 @@
         }
       }
     },
-    "About Pocket Chef": {
+    "About Recipe Raccoon": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Acerca de Pocket Chef"
+            "value": "Acerca de Recipe Raccoon"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "À propos de Pocket Chef"
+            "value": "À propos de Recipe Raccoon"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Über Pocket Chef"
+            "value": "Über Recipe Raccoon"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Over Pocket Chef"
+            "value": "Over Recipe Raccoon"
           }
         }
       }
@@ -3781,30 +3781,30 @@
         }
       }
     },
-    "Recipe sites bury the recipe under ads, pop-ups and life stories. Pocket Chef keeps just the recipe: type it, paste it or link it, check it once, and cook from a clean page.": {
+    "Recipe sites bury the recipe under ads, pop-ups and life stories. Recipe Raccoon keeps just the recipe: type it, paste it or link it, check it once, and cook from a clean page.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las webs de recetas entierran la receta bajo anuncios, ventanas emergentes e historias de vida. Pocket Chef se queda solo con la receta: escríbela, pégala o enlázala, revísala una vez y cocina desde una página limpia."
+            "value": "Las webs de recetas entierran la receta bajo anuncios, ventanas emergentes e historias de vida. Recipe Raccoon se queda solo con la receta: escríbela, pégala o enlázala, revísala una vez y cocina desde una página limpia."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les sites de recettes enfouissent la recette sous les publicités, les pop-ups et les récits de vie. Pocket Chef ne garde que la recette : tapez-la, collez-la ou importez-la depuis un lien, vérifiez-la une fois, et cuisinez depuis une page épurée."
+            "value": "Les sites de recettes enfouissent la recette sous les publicités, les pop-ups et les récits de vie. Recipe Raccoon ne garde que la recette : tapez-la, collez-la ou importez-la depuis un lien, vérifiez-la une fois, et cuisinez depuis une page épurée."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rezeptseiten verstecken das Rezept unter Werbung, Pop-ups und Lebensgeschichten. Pocket Chef behält nur das Rezept: Tipp es ein, füg es ein oder verlinke es, prüf es einmal und koch von einer aufgeräumten Seite."
+            "value": "Rezeptseiten verstecken das Rezept unter Werbung, Pop-ups und Lebensgeschichten. Recipe Raccoon behält nur das Rezept: Tipp es ein, füg es ein oder verlinke es, prüf es einmal und koch von einer aufgeräumten Seite."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Receptensites verstoppen het recept onder advertenties, pop-ups en levensverhalen. Pocket Chef houdt alleen het recept over: typ het, plak het of link ernaar, controleer het één keer en kook vanaf een overzichtelijke pagina."
+            "value": "Receptensites verstoppen het recept onder advertenties, pop-ups en levensverhalen. Recipe Raccoon houdt alleen het recept over: typ het, plak het of link ernaar, controleer het één keer en kook vanaf een overzichtelijke pagina."
           }
         }
       }
@@ -3837,30 +3837,30 @@
         }
       }
     },
-    "Pocket Chef is open source under the MIT license. Anyone can read the code, check what the app does, and build it themselves.": {
+    "Recipe Raccoon is open source under the MIT license. Anyone can read the code, check what the app does, and build it themselves.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pocket Chef es de código abierto con licencia MIT. Cualquiera puede leer el código, comprobar qué hace la app y compilarla por su cuenta."
+            "value": "Recipe Raccoon es de código abierto con licencia MIT. Cualquiera puede leer el código, comprobar qué hace la app y compilarla por su cuenta."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pocket Chef est open source sous licence MIT. Tout le monde peut lire le code, vérifier ce que fait l'app et la compiler soi-même."
+            "value": "Recipe Raccoon est open source sous licence MIT. Tout le monde peut lire le code, vérifier ce que fait l'app et la compiler soi-même."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pocket Chef ist Open Source unter der MIT-Lizenz. Alle können den Code lesen, prüfen, was die App macht, und sie selbst bauen."
+            "value": "Recipe Raccoon ist Open Source unter der MIT-Lizenz. Alle können den Code lesen, prüfen, was die App macht, und sie selbst bauen."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pocket Chef is open source onder de MIT-licentie. Iedereen kan de code lezen, controleren wat de app doet en hem zelf bouwen."
+            "value": "Recipe Raccoon is open source onder de MIT-licentie. Iedereen kan de code lezen, controleren wat de app doet en hem zelf bouwen."
           }
         }
       }
@@ -4061,30 +4061,30 @@
         }
       }
     },
-    "Download ingredient densities from Pocket Chef's server. The app sends it nothing about you or your recipes.": {
+    "Download ingredient densities from Recipe Raccoon's server. The app sends it nothing about you or your recipes.": {
       "localizations": {
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Descargar las densidades de ingredientes del servidor de Pocket Chef. La app no le envía nada sobre ti ni sobre tus recetas."
+            "value": "Descargar las densidades de ingredientes del servidor de Recipe Raccoon. La app no le envía nada sobre ti ni sobre tus recetas."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Télécharger les densités des ingrédients depuis le serveur de Pocket Chef. L'app ne lui envoie rien sur vous ni sur vos recettes."
+            "value": "Télécharger les densités des ingrédients depuis le serveur de Recipe Raccoon. L'app ne lui envoie rien sur vous ni sur vos recettes."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zutatendichten vom Server von Pocket Chef laden. Die App schickt ihm nichts über dich oder deine Rezepte."
+            "value": "Zutatendichten vom Server von Recipe Raccoon laden. Die App schickt ihm nichts über dich oder deine Rezepte."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ingrediëntdichtheden downloaden van de server van Pocket Chef. De app stuurt de server niets over jou of je recepten."
+            "value": "Ingrediëntdichtheden downloaden van de server van Recipe Raccoon. De app stuurt de server niets over jou of je recepten."
           }
         }
       }

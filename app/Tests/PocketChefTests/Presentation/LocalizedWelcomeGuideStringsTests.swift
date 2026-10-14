@@ -6,11 +6,11 @@ import XCTest
 /// native-speaker review.
 final class LocalizedWelcomeGuideStringsTests: XCTestCase {
     private let strings: [String: [String: String]] = [
-        "Welcome to Pocket Chef": [
-            "es": "Te damos la bienvenida a Pocket Chef",
-            "fr": "Bienvenue dans Pocket Chef",
-            "de": "Willkommen bei Pocket Chef",
-            "nl": "Welkom bij Pocket Chef",
+        "Welcome to Recipe Raccoon": [
+            "es": "Te damos la bienvenida a Recipe Raccoon",
+            "fr": "Bienvenue dans Recipe Raccoon",
+            "de": "Willkommen bei Recipe Raccoon",
+            "nl": "Welkom bij Recipe Raccoon",
         ],
         "Add a Recipe": ["es": "Añadir una receta", "fr": "Ajouter une recette", "de": "Ein Rezept hinzufügen", "nl": "Een recept toevoegen"],
         "Cook From It": ["es": "Cocina con ella", "fr": "Cuisinez avec la recette", "de": "Damit kochen", "nl": "Ermee koken"],

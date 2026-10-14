@@ -6,7 +6,7 @@ import XCTest
 /// native-speaker review (#156).
 final class LocalizedAboutStringsTests: XCTestCase {
     private let strings: [String: [String: String]] = [
-        "About Pocket Chef": ["es": "Acerca de Pocket Chef", "fr": "À propos de Pocket Chef", "de": "Über Pocket Chef", "nl": "Over Pocket Chef"],
+        "About Recipe Raccoon": ["es": "Acerca de Recipe Raccoon", "fr": "À propos de Recipe Raccoon", "de": "Über Recipe Raccoon", "nl": "Over Recipe Raccoon"],
         "No Tracking": ["es": "Sin rastreo", "fr": "Aucun suivi", "de": "Kein Tracking", "nl": "Geen tracking"],
         "View the Code on GitHub": ["es": "Ver el código en GitHub", "fr": "Voir le code sur GitHub", "de": "Code auf GitHub ansehen", "nl": "Code bekijken op GitHub"],
         "Report an Issue": ["es": "Informar de un problema", "fr": "Signaler un problème", "de": "Problem melden", "nl": "Probleem melden"],
@@ -24,14 +24,14 @@ final class LocalizedAboutStringsTests: XCTestCase {
     /// the version line read the same in some languages, so they're only in `strings`.)
     private let pageTexts = [
         "The Idea",
-        "Recipe sites bury the recipe under ads, pop-ups and life stories. Pocket Chef keeps just the recipe: type it, paste it or link it, check it once, and cook from a clean page.",
-        "Pocket Chef is open source under the MIT license. Anyone can read the code, check what the app does, and build it themselves.",
+        "Recipe sites bury the recipe under ads, pop-ups and life stories. Recipe Raccoon keeps just the recipe: type it, paste it or link it, check it once, and cook from a clean page.",
+        "Recipe Raccoon is open source under the MIT license. Anyone can read the code, check what the app does, and build it themselves.",
         "No account, no ads, no analytics, no tracking.",
         "Your recipes stay on this device, or in your own iCloud if you turn on sync.",
         "Recipe capture runs on your device.",
         "Fetch the recipe from a link you paste. That website sees the visit, as it would in a browser.",
         "Sync your recipes through your own iCloud, if you turn it on.",
-        "Download ingredient densities from Pocket Chef's server. The app sends it nothing about you or your recipes.",
+        "Download ingredient densities from Recipe Raccoon's server. The app sends it nothing about you or your recipes.",
         "Reporting an issue needs a free GitHub account.",
         "Made by NeonPixel",
     ]

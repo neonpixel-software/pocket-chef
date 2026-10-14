@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// About Pocket Chef (14.2): why the app exists, that it's open source and doesn't track anyone,
+/// About Recipe Raccoon (14.2): why the app exists, that it's open source and doesn't track anyone,
 /// links to its code and to reporting an issue, and the version. Pushed from Settings on iOS;
-/// its own window on the Mac, from Pocket Chef → About Pocket Chef.
+/// its own window on the Mac, from Recipe Raccoon → About Recipe Raccoon.
 struct AboutView: View {
     /// The Mac's About window, which replaces the standard About panel: that panel only has room
     /// for the icon, the version and a credits file.
@@ -18,7 +18,7 @@ struct AboutView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text(verbatim: "Pocket Chef")
+                Text(verbatim: "Recipe Raccoon")
                     .font(PCFont.display(34))
                     .frame(maxWidth: .infinity)
                     .accessibilityAddTraits(.isHeader)
@@ -26,12 +26,12 @@ struct AboutView: View {
                 section("The Idea") {
                     paragraph("""
                     Recipe sites bury the recipe under ads, pop-ups and life stories. \
-                    Pocket Chef keeps just the recipe: type it, paste it or link it, check it once, and cook from a clean page.
+                    Recipe Raccoon keeps just the recipe: type it, paste it or link it, check it once, and cook from a clean page.
                     """)
                 }
 
                 section("Open Source") {
-                    paragraph("Pocket Chef is open source under the MIT license. Anyone can read the code, check what the app does, and build it themselves.")
+                    paragraph("Recipe Raccoon is open source under the MIT license. Anyone can read the code, check what the app does, and build it themselves.")
                 }
 
                 // This list has to stay literally true and complete: see "No tracking" in the
@@ -43,7 +43,7 @@ struct AboutView: View {
                     paragraph("The app only goes online to:")
                     bullet("Fetch the recipe from a link you paste. That website sees the visit, as it would in a browser.")
                     bullet("Sync your recipes through your own iCloud, if you turn it on.")
-                    bullet("Download ingredient densities from Pocket Chef's server. The app sends it nothing about you or your recipes.")
+                    bullet("Download ingredient densities from Recipe Raccoon's server. The app sends it nothing about you or your recipes.")
                 }
 
                 links
@@ -64,7 +64,7 @@ struct AboutView: View {
         }
         .background(PCColor.background)
         #if os(iOS)
-        .navigationTitle("About Pocket Chef")
+        .navigationTitle("About Recipe Raccoon")
         .navigationBarTitleDisplayMode(.inline)
         #endif
     }
@@ -125,13 +125,13 @@ struct AboutView: View {
 }
 
 #if os(macOS)
-/// Pocket Chef → About Pocket Chef, in place of the standard About panel.
+/// Recipe Raccoon → About Recipe Raccoon, in place of the standard About panel.
 struct AboutCommands: Commands {
     @Environment(\.openWindow) private var openWindow
 
     var body: some Commands {
         CommandGroup(replacing: .appInfo) {
-            Button("About Pocket Chef") { openWindow(id: AboutView.windowID) }
+            Button("About Recipe Raccoon") { openWindow(id: AboutView.windowID) }
         }
     }
 }

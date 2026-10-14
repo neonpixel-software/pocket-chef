@@ -77,10 +77,10 @@ struct SettingsView: View {
                 }
             }
 
-            // The Mac has About Pocket Chef in its app menu instead.
+            // The Mac has About Recipe Raccoon in its app menu instead.
             #if os(iOS)
             Section {
-                NavigationLink("About Pocket Chef") { AboutView() }
+                NavigationLink("About Recipe Raccoon") { AboutView() }
             }
             #endif
         }
@@ -158,7 +158,7 @@ struct SettingsView: View {
         if !viewModel.isDensityAPIAvailableInBuild {
             return "Ingredient densities aren't available in this build."
         }
-        return "Pocket Chef uses ingredient densities to convert between volume and weight. It checks for updates once a day."
+        return "Recipe Raccoon uses ingredient densities to convert between volume and weight. It checks for updates once a day."
     }
 
     private var footerText: LocalizedStringKey {

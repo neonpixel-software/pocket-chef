@@ -16,7 +16,7 @@
 	</dict>
 	<!-- Localized in Resources/InfoPlist.xcstrings. -->
 	<key>NSCameraUsageDescription</key>
-	<string>Pocket Chef uses the camera to add photos to your recipes.</string>
+	<string>Recipe Raccoon uses the camera to add photos to your recipes.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

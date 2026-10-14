@@ -41,7 +41,7 @@ final class WelcomeGuidePageTests: XCTestCase {
         for index in [0, 2, 3] {
             XCTAssertEqual(with[index], without[index])
         }
-        XCTAssertEqual(with.map(\.title), ["Welcome to Pocket Chef", "Add a Recipe", "Cook From It", "Make It Yours"])
+        XCTAssertEqual(with.map(\.title), ["Welcome to Recipe Raccoon", "Add a Recipe", "Cook From It", "Make It Yours"])
     }
 
     func testTheVoiceOverLabelReadsTheWholePageThenItsPosition() {
@@ -63,7 +63,7 @@ final class WelcomeGuidePageTests: XCTestCase {
             "Ingredient Densities: they update daily, and you can refresh them any time.",
         ])
         #if os(macOS)
-        XCTAssertEqual(page.note, "Settings is in the Pocket Chef menu (⌘,). You can open this guide again there, or from the Help menu.")
+        XCTAssertEqual(page.note, "Settings is in the Recipe Raccoon menu (⌘,). You can open this guide again there, or from the Help menu.")
         #else
         XCTAssertEqual(page.note, "Settings is the gear at the top of your recipes. You can open this guide again there too.")
         #endif

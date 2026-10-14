@@ -44,10 +44,10 @@ final class LocalizedPhotoStringsTests: XCTestCase {
     /// The camera permission prompt comes from the Info.plist, localized by InfoPlist.xcstrings.
     func testCameraUsageDescriptionTranslatesPerLocale() {
         let translations = [
-            "es": "Pocket Chef usa la cámara para añadir fotos a tus recetas.",
-            "fr": "Pocket Chef utilise l'appareil photo pour ajouter des photos à vos recettes.",
-            "de": "Pocket Chef verwendet die Kamera, um Fotos zu deinen Rezepten hinzuzufügen.",
-            "nl": "Pocket Chef gebruikt de camera om foto's aan je recepten toe te voegen.",
+            "es": "Recipe Raccoon usa la cámara para añadir fotos a tus recetas.",
+            "fr": "Recipe Raccoon utilise l'appareil photo pour ajouter des photos à vos recettes.",
+            "de": "Recipe Raccoon verwendet die Kamera, um Fotos zu deinen Rezepten hinzuzufügen.",
+            "nl": "Recipe Raccoon gebruikt de camera om foto's aan je recepten toe te voegen.",
         ]
         for (languageCode, translated) in translations {
             guard let path = Bundle.main.path(forResource: languageCode, ofType: "lproj"),

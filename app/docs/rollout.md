@@ -24,7 +24,7 @@ syncs. So first fill in every field once:
    - with equipment, steps, a preset tag and a custom tag
    - with two photos, so the image and thumbnail data and positions sync
 2. In the [CloudKit console](https://icloud.developer.apple.com), container
-   `iCloud.com.neonpixel.pocketchef`, Development → Schema → Record Types, check that these exist
+   `iCloud.com.neonpixel.reciperaccoon`, Development → Schema → Record Types, check that these exist
    with all their fields. Core Data's CloudKit mirroring, which SwiftData uses, prefixes both the
    record types and the fields with `CD_`:
 

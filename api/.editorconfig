@@ -1,4 +1,4 @@
-# Style contract for the Pocket Chef density API.
+# Style contract for the Recipe Raccoon density API.
 #
 # Enforced in CI via `dotnet format --verify-no-changes` (see
 # .github/workflows/ci.yml, build-api job). Run `dotnet format` locally to

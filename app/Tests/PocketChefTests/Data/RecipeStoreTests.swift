@@ -14,7 +14,7 @@ final class RecipeStoreTests: XCTestCase {
         let configuration = RecipeStore.configuration(for: .iCloud)
 
         XCTAssertEqual(configuration.url.lastPathComponent, "iCloud.store")
-        XCTAssertEqual(configuration.cloudKitContainerIdentifier, "iCloud.com.neonpixel.pocketchef")
+        XCTAssertEqual(configuration.cloudKitContainerIdentifier, "iCloud.com.neonpixel.reciperaccoon")
     }
 
     func testDensityEntriesAreNotPartOfTheSyncedSchema() {
