@@ -51,7 +51,7 @@ instead, so each tag names exactly the commit that was uploaded.
 
 Set this up in Xcode (⌘9 → Cloud → right-click the product → Manage Workflows) or in App Store
 Connect (Xcode Cloud → Manage Workflows). The existing TestFlight workflow stays as it is. Xcode
-Cloud has one product for the app, named RecipeRaccoon-iOS after the scheme it was created from. iOS
+Cloud has one product for the app, named RecipeRaccoon after the iOS target's product name. iOS
 and macOS share the bundle ID, so the macOS archive goes in the same product's workflow, and the
 App Store Connect app record must list macOS as a platform.
 

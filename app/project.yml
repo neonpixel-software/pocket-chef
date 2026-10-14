@@ -29,6 +29,9 @@ targets:
   RecipeRaccoon-iOS:
     type: application
     platform: iOS
+    # Xcode Cloud names its product after this, which otherwise is the target name,
+    # RecipeRaccoon-iOS. Same pairing with PRODUCT_NAME as the macOS target below.
+    productName: RecipeRaccoon
     sources:
       - Sources/RecipeRaccoon
     configFiles:
@@ -36,6 +39,7 @@ targets:
       Release: Config/RecipeRaccoon.xcconfig
     settings:
       PRODUCT_MODULE_NAME: RecipeRaccoon
+      PRODUCT_NAME: RecipeRaccoon
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.reciperaccoon
       # Merged with the generated Info.plist: UIBackgroundModes has no INFOPLIST_KEY_ setting.
       # CloudKit sync wakes the app with silent pushes (remote-notification).
