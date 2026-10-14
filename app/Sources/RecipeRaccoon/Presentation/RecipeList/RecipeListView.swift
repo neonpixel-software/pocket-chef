@@ -219,7 +219,11 @@ struct RecipeListView: View {
                 )
             }
         }
-        .modifier(OptionalWelcomeGuide(isPresented: $isPresentingWelcomeGuide, viewModel: welcomeGuideViewModel))
+        .modifier(OptionalWelcomeGuide(
+            isPresented: $isPresentingWelcomeGuide,
+            viewModel: welcomeGuideViewModel,
+            settingsViewModel: settingsViewModel
+        ))
         #endif
     }
 
@@ -238,10 +242,11 @@ struct RecipeListView: View {
 private struct OptionalWelcomeGuide: ViewModifier {
     @Binding var isPresented: Bool
     let viewModel: WelcomeGuideViewModel?
+    let settingsViewModel: SettingsViewModel?
 
     func body(content: Content) -> some View {
         if let viewModel {
-            content.welcomeGuide(isPresented: $isPresented, viewModel: viewModel)
+            content.welcomeGuide(isPresented: $isPresented, viewModel: viewModel, settingsViewModel: settingsViewModel)
         } else {
             content
         }

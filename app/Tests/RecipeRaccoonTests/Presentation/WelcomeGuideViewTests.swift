@@ -69,7 +69,9 @@ final class WelcomeGuideViewTests: XCTestCase {
         let viewModel = makeViewModel()
         let sut = WelcomeGuideView(viewModel: viewModel) {}
 
-        let labels = try sut.inspect().findAll(WelcomeGuidePageView.self).map { try $0.accessibilityLabel().string() }
+        let labels = try sut.inspect().findAll(WelcomeGuidePageView.self).map {
+            try $0.find(viewWithAccessibilityIdentifier: WelcomeGuideView.pageAccessibilityIdentifier).accessibilityLabel().string()
+        }
 
         XCTAssertEqual(labels, viewModel.pages.enumerated().map { $1.accessibilityLabel(at: $0, of: 4) })
         XCTAssertEqual(labels.first, "Welcome to Recipe Raccoon, A recipe box without the fluff: no ads, no life stories, just the recipe. Here's a quick tour. Page 1 of 4")
@@ -77,7 +79,7 @@ final class WelcomeGuideViewTests: XCTestCase {
 
     func testAPageShowsItsTitleTextPointsAndNote() throws {
         let page = WelcomeGuidePage.pages(isCaptureAvailable: true)[1]
-        let sut = WelcomeGuidePageView(page: page)
+        let sut = WelcomeGuidePageView(page: page, accessibilityLabel: page.accessibilityLabel(at: 0, of: 4))
 
         let texts = try sut.inspect().findAll(ViewType.Text.self).map { try $0.string() }
 
@@ -86,7 +88,7 @@ final class WelcomeGuideViewTests: XCTestCase {
 
     func testAPageWithoutANoteShowsNone() throws {
         let page = WelcomeGuidePage.pages(isCaptureAvailable: true)[0]
-        let sut = WelcomeGuidePageView(page: page)
+        let sut = WelcomeGuidePageView(page: page, accessibilityLabel: page.accessibilityLabel(at: 0, of: 4))
 
         let texts = try sut.inspect().findAll(ViewType.Text.self).map { try $0.string() }
 

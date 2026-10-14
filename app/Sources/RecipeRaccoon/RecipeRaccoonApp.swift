@@ -251,7 +251,9 @@ struct RecipeRaccoonApp: App {
         // Opened by the recipe window at launch, Settings and the Help menu; never by itself,
         // and not reopened by state restoration once closed.
         Window("Welcome Guide", id: WelcomeGuideView.windowID) {
-            WelcomeGuideWindow(viewModel: welcomeGuideViewModel)
+            // Like Settings: with the recipe window closed, a theme change would otherwise wait.
+            WelcomeGuideWindow(viewModel: welcomeGuideViewModel, settingsViewModel: settingsViewModel)
+                .appTheme()
         }
         .windowResizability(.contentSize)
         .defaultPosition(.center)

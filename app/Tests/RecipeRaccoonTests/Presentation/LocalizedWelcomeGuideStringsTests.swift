@@ -42,6 +42,25 @@ final class LocalizedWelcomeGuideStringsTests: XCTestCase {
             "nl": "Welkomstgids tonen",
         ],
         "Welcome Guide": ["es": "Guía de bienvenida", "fr": "Guide de bienvenue", "de": "Willkommensanleitung", "nl": "Welkomstgids"],
+        // The last page's storage choice (WelcomeStorageChoiceView).
+        "Where to Keep Your Recipes": [
+            "es": "Dónde guardar tus recetas",
+            "fr": "Où garder vos recettes",
+            "de": "Wo deine Rezepte gespeichert werden",
+            "nl": "Waar je je recepten bewaart",
+        ],
+        "Your recipes stay on this device. You can turn on iCloud later in Settings.": [
+            "es": "Tus recetas se quedan en este dispositivo. Puedes activar iCloud más tarde en Ajustes.",
+            "fr": "Vos recettes restent sur cet appareil. Vous pourrez activer iCloud plus tard dans Réglages.",
+            "de": "Deine Rezepte bleiben auf diesem Gerät. Du kannst iCloud später in den Einstellungen aktivieren.",
+            "nl": "Je recepten blijven op dit apparaat. Je kunt iCloud later aanzetten in Instellingen.",
+        ],
+        "Your recipes sync to your other devices signed in to the same account.": [
+            "es": "Tus recetas se sincronizan con tus otros dispositivos que usan la misma cuenta.",
+            "fr": "Vos recettes se synchronisent avec vos autres appareils connectés au même compte.",
+            "de": "Deine Rezepte werden mit deinen anderen Geräten synchronisiert, die mit demselben Account angemeldet sind.",
+            "nl": "Je recepten worden gesynchroniseerd met je andere apparaten die met hetzelfde account zijn ingelogd.",
+        ],
     ]
 
     func testEachGuideStringTranslatesPerLocale() {
