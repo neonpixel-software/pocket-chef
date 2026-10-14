@@ -6,8 +6,15 @@ struct WelcomeGuidePage: Identifiable, Equatable {
         case welcome, addRecipe, cook, settings
     }
 
+    /// What sits above the title: the app icon on the first page, a symbol in a pink circle on
+    /// the others.
+    enum Artwork: Equatable {
+        case appIcon
+        case symbol(String)
+    }
+
     let id: Topic
-    let systemImage: String
+    let artwork: Artwork
     let title: String
     let body: String
     /// Short points under the body, such as the three ways to add a recipe.
@@ -32,14 +39,14 @@ struct WelcomeGuidePage: Identifiable, Equatable {
         [
             WelcomeGuidePage(
                 id: .welcome,
-                systemImage: "fork.knife",
+                artwork: .appIcon,
                 title: String(localized: "Welcome to Recipe Raccoon"),
                 body: String(localized: "A recipe box without the fluff: no ads, no life stories, just the recipe. Here's a quick tour.")
             ),
             isCaptureAvailable ? addRecipeWithCapture : addRecipeByHand,
             WelcomeGuidePage(
                 id: .cook,
-                systemImage: "frying.pan",
+                artwork: .symbol("frying.pan"),
                 title: String(localized: "Cook From It"),
                 body: String(localized: "Open a recipe for a clean page with just the ingredients and steps."),
                 items: [
@@ -49,7 +56,7 @@ struct WelcomeGuidePage: Identifiable, Equatable {
             ),
             WelcomeGuidePage(
                 id: .settings,
-                systemImage: "gearshape",
+                artwork: .symbol("gearshape"),
                 title: String(localized: "Make It Yours"),
                 body: String(localized: "In Settings you can change:"),
                 items: [
@@ -65,7 +72,7 @@ struct WelcomeGuidePage: Identifiable, Equatable {
     private static var addRecipeWithCapture: WelcomeGuidePage {
         WelcomeGuidePage(
             id: .addRecipe,
-            systemImage: "plus",
+            artwork: .symbol("plus"),
             title: String(localized: "Add a Recipe"),
             body: String(localized: "Choose + and then one of three ways:"),
             items: [
@@ -80,7 +87,7 @@ struct WelcomeGuidePage: Identifiable, Equatable {
     private static var addRecipeByHand: WelcomeGuidePage {
         WelcomeGuidePage(
             id: .addRecipe,
-            systemImage: "plus",
+            artwork: .symbol("plus"),
             title: String(localized: "Add a Recipe"),
             body: String(localized: "Choose + and then Enter Manually to fill in a recipe yourself."),
             note: String(localized: "Type It and Paste a Link read a recipe for you with Apple Intelligence, which isn't available on this device.")
