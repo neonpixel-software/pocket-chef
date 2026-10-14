@@ -313,7 +313,7 @@ jobs:
           #   e4      swift:S1075  the About page's GitHub links are fixed on purpose: kept in code,
           #                        not the strings catalog, so a translation can't break them.
           $HOME/.dotnet/tools/dotnet-sonarscanner begin \
-            /k:"neonpixel-software_pocket-chef" \
+            /k:"neonpixel-software_recipe-raccoon" \
             /o:"neonpixel-software" \
             /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.host.url="https://sonarcloud.io" \

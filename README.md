@@ -4,11 +4,11 @@ A NeonPixel app for macOS, iPadOS, and iOS. Gather recipes with zero friction: t
 
 > ⚠️ **Disclaimer:** This repository was built by three LLMs (large language models). The code was written by language models, but it holds the same standard as anything else here: it has to pass CI, the test suites, and the SonarCloud quality gate before it lands.
 
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_pocket-chef&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_pocket-chef)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_pocket-chef&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_pocket-chef)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_pocket-chef&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_pocket-chef)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_pocket-chef&metric=coverage)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_pocket-chef)
-[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_pocket-chef&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_pocket-chef)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_recipe-raccoon&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_recipe-raccoon)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_recipe-raccoon&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_recipe-raccoon)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_recipe-raccoon&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_recipe-raccoon)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_recipe-raccoon&metric=coverage)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_recipe-raccoon)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=neonpixel-software_recipe-raccoon&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=neonpixel-software_recipe-raccoon)
 
 ## Features
 
