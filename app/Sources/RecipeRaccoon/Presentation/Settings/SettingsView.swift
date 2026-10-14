@@ -137,11 +137,19 @@ struct SettingsView: View {
         #endif
     }
 
-    /// The language the app runs in, in that language ("Español"), as the system names it.
+    /// The language the app runs in, as `languageName(for:)` names it.
     static var currentLanguageName: String {
-        let code = Bundle.main.preferredLocalizations.first ?? "en"
-        let locale = Locale(identifier: code)
-        return locale.localizedString(forLanguageCode: code)?.capitalized(with: locale) ?? code
+        languageName(for: Bundle.main.preferredLocalizations.first ?? "en")
+    }
+
+    /// A localization's language in that language ("Español"), as the system names it. The
+    /// catalogs are bare language codes, but a region ("en-GB") is dropped anyway. "Base" has no
+    /// name of its own and means the development language, English. Capitalized because Spanish
+    /// and French name their languages in lowercase ("español", "français").
+    static func languageName(for identifier: String) -> String {
+        let locale = Locale(identifier: identifier == "Base" ? "en" : identifier)
+        let code = locale.language.languageCode?.identifier ?? identifier
+        return locale.localizedString(forLanguageCode: code)?.capitalized(with: locale) ?? identifier
     }
 
     private var volumeStandardSection: some View {

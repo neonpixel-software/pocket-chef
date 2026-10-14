@@ -32,8 +32,19 @@ final class AppThemeTests: XCTestCase {
     }
     #endif
 
-    /// The tests run in English, so the row names the language as English does.
-    func testTheLanguageRowNamesTheLanguageTheAppRunsIn() {
-        XCTAssertEqual(SettingsView.currentLanguageName, "English")
+    /// Fixed codes, not the language the tests happen to run in: on a German Mac the app runs in
+    /// German. Spanish and French come back lowercase from the system.
+    func testTheLanguageRowNamesEachLanguageInThatLanguage() {
+        XCTAssertEqual(
+            ["en", "es", "fr", "de", "nl"].map(SettingsView.languageName(for:)),
+            ["English", "Español", "Français", "Deutsch", "Nederlands"]
+        )
+        XCTAssertEqual(SettingsView.languageName(for: "en-GB"), "English")
+        XCTAssertEqual(SettingsView.languageName(for: "Base"), "English")
+    }
+
+    func testTheLanguageRowNamesOneOfTheAppsLanguages() {
+        let names = ["en", "es", "fr", "de", "nl"].map(SettingsView.languageName(for:))
+        XCTAssertTrue(names.contains(SettingsView.currentLanguageName), SettingsView.currentLanguageName)
     }
 }

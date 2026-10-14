@@ -35,20 +35,30 @@ struct AppThemeModifier: ViewModifier {
     @AppStorage(AppTheme.storageKey) private var theme = AppTheme.system
 
     func body(content: Content) -> some View {
-        content.onChange(of: theme, initial: true) { _, theme in
-            #if DEBUG
-            // UI test runs read the developer's own settings on the Mac; the stored theme would
-            // undo the screenshots' light mode (UITestScenario.prepareScreenshotWindow).
-            guard UITestScenario.current() == nil else { return }
+        content
+            .onChange(of: theme, initial: true) { _, theme in applyUnlessUITest(theme) }
+            #if os(iOS)
+            // A new iPad window may not be in its scene's windows yet when its root view's
+            // onChange first runs, so apply again once any window shows.
+            .onReceive(NotificationCenter.default.publisher(for: UIWindow.didBecomeVisibleNotification)) { _ in
+                applyUnlessUITest(theme)
+            }
             #endif
-            Self.apply(theme)
-        }
+    }
+
+    private func applyUnlessUITest(_ theme: AppTheme) {
+        #if DEBUG
+        // UI test runs read the developer's own settings on the Mac; the stored theme would
+        // undo the screenshots' light mode (UITestScenario.prepareScreenshotWindow). So UI tests
+        // run in the system's appearance and have no dark-theme coverage of their own.
+        guard UITestScenario.current() == nil else { return }
+        #endif
+        Self.apply(theme)
     }
 
     @MainActor
     static func apply(_ theme: AppTheme) {
         #if os(iOS)
-        // Every scene's root view has this modifier, so a new iPad window gets the theme too.
         for case let scene as UIWindowScene in UIApplication.shared.connectedScenes {
             for window in scene.windows {
                 window.overrideUserInterfaceStyle = theme.userInterfaceStyle
