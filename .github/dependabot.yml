@@ -14,3 +14,11 @@ updates:
       interval: "daily"
       time: "03:00"
       timezone: "UTC"
+    # .NET ships EF Core, ASP.NET Core and Microsoft.Extensions together, and they require each
+    # other's version: EF Core Design 10.0.13 alone fails restore with NU1605 while EF Core is
+    # still 10.0.12 (#187). One PR per release builds; Npgsql's EF provider follows EF Core.
+    groups:
+      dotnet:
+        patterns:
+          - "Microsoft.*"
+          - "Npgsql.*"
