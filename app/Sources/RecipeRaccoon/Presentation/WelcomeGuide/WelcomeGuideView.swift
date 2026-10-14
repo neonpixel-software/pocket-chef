@@ -93,19 +93,31 @@ struct WelcomeGuideView: View {
     }
 }
 
-/// One page: a symbol in a pink circle, the title, the text and its points. Centered; it
-/// scrolls when it doesn't fit.
+/// One page: the app icon or a symbol in a pink circle, the title, the text and its points.
+/// Centered; it scrolls when it doesn't fit.
 struct WelcomeGuidePageView: View {
     let page: WelcomeGuidePage
+
+    @ViewBuilder private var artwork: some View {
+        switch page.artwork {
+        case .appIcon:
+            // The icon as Icon Composer renders it, light and dark (app/Design/AppIcon/build.sh).
+            Image(decorative: "WelcomeAppIcon")
+                .resizable()
+                .frame(width: 96, height: 96)
+        case let .symbol(name):
+            Image(systemName: name)
+                .font(.system(size: 34, weight: .semibold))
+                .foregroundStyle(PCColor.onPink)
+                .frame(width: 84, height: 84)
+                .background(PCColor.pink, in: Circle())
+        }
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
-                Image(systemName: page.systemImage)
-                    .font(.system(size: 34, weight: .semibold))
-                    .foregroundStyle(PCColor.onPink)
-                    .frame(width: 84, height: 84)
-                    .background(PCColor.pink, in: Circle())
+                artwork
                     .accessibilityHidden(true)
 
                 Text(page.title)

@@ -28,4 +28,16 @@ for rendition in Default Dark; do
   "$ictool" "$icon" --export-image --output-file "$previews/macOS-$rendition.png" \
     --platform macOS --rendition "$rendition" --width 1024 --height 1024 --scale 1 >/dev/null
 done
-echo "Layers written to $icon/Assets; previews in $previews"
+
+# The welcome guide's first page shows the icon at 96 pt (WelcomeGuidePageView): 192 px at 2×
+# and 288 px at 3×. macOS asset catalogs drop 3× images, so the 2× ones are needed on the Mac.
+welcome=${icon:h}/Assets.xcassets/WelcomeAppIcon.imageset
+for scale in 2 3; do
+  for rendition in Default Dark; do
+    appearance=${${rendition:l}/default/light}
+    "$ictool" "$icon" --export-image --output-file "$welcome/welcome-app-icon-$appearance@${scale}x.png" \
+      --platform iOS --rendition "$rendition" --width $((96 * scale)) --height $((96 * scale)) --scale 1 >/dev/null
+  done
+done
+
+echo "Layers written to $icon/Assets, welcome guide icon to $welcome; previews in $previews"
