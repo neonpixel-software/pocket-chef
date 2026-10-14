@@ -79,7 +79,7 @@ final class WelcomeGuideViewTests: XCTestCase {
 
     func testAPageShowsItsTitleTextPointsAndNote() throws {
         let page = WelcomeGuidePage.pages(isCaptureAvailable: true)[1]
-        let sut = WelcomeGuidePageView(page: page)
+        let sut = WelcomeGuidePageView(page: page, accessibilityLabel: page.accessibilityLabel(at: 0, of: 4))
 
         let texts = try sut.inspect().findAll(ViewType.Text.self).map { try $0.string() }
 
@@ -88,7 +88,7 @@ final class WelcomeGuideViewTests: XCTestCase {
 
     func testAPageWithoutANoteShowsNone() throws {
         let page = WelcomeGuidePage.pages(isCaptureAvailable: true)[0]
-        let sut = WelcomeGuidePageView(page: page)
+        let sut = WelcomeGuidePageView(page: page, accessibilityLabel: page.accessibilityLabel(at: 0, of: 4))
 
         let texts = try sut.inspect().findAll(ViewType.Text.self).map { try $0.string() }
 

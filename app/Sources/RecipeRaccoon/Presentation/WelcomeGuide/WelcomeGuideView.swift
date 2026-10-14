@@ -100,8 +100,10 @@ struct WelcomeGuideView: View {
 /// then on the last page the storage choice. Centered; it scrolls when it doesn't fit.
 struct WelcomeGuidePageView: View {
     let page: WelcomeGuidePage
-    /// What VoiceOver reads for the page's text, which is one element (`WelcomeGuidePage`).
-    var accessibilityLabel: String = ""
+    /// What VoiceOver reads for the page's text, which is one element
+    /// (`WelcomeGuidePage.accessibilityLabel(at:of:)`). No default: an empty label would hide the
+    /// page's text from VoiceOver.
+    let accessibilityLabel: String
     var settingsViewModel: SettingsViewModel?
 
     @ViewBuilder private var artwork: some View {

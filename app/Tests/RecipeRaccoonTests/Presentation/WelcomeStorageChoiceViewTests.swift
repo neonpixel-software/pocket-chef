@@ -31,7 +31,7 @@ final class WelcomeStorageChoiceViewTests: XCTestCase {
         let pages = WelcomeGuidePage.pages(isCaptureAvailable: true)
 
         let shown = try pages.map { page in
-            try !WelcomeGuidePageView(page: page, settingsViewModel: settings).inspect()
+            try !WelcomeGuidePageView(page: page, accessibilityLabel: page.title, settingsViewModel: settings).inspect()
                 .findAll(WelcomeStorageChoiceView.self).isEmpty
         }
 
@@ -41,7 +41,7 @@ final class WelcomeStorageChoiceViewTests: XCTestCase {
     func testWithoutSettingsTheLastPageHasNoChoice() throws {
         let page = try XCTUnwrap(WelcomeGuidePage.pages(isCaptureAvailable: true).last)
 
-        let sut = WelcomeGuidePageView(page: page)
+        let sut = WelcomeGuidePageView(page: page, accessibilityLabel: page.title)
 
         XCTAssertTrue(try sut.inspect().findAll(WelcomeStorageChoiceView.self).isEmpty)
     }
@@ -68,7 +68,7 @@ final class WelcomeStorageChoiceViewTests: XCTestCase {
         let sut = WelcomeStorageChoiceView(viewModel: settings)
 
         try sut.inspect().find(ViewType.Picker.self).select(value: StorageMode.iCloud)
-        await waitUntil { settings.storageMode == .iCloud }
+        try await waitUntil { settings.storageMode == .iCloud }
 
         XCTAssertEqual(useCase.executed, [.iCloud])
         XCTAssertNoThrow(try sut.inspect().find(text: "Your recipes sync to your other devices signed in to the same account."))
@@ -81,7 +81,7 @@ final class WelcomeStorageChoiceViewTests: XCTestCase {
         let sut = WelcomeStorageChoiceView(viewModel: settings)
 
         try sut.inspect().find(ViewType.Picker.self).select(value: StorageMode.iCloud)
-        await waitUntil { settings.errorMessage != nil }
+        try await waitUntil { settings.errorMessage != nil }
 
         XCTAssertEqual(settings.storageMode, .local)
         XCTAssertNoThrow(try sut.inspect().find(text: "Sign in to iCloud on this device to sync your recipes."))
@@ -94,10 +94,20 @@ final class WelcomeStorageChoiceViewTests: XCTestCase {
         XCTAssertNoThrow(try sut.inspect().find(text: "iCloud sync isn't available in this build."))
     }
 
-    /// The picker switches in a Task, as in Settings; give it a few turns of the main actor.
-    private func waitUntil(_ condition: () -> Bool) async {
-        for _ in 0..<100 where !condition() {
-            await Task.yield()
+    /// The picker switches in a Task, as in Settings. Waits for it in real time rather than a
+    /// fixed number of yields, and fails here rather than at a later, vaguer assertion.
+    private func waitUntil(
+        timeout: Duration = .seconds(2),
+        file: StaticString = #filePath,
+        line: UInt = #line,
+        _ condition: () -> Bool
+    ) async throws {
+        let deadline = ContinuousClock.now + timeout
+        while !condition() {
+            guard ContinuousClock.now < deadline else {
+                return XCTFail("Timed out waiting for the storage switch", file: file, line: line)
+            }
+            try await Task.sleep(for: .milliseconds(10))
         }
     }
 }

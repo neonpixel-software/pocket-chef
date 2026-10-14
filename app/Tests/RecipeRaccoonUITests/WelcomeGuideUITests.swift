@@ -82,8 +82,10 @@ final class WelcomeGuideUITests: XCTestCase {
         let first = page("Welcome to Recipe Raccoon", in: app)
         XCTAssertTrue(first.waitForExistence(timeout: 5))
         XCTAssertTrue(first.label.hasSuffix("Page 1 of 4"), "The page doesn't say where it is: \(first.label)")
-        // 560 pt wide; its content 680 pt tall under the title bar.
+        // 560 pt wide; its content 680 pt tall under the title bar, which is under 60 pt.
         XCTAssertEqual(window.frame.width, 560, accuracy: 1)
+        XCTAssertGreaterThanOrEqual(window.frame.height, 680)
+        XCTAssertLessThan(window.frame.height, 740)
         for button in [window.buttons["Skip"], window.buttons["Next"], window.buttons["Next Page"]] {
             XCTAssertTrue(button.exists, "\(button) is missing")
             XCTAssertTrue(window.frame.contains(button.frame), "\(button) isn't inside the window")
