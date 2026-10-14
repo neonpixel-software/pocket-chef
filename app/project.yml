@@ -1,4 +1,4 @@
-name: PocketChef
+name: RecipeRaccoon
 options:
   bundleIdPrefix: com.neonpixel.reciperaccoon
   deploymentTarget:
@@ -26,16 +26,16 @@ packages:
     exactVersion: 0.10.5
 
 targets:
-  PocketChef-iOS:
+  RecipeRaccoon-iOS:
     type: application
     platform: iOS
     sources:
-      - Sources/PocketChef
+      - Sources/RecipeRaccoon
     configFiles:
-      Debug: Config/PocketChef.xcconfig
-      Release: Config/PocketChef.xcconfig
+      Debug: Config/RecipeRaccoon.xcconfig
+      Release: Config/RecipeRaccoon.xcconfig
     settings:
-      PRODUCT_MODULE_NAME: PocketChef
+      PRODUCT_MODULE_NAME: RecipeRaccoon
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.reciperaccoon
       # Merged with the generated Info.plist: UIBackgroundModes has no INFOPLIST_KEY_ setting.
       # CloudKit sync wakes the app with silent pushes (remote-notification).
@@ -51,47 +51,47 @@ targets:
       TARGETED_DEVICE_FAMILY: "1,2"
     scheme:
       testTargets:
-        - PocketChef-iOSTests
-        - PocketChef-iOSUITests
+        - RecipeRaccoon-iOSTests
+        - RecipeRaccoon-iOSUITests
       gatherCoverageData: true
 
-  PocketChef-iOSTests:
+  RecipeRaccoon-iOSTests:
     type: bundle.unit-test
     platform: iOS
     configFiles:
       Debug: Config/UnitTests.xcconfig
       Release: Config/UnitTests.xcconfig
     sources:
-      - Tests/PocketChefTests
+      - Tests/RecipeRaccoonTests
     dependencies:
-      - target: PocketChef-iOS
+      - target: RecipeRaccoon-iOS
       - package: ViewInspector
 
   # Layout checks that need a running app, such as where the header lands (#98).
   # They start the Debug app with -UITestScenario (Data/DevSupport/UITestScenario.swift).
-  PocketChef-iOSUITests:
+  RecipeRaccoon-iOSUITests:
     type: bundle.ui-testing
     platform: iOS
     sources:
-      - Tests/PocketChefUITests
+      - Tests/RecipeRaccoonUITests
     dependencies:
-      - target: PocketChef-iOS
+      - target: RecipeRaccoon-iOS
 
-  PocketChef-macOS:
+  RecipeRaccoon-macOS:
     type: application
     platform: macOS
     # The app menu (About, Hide, Quit) and the .app in Applications use the product name,
-    # which otherwise is the target name, PocketChef-macOS. Xcode builds with PRODUCT_NAME
+    # which otherwise is the target name, RecipeRaccoon-macOS. Xcode builds with PRODUCT_NAME
     # below; XcodeGen derives the unit tests' TEST_HOST (and so BUNDLE_LOADER) from this key.
     # Keep the two the same.
     productName: Recipe Raccoon
     sources:
-      - Sources/PocketChef
+      - Sources/RecipeRaccoon
     configFiles:
-      Debug: Config/PocketChef.xcconfig
-      Release: Config/PocketChef.xcconfig
+      Debug: Config/RecipeRaccoon.xcconfig
+      Release: Config/RecipeRaccoon.xcconfig
     settings:
-      PRODUCT_MODULE_NAME: PocketChef
+      PRODUCT_MODULE_NAME: RecipeRaccoon
       PRODUCT_NAME: Recipe Raccoon
       PRODUCT_BUNDLE_IDENTIFIER: com.neonpixel.reciperaccoon
       # Merged with the generated Info.plist: carries the density API settings.
@@ -102,26 +102,26 @@ targets:
       ENABLE_HARDENED_RUNTIME: YES
     scheme:
       testTargets:
-        - PocketChef-macOSTests
-        - PocketChef-macOSUITests
+        - RecipeRaccoon-macOSTests
+        - RecipeRaccoon-macOSUITests
       gatherCoverageData: true
 
-  PocketChef-macOSTests:
+  RecipeRaccoon-macOSTests:
     type: bundle.unit-test
     platform: macOS
     configFiles:
       Debug: Config/UnitTests.xcconfig
       Release: Config/UnitTests.xcconfig
     sources:
-      - Tests/PocketChefTests
+      - Tests/RecipeRaccoonTests
     dependencies:
-      - target: PocketChef-macOS
+      - target: RecipeRaccoon-macOS
       - package: ViewInspector
 
-  PocketChef-macOSUITests:
+  RecipeRaccoon-macOSUITests:
     type: bundle.ui-testing
     platform: macOS
     sources:
-      - Tests/PocketChefUITests
+      - Tests/RecipeRaccoonUITests
     dependencies:
-      - target: PocketChef-macOS
+      - target: RecipeRaccoon-macOS

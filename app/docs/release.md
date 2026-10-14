@@ -51,7 +51,7 @@ instead, so each tag names exactly the commit that was uploaded.
 
 Set this up in Xcode (⌘9 → Cloud → right-click the product → Manage Workflows) or in App Store
 Connect (Xcode Cloud → Manage Workflows). The existing TestFlight workflow stays as it is. Xcode
-Cloud has one product for the app, named PocketChef-iOS after the scheme it was created from. iOS
+Cloud has one product for the app, named RecipeRaccoon-iOS after the scheme it was created from. iOS
 and macOS share the bundle ID, so the macOS archive goes in the same product's workflow, and the
 App Store Connect app record must list macOS as a platform.
 
@@ -60,8 +60,8 @@ App Store Connect app record must list macOS as a platform.
 | Name | Release |
 | Start condition | **Tag Changes**, custom tag pattern `v*`. Remove the default Branch Changes condition. Leave **Auto-cancel builds** off. |
 | Environment | The same Xcode and macOS as the existing workflow. Secret environment variables: `DEVELOPMENT_TEAM`, `DENSITY_API_HOST`, `DENSITY_API_READ_KEY` (see `ci_post_clone.sh`). |
-| Action 1 | **Archive**, platform iOS, scheme `PocketChef-iOS`, deployment preparation **TestFlight and App Store** |
-| Action 2 | **Archive**, platform macOS, scheme `PocketChef-macOS`, deployment preparation **TestFlight and App Store** |
+| Action 1 | **Archive**, platform iOS, scheme `RecipeRaccoon-iOS`, deployment preparation **TestFlight and App Store** |
+| Action 2 | **Archive**, platform macOS, scheme `RecipeRaccoon-macOS`, deployment preparation **TestFlight and App Store** |
 | Post-actions | **TestFlight Internal Testing** for each archive, to the internal group |
 
 Before the first release, check that:

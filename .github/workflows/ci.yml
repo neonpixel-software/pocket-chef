@@ -68,11 +68,11 @@ jobs:
             # against 94% with them). Every push to main runs them, so a UI break from a change
             # outside these paths shows up there.
             ui-sources:
-              - 'app/Sources/PocketChef/{Presentation,Resources,Data/DevSupport}/**'
+              - 'app/Sources/RecipeRaccoon/{Presentation,Resources,Data/DevSupport}/**'
             ui-entry:
-              - 'app/{Sources/PocketChef/PocketChefApp.swift,project.yml}'
+              - 'app/{Sources/RecipeRaccoon/RecipeRaccoonApp.swift,project.yml}'
             ui-tests:
-              - 'app/Tests/PocketChefUITests/**'
+              - 'app/Tests/RecipeRaccoonUITests/**'
 
   build-apple:
     needs: changes
@@ -89,13 +89,13 @@ jobs:
       matrix:
         include:
           - platform: iOS
-            scheme: PocketChef-iOS
+            scheme: RecipeRaccoon-iOS
             release-destination: generic/platform=iOS Simulator
             test-destination: platform=iOS Simulator,name=iPhone 17
             coverage: coverage-ios
             runs-checks: false
           - platform: macOS
-            scheme: PocketChef-macOS
+            scheme: RecipeRaccoon-macOS
             release-destination: generic/platform=macOS
             test-destination: platform=macOS
             coverage: coverage-macos
@@ -120,11 +120,11 @@ jobs:
         # hand-synced copy of project.yml's packages. Resolve fresh for both schemes and
         # fail on any difference, so a stale copy breaks here instead of in Xcode Cloud.
         run: |
-          for scheme in PocketChef-iOS PocketChef-macOS; do
-            xcodebuild -resolvePackageDependencies -project PocketChef.xcodeproj -scheme "$scheme"
+          for scheme in RecipeRaccoon-iOS RecipeRaccoon-macOS; do
+            xcodebuild -resolvePackageDependencies -project RecipeRaccoon.xcodeproj -scheme "$scheme"
           done
           diff ci_scripts/Package.resolved \
-            PocketChef.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+            RecipeRaccoon.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
       - name: Verify formatting
         if: matrix.runs-checks
         # Enforces the style contract in app/.swiftformat; fails without changing anything.
@@ -150,7 +150,7 @@ jobs:
         # #if DEBUG (issue #95). Build Release too so archives can't break unnoticed.
         # Runs before the tests so a Release-only break fails in minutes, not after them.
         run: |
-          xcodebuild -project PocketChef.xcodeproj -scheme "$SCHEME" \
+          xcodebuild -project RecipeRaccoon.xcodeproj -scheme "$SCHEME" \
             -configuration Release -destination "$RELEASE_DESTINATION" \
             CODE_SIGNING_ALLOWED=NO build
       - name: Build & test
@@ -166,7 +166,7 @@ jobs:
             skip=(-skip-testing:"${SCHEME}UITests")
             echo "::notice::UI tests skipped: this PR changes nothing they exercise (see the ui-* filters)"
           fi
-          xcodebuild -project PocketChef.xcodeproj -scheme "$SCHEME" \
+          xcodebuild -project RecipeRaccoon.xcodeproj -scheme "$SCHEME" \
             -destination "$TEST_DESTINATION" \
             -enableCodeCoverage YES -resultBundlePath "$COVERAGE.xcresult" \
             -collect-test-diagnostics never \
@@ -325,21 +325,21 @@ jobs:
             /d:sonar.coverage.exclusions="$COVERAGE_EXCLUSIONS" \
             /d:sonar.issue.ignore.multicriteria="e1,e2,e3,e4" \
             /d:sonar.issue.ignore.multicriteria.e1.ruleKey="swift:S1075" \
-            /d:sonar.issue.ignore.multicriteria.e1.resourceKey="app/Sources/PocketChef/Presentation/RecipeCapture/RecipeURLCaptureView.swift" \
+            /d:sonar.issue.ignore.multicriteria.e1.resourceKey="app/Sources/RecipeRaccoon/Presentation/RecipeCapture/RecipeURLCaptureView.swift" \
             /d:sonar.issue.ignore.multicriteria.e2.ruleKey="swift:S1075" \
-            /d:sonar.issue.ignore.multicriteria.e2.resourceKey="app/Sources/PocketChef/Data/Density/DensityAPIConfiguration.swift" \
+            /d:sonar.issue.ignore.multicriteria.e2.resourceKey="app/Sources/RecipeRaccoon/Data/Density/DensityAPIConfiguration.swift" \
             /d:sonar.issue.ignore.multicriteria.e3.ruleKey="swift:S107" \
-            /d:sonar.issue.ignore.multicriteria.e3.resourceKey="app/Sources/PocketChef/Data/Models/RecipeModel.swift" \
+            /d:sonar.issue.ignore.multicriteria.e3.resourceKey="app/Sources/RecipeRaccoon/Data/Models/RecipeModel.swift" \
             /d:sonar.issue.ignore.multicriteria.e4.ruleKey="swift:S1075" \
-            /d:sonar.issue.ignore.multicriteria.e4.resourceKey="app/Sources/PocketChef/Presentation/About/AboutInfo.swift"
+            /d:sonar.issue.ignore.multicriteria.e4.resourceKey="app/Sources/RecipeRaccoon/Presentation/About/AboutInfo.swift"
       - name: Build .NET API (captures C# semantic data for the scanner)
-        run: dotnet build api/PocketChef.DensityApi.slnx --configuration Release
+        run: dotnet build api/RecipeRaccoon.DensityApi.slnx --configuration Release
       - name: Add the Swift sources to the analysis
         # The Scanner for .NET only analyzes Swift files an MSBuild project includes (#138).
-        run: dotnet build app/Sonar/PocketChef.App.Sonar.csproj --configuration Release
+        run: dotnet build app/Sonar/RecipeRaccoon.App.Sonar.csproj --configuration Release
       - name: Test .NET API with coverage
         run: |
-          dotnet test api/PocketChef.DensityApi.slnx --configuration Release --logger trx \
+          dotnet test api/RecipeRaccoon.DensityApi.slnx --configuration Release --logger trx \
             --collect:"XPlat Code Coverage" \
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
       - name: End SonarCloud analysis

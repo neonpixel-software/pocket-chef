@@ -41,9 +41,9 @@ The Xcode project is generated from [`project.yml`](app/project.yml) with [Xcode
 xcodegen generate
 ```
 
-Then open `app/PocketChef.xcodeproj` and use the `PocketChef-iOS` / `PocketChef-macOS` schemes (build, test, coverage). Deployment targets are iOS 26 / macOS 26; the UI is localized into English, Spanish, French, German, and Dutch.
+Then open `app/RecipeRaccoon.xcodeproj` and use the `RecipeRaccoon-iOS` / `RecipeRaccoon-macOS` schemes (build, test, coverage). Deployment targets are iOS 26 / macOS 26; the UI is localized into English, Spanish, French, German, and Dutch.
 
-Each scheme's tests include a small UI test target (`app/Tests/PocketChefUITests`) for layout that unit tests can't see. It launches the Debug app with `-UITestScenario <name>`, which swaps in an in-memory store in a fixed state, so your own recipes are never touched. On macOS a run asks you to authenticate to turn on Automation Mode, and the header checks take screenshots, which need the Screen Recording permission: if they fail with "Image creation failed", allow the prompt or add `PocketChef-macOSUITests-Runner` (in the DerivedData `Build/Products/Debug` folder) under Privacy & Security > Screen & System Audio Recording.
+Each scheme's tests include a small UI test target (`app/Tests/RecipeRaccoonUITests`) for layout that unit tests can't see. It launches the Debug app with `-UITestScenario <name>`, which swaps in an in-memory store in a fixed state, so your own recipes are never touched. On macOS a run asks you to authenticate to turn on Automation Mode, and the header checks take screenshots, which need the Screen Recording permission: if they fail with "Image creation failed", allow the prompt or add `RecipeRaccoon-macOSUITests-Runner` (in the DerivedData `Build/Products/Debug` folder) under Privacy & Security > Screen & System Audio Recording.
 
 iCloud sync needs a signing team, which stays out of this public repo: copy `app/Config/Signing.xcconfig.example` to `app/Config/Signing.xcconfig` (gitignored), fill in your team ID, and run `xcodegen generate` again. Without it the app builds without the iCloud entitlement and the storage setting is disabled; that's how CI builds it.
 
@@ -54,9 +54,9 @@ Local development uses [Podman](https://podman.io) for the PostgreSQL container.
 ```sh
 podman compose up -d        # starts Postgres on localhost:5433
 dotnet ef database update \
-  --project src/PocketChef.DensityApi.Infrastructure \
-  --startup-project src/PocketChef.DensityApi.Api
-dotnet run --project src/PocketChef.DensityApi.Api
+  --project src/RecipeRaccoon.DensityApi.Infrastructure \
+  --startup-project src/RecipeRaccoon.DensityApi.Api
+dotnet run --project src/RecipeRaccoon.DensityApi.Api
 dotnet test                 # unit + Testcontainers-backed integration tests
 ```
 
@@ -74,7 +74,7 @@ Development proceeds in vertical slices (see `PLAN.md`); the project is not yet 
 
 ## CI & quality
 
-GitHub Actions runs on every PR targeting `main` and every push to `main`: Swift build + test + coverage (iOS and macOS), .NET build + test, linting (SwiftLint/SwiftFormat, `dotnet format`), and a SonarCloud analysis with quality gate for the whole repo (the badges above). The 90% coverage target is enforced: each iOS and macOS build fails below 90% line coverage of `app/Sources`, and the .NET build below 90% of `api/src` ([`check-coverage.py`](.github/scripts/check-coverage.py); the minimum is `COVERAGE_MIN` in `ci.yml`). Files that no test can reasonably reach are listed in [`coverage-exclusions.txt`](.github/coverage-exclusions.txt), which SonarCloud uses too. When the gate fails, add tests, or exclude a file no test can reasonably reach and give the reason in that file. Don't lower the minimum. Each side is only checked when its build runs, so an app-only PR doesn't check the API. SonarCloud analyzes both sides in one project. The .NET scanner only sees Swift files through [`app/Sonar/PocketChef.App.Sonar.csproj`](app/Sonar/PocketChef.App.Sonar.csproj) (#138).
+GitHub Actions runs on every PR targeting `main` and every push to `main`: Swift build + test + coverage (iOS and macOS), .NET build + test, linting (SwiftLint/SwiftFormat, `dotnet format`), and a SonarCloud analysis with quality gate for the whole repo (the badges above). The 90% coverage target is enforced: each iOS and macOS build fails below 90% line coverage of `app/Sources`, and the .NET build below 90% of `api/src` ([`check-coverage.py`](.github/scripts/check-coverage.py); the minimum is `COVERAGE_MIN` in `ci.yml`). Files that no test can reasonably reach are listed in [`coverage-exclusions.txt`](.github/coverage-exclusions.txt), which SonarCloud uses too. When the gate fails, add tests, or exclude a file no test can reasonably reach and give the reason in that file. Don't lower the minimum. Each side is only checked when its build runs, so an app-only PR doesn't check the API. SonarCloud analyzes both sides in one project. The .NET scanner only sees Swift files through [`app/Sonar/RecipeRaccoon.App.Sonar.csproj`](app/Sonar/RecipeRaccoon.App.Sonar.csproj) (#138).
 
 Xcode Cloud builds the app for TestFlight. Since the Xcode project is generated and gitignored, [`app/ci_scripts/ci_post_clone.sh`](app/ci_scripts/ci_post_clone.sh) runs `xcodegen generate` and resolves the Swift packages after each clone. For iCloud-enabled builds, set a secret `DEVELOPMENT_TEAM` environment variable in the Xcode Cloud workflow; the script writes it into `Signing.xcconfig`. Releases go out by pushing a `vX.Y.Z` tag, which starts the Xcode Cloud Release workflow for iOS and macOS: see [`app/docs/release.md`](app/docs/release.md).
 

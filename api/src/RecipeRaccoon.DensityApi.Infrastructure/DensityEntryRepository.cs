@@ -1,0 +1,59 @@
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using RecipeRaccoon.DensityApi.Application;
+using RecipeRaccoon.DensityApi.Domain;
+
+namespace RecipeRaccoon.DensityApi.Infrastructure;
+
+public sealed class DensityEntryRepository : IDensityEntryRepository
+{
+    private readonly DensityApiDbContext _context;
+
+    public DensityEntryRepository(DensityApiDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<IReadOnlyList<DensityEntry>> GetAllAsync(CancellationToken cancellationToken)
+        => await _context.DensityEntries.AsNoTracking().OrderBy(entry => entry.IngredientName).ToListAsync(cancellationToken);
+
+    public Task<DensityEntry?> FindByNameAsync(string ingredientName, CancellationToken cancellationToken)
+        => _context.DensityEntries.AsNoTracking().FirstOrDefaultAsync(entry => entry.IngredientName == ingredientName, cancellationToken);
+
+    public async Task<DensityEntry> UpsertAsync(DensityEntry entry, CancellationToken cancellationToken)
+    {
+        var existing = await _context.DensityEntries.FindAsync([entry.Id], cancellationToken);
+        if (existing is null)
+        {
+            _context.DensityEntries.Add(entry);
+        }
+        else
+        {
+            // DensityEntry has no public setters, so EF falls back to writing the backing
+            // fields directly for this copy — no CLR-level property setter needed.
+            _context.Entry(existing).CurrentValues.SetValues(entry);
+        }
+
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation,
+            ConstraintName: DensityEntryConfiguration.IngredientNameUniqueIndexName
+        })
+        {
+            // Two concurrent writes for the same (case-insensitive) name can both pass the
+            // service's FindByNameAsync-then-insert check before either commits — only the
+            // database's unique index actually catches the second one. Translate the raw
+            // Npgsql/EF exception into something the Api layer can map to a clean response
+            // without depending on persistence-specific exception types. Scoped to this
+            // specific index by name so a violation on some future, unrelated unique
+            // constraint isn't misreported as a name conflict.
+            throw new DensityEntryConflictException(entry.IngredientName);
+        }
+
+        return entry;
+    }
+}

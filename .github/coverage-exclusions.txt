@@ -4,14 +4,14 @@
 # Apple Intelligence and network adapters (faked in tests), the system camera (no simulator
 # has one), entry points, generated migrations and DI wiring. CI tooling is listed too: the coverage target is for the app and the API, and
 # SonarCloud would otherwise count the gate script's Python as uncovered new code.
-app/Sources/PocketChef/Data/DevSupport/**
-app/Sources/PocketChef/Data/Capture/FoundationModelsRecipeCaptureService.swift
-app/Sources/PocketChef/Data/Capture/URLSessionWebPageFetcher.swift
-app/Sources/PocketChef/Presentation/RecipeForm/CameraPicker.swift
-api/src/PocketChef.DensityApi.Api/Program.cs
-api/src/PocketChef.DensityApi.Seed/Program.cs
-api/src/PocketChef.DensityApi.Infrastructure/Migrations/**
-api/src/PocketChef.DensityApi.Api/Authentication/ServiceCollectionExtensions.cs
-api/src/PocketChef.DensityApi.Infrastructure/ServiceCollectionExtensions.cs
-api/src/PocketChef.DensityApi.Application/ServiceCollectionExtensions.cs
+app/Sources/RecipeRaccoon/Data/DevSupport/**
+app/Sources/RecipeRaccoon/Data/Capture/FoundationModelsRecipeCaptureService.swift
+app/Sources/RecipeRaccoon/Data/Capture/URLSessionWebPageFetcher.swift
+app/Sources/RecipeRaccoon/Presentation/RecipeForm/CameraPicker.swift
+api/src/RecipeRaccoon.DensityApi.Api/Program.cs
+api/src/RecipeRaccoon.DensityApi.Seed/Program.cs
+api/src/RecipeRaccoon.DensityApi.Infrastructure/Migrations/**
+api/src/RecipeRaccoon.DensityApi.Api/Authentication/ServiceCollectionExtensions.cs
+api/src/RecipeRaccoon.DensityApi.Infrastructure/ServiceCollectionExtensions.cs
+api/src/RecipeRaccoon.DensityApi.Application/ServiceCollectionExtensions.cs
 .github/scripts/**

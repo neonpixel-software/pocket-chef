@@ -17,7 +17,7 @@ Under **App Privacy**:
 
 | Field | Value |
 |---|---|
-| Privacy Policy URL | `https://github.com/neonpixel-software/pocket-chef/blob/main/PRIVACY.md` |
+| Privacy Policy URL | `https://github.com/neonpixel-software/recipe-raccoon/blob/main/PRIVACY.md` |
 | Do you or your third-party partners collect data from this app? | **No, we do not collect data from this app** |
 
 Then **Publish**. The label then reads "Data Not Collected", which covers every platform of the
@@ -40,7 +40,7 @@ read it for longer than it takes to answer the request. Recipe Raccoon sends not
 There are no third-party SDKs in the app: its only package, ViewInspector, is linked into the
 unit tests and not shipped. Recipe capture runs on the device with Apple Intelligence.
 
-The app's privacy manifest (`Sources/PocketChef/Resources/PrivacyInfo.xcprivacy`) says the same:
+The app's privacy manifest (`Sources/RecipeRaccoon/Resources/PrivacyInfo.xcprivacy`) says the same:
 no tracking, no collected data types. It also declares the one required-reason API the app's own
 code uses, `UserDefaults`, with reason `CA92.1` (read and written by the app itself only).
 
@@ -62,8 +62,8 @@ the device, such as a new SDK, crash reporting, or logging on the server, change
 
 | Field | Value |
 |---|---|
-| Support URL | `https://github.com/neonpixel-software/pocket-chef/issues` |
-| Marketing URL | `https://github.com/neonpixel-software/pocket-chef` (optional) |
+| Support URL | `https://github.com/neonpixel-software/recipe-raccoon/issues` |
+| Marketing URL | `https://github.com/neonpixel-software/recipe-raccoon` (optional) |
 | Copyright | `2026 NeonPixel` |
 
 The subtitle, promotional text, description and keywords for each language are in
