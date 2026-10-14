@@ -2,6 +2,10 @@
 
 Last updated: 9 October 2026
 
+Also in [Español](PRIVACY.es.md) · [Français](PRIVACY.fr.md) · [Deutsch](PRIVACY.de.md) ·
+[Nederlands](PRIVACY.nl.md). This English version is the original; if a translation differs,
+this version applies.
+
 Recipe Raccoon is a recipe app for iPhone, iPad and Mac, made by NeonPixel. It collects no data
 about you. There's no account, no ads, no analytics and no tracking, and nothing you do in the
 app is sent to NeonPixel.
@@ -43,8 +47,8 @@ Recipe Raccoon doesn't collect data from anyone, including children.
 
 ## Changes
 
-If this policy ever changes, the new version will be published here with a new date. Its
-history is kept in the app's [public repository](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md).
+If this policy ever changes, the new version will be published here with a new date, and the
+translations are updated with it. Its history is kept in the app's [public repository](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md).
 
 ## Contact
 
