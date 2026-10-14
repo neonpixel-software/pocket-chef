@@ -31,9 +31,9 @@ De app maakt alleen verbinding met internet om:
 - **Ingrediëntdichtheden te downloaden** van de server van Recipe Raccoon, om tussen kopjes en
   grammen om te rekenen. Het verzoek bevat geen informatie over jou of je recepten, en de server
   houdt geen verzoeken bij. Hij houdt het adres waar een verzoek vandaan kwam ongeveer een minuut
-  in het geheugen, zodat niemand hem kan overbelasten. Als een verzoek op de server misgaat, kan
-  het foutlogboek dat adres vastleggen zolang de fout wordt onderzocht; het logboek wordt bij de
-  gewone rotatie verwijderd.
+  in het geheugen, zodat één afzender hem niet kan overbelasten. Als een verzoek op de server
+  misgaat, kan het foutlogboek dat adres vastleggen zolang de fout wordt onderzocht; het logboek
+  wordt bij de gewone rotatie verwijderd.
 
 ## Je gegevens verwijderen
 
@@ -48,8 +48,8 @@ Recipe Raccoon verzamelt van niemand gegevens, ook niet van kinderen.
 
 ## Wijzigingen
 
-Als dit beleid ooit verandert, wordt de nieuwe versie hier gepubliceerd met een nieuwe datum. De
-geschiedenis ervan staat in de [openbare repository](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md)
+Als dit beleid ooit verandert, wordt de nieuwe versie hier gepubliceerd met een nieuwe datum, en
+worden de vertalingen mee bijgewerkt. De geschiedenis ervan staat in de [openbare repository](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md)
 van de app.
 
 ## Contact

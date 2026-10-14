@@ -31,7 +31,7 @@ La app solo se conecta a internet para:
 - **Descargar densidades de ingredientes** del servidor de Recipe Raccoon, que se usan para
   convertir entre tazas y gramos. La solicitud no lleva ninguna información sobre ti ni sobre
   tus recetas, y el servidor no registra las solicitudes. Guarda en memoria la dirección de la
-  que vino una solicitud durante un minuto aproximadamente, para evitar que alguien lo
+  que vino una solicitud durante un minuto aproximadamente, para evitar que un mismo cliente lo
   sobrecargue. Si una solicitud falla en el servidor, su registro de errores puede anotar esa
   dirección mientras se diagnostica el fallo; el registro se borra con la rotación habitual.
 
@@ -48,8 +48,8 @@ Recipe Raccoon no recoge datos de nadie, tampoco de niños.
 
 ## Cambios
 
-Si esta política cambia alguna vez, la nueva versión se publicará aquí con una fecha nueva. Su
-historial se guarda en el [repositorio público](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md)
+Si esta política cambia alguna vez, la nueva versión se publicará aquí con una fecha nueva, y
+las traducciones se actualizarán con ella. Su historial se guarda en el [repositorio público](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md)
 de la app.
 
 ## Contacto

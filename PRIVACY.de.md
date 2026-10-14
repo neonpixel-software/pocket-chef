@@ -32,9 +32,9 @@ Die App verbindet sich nur mit dem Internet, um:
 - **Zutatendichten herunterzuladen** vom Server von Recipe Raccoon, um zwischen Tassen und Gramm
   umzurechnen. Die Anfrage enthält keine Informationen über dich oder deine Rezepte, und der
   Server protokolliert keine Anfragen. Er hält die Adresse, von der eine Anfrage kam, etwa eine
-  Minute im Arbeitsspeicher, damit ihn niemand überlastet. Schlägt eine Anfrage auf dem Server
-  fehl, kann das Fehlerprotokoll diese Adresse vermerken, solange der Fehler untersucht wird;
-  das Protokoll wird durch die übliche Rotation gelöscht.
+  Minute im Arbeitsspeicher, damit ihn kein einzelner Aufrufer überlastet. Schlägt eine Anfrage
+  auf dem Server fehl, kann das Fehlerprotokoll diese Adresse vermerken, solange der Fehler
+  untersucht wird; das Protokoll wird durch die übliche Rotation gelöscht.
 
 ## Deine Daten löschen
 
@@ -50,7 +50,7 @@ Recipe Raccoon erhebt von niemandem Daten, auch nicht von Kindern.
 ## Änderungen
 
 Wenn sich diese Erklärung einmal ändert, wird die neue Fassung hier mit neuem Datum
-veröffentlicht. Ihr Verlauf wird im [öffentlichen Repository](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md)
+veröffentlicht, und die Übersetzungen werden mit aktualisiert. Ihr Verlauf wird im [öffentlichen Repository](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md)
 der App aufbewahrt.
 
 ## Kontakt

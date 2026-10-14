@@ -48,8 +48,8 @@ Recipe Raccoon ne recueille de données auprès de personne, y compris les enfan
 
 ## Modifications
 
-Si cette politique change un jour, la nouvelle version sera publiée ici avec une nouvelle date.
-Son historique est conservé dans le [dépôt public](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md)
+Si cette politique change un jour, la nouvelle version sera publiée ici avec une nouvelle date,
+et les traductions seront mises à jour en même temps. Son historique est conservé dans le [dépôt public](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md)
 de l'app.
 
 ## Contact
