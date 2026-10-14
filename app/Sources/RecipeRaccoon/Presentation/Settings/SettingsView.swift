@@ -9,6 +9,9 @@ struct SettingsView: View {
     /// Read by the recipe screen's weight view; not part of the view model because nothing but
     /// this picker writes it.
     @AppStorage(VolumeStandard.storageKey) private var volumeStandard = VolumeStandard.regionDefault()
+    /// Applied to the windows by AppThemeModifier.
+    @AppStorage(AppTheme.storageKey) private var theme = AppTheme.system
+    @Environment(\.openURL) private var openURL
 
     /// On iOS, opens the welcome guide: the list closes this sheet first and presents it.
     /// The Mac opens the guide's window itself.
@@ -67,6 +70,10 @@ struct SettingsView: View {
                 Text(footerText)
             }
 
+            appearanceSection
+
+            languageSection
+
             volumeStandardSection
 
             densitySection
@@ -86,6 +93,55 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .task { viewModel.reloadDensityStatus() }
+    }
+
+    private var appearanceSection: some View {
+        Section("Appearance") {
+            Picker("Theme", selection: $theme) {
+                Text("System").tag(AppTheme.system)
+                Text("Light").tag(AppTheme.light)
+                Text("Dark").tag(AppTheme.dark)
+            }
+            .pickerStyle(.inline)
+        }
+    }
+
+    /// The app follows the device's language. The system has a per-app language setting, and
+    /// iOS can't switch an app's language while it runs, so this only leads there.
+    private var languageSection: some View {
+        Section {
+            LabeledContent("Language", value: Self.currentLanguageName)
+            #if os(macOS)
+            Button("Open System Settings") {
+                if let url = URL(string: "x-apple.systempreferences:com.apple.Localization-Settings.extension") {
+                    openURL(url)
+                }
+            }
+            #else
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    openURL(url)
+                }
+            }
+            #endif
+        } footer: {
+            Text(languageFooterText)
+        }
+    }
+
+    private var languageFooterText: LocalizedStringKey {
+        #if os(macOS)
+        "Recipe Raccoon uses your Mac's language. To choose another one for this app only, add Recipe Raccoon under Applications in Language & Region."
+        #else
+        "Recipe Raccoon uses your device's language. To use another one for this app only, choose it under Language in Settings. If it isn't listed, add it to your device's languages first."
+        #endif
+    }
+
+    /// The language the app runs in, in that language ("Español"), as the system names it.
+    static var currentLanguageName: String {
+        let code = Bundle.main.preferredLocalizations.first ?? "en"
+        let locale = Locale(identifier: code)
+        return locale.localizedString(forLanguageCode: code)?.capitalized(with: locale) ?? code
     }
 
     private var volumeStandardSection: some View {

@@ -38,7 +38,21 @@ final class LocalizedSettingsStringsTests: XCTestCase {
         "US Customary",
         "Metric",
         "Used to show ingredients by weight. A US cup is 237 ml; a metric cup is 250 ml.",
+        // Theme and language.
+        "Appearance",
+        "Theme",
+        "Light",
+        "Dark",
+        "Language",
+        "Open Settings",
+        "Open System Settings",
+        "Recipe Raccoon uses your Mac's language. To choose another one for this app only, add Recipe Raccoon under Applications in Language & Region.",
+        "Recipe Raccoon uses your device's language. To use another one for this app only, choose it under Language in Settings. If it isn't listed, add it to your device's languages first.",
     ]
+
+    /// Translated, but the same word in some language ("System" in German), so the check
+    /// above can't tell them from a missing entry.
+    private let keysSameInSomeLanguage = ["System"]
 
     /// A missing entry falls back to the English key, and every key here differs from its
     /// translation in all four languages, so equality means the entry is missing.
@@ -48,6 +62,14 @@ final class LocalizedSettingsStringsTests: XCTestCase {
                 let translated = LocalizationTestHelper.translatedString(key, languageCode: languageCode)
                 XCTAssertNotNil(translated, "\(key) in \(languageCode)")
                 XCTAssertNotEqual(translated, key, "\(key) in \(languageCode)")
+            }
+        }
+    }
+
+    func testSettingsStringsThatCanMatchEnglishHaveEntries() {
+        for key in keysSameInSomeLanguage {
+            for languageCode in ["es", "fr", "de", "nl"] {
+                XCTAssertTrue(LocalizationTestHelper.hasEntry(key, languageCode: languageCode), "\(key) in \(languageCode)")
             }
         }
     }
