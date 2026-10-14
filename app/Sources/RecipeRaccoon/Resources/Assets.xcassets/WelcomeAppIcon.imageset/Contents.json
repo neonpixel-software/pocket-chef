@@ -1,6 +1,22 @@
 {
   "images" : [
     {
+      "filename" : "welcome-app-icon-light@1x.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "welcome-app-icon-dark@1x.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
       "filename" : "welcome-app-icon-light@2x.png",
       "idiom" : "universal",
       "scale" : "2x"

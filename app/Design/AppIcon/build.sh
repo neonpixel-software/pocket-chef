@@ -29,10 +29,12 @@ for rendition in Default Dark; do
     --platform macOS --rendition "$rendition" --width 1024 --height 1024 --scale 1 >/dev/null
 done
 
-# The welcome guide's first page shows the icon at 96 pt (WelcomeGuidePageView): 192 px at 2×
-# and 288 px at 3×. macOS asset catalogs drop 3× images, so the 2× ones are needed on the Mac.
+# The welcome guide's first page shows the icon at 96 pt (WelcomeGuidePageView): 96 px at 1×,
+# 192 px at 2× and 288 px at 3×. macOS asset catalogs drop 3× images, so the Mac uses the 2×
+# ones on a Retina screen and the 1× ones on a non-Retina screen, which would otherwise scale
+# the 2× render down at runtime.
 welcome=${icon:h}/Assets.xcassets/WelcomeAppIcon.imageset
-for scale in 2 3; do
+for scale in 1 2 3; do
   for rendition in Default Dark; do
     appearance=${${rendition:l}/default/light}
     "$ictool" "$icon" --export-image --output-file "$welcome/welcome-app-icon-$appearance@${scale}x.png" \
