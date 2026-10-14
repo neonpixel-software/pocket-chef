@@ -24,7 +24,20 @@ Then **Publish**. The label then reads "Data Not Collected", which covers every 
 record. Apple checks it during App Review, so it's verified with the first submission (12.4).
 
 The privacy policy URL is also required for the macOS platform: set it once under App Privacy,
-not per platform.
+not per platform. It is set per language, though: for each of the record's localizations, point
+it at that language's translation of the policy, so a Spanish, French, German or Dutch user gets
+it in their own language (the English version is the original and applies if they differ):
+
+| Localization | Privacy Policy URL |
+|---|---|
+| English | `https://github.com/neonpixel-software/recipe-raccoon/blob/main/PRIVACY.md` |
+| Spanish | `https://github.com/neonpixel-software/recipe-raccoon/blob/main/PRIVACY.es.md` |
+| French | `https://github.com/neonpixel-software/recipe-raccoon/blob/main/PRIVACY.fr.md` |
+| German | `https://github.com/neonpixel-software/recipe-raccoon/blob/main/PRIVACY.de.md` |
+| Dutch | `https://github.com/neonpixel-software/recipe-raccoon/blob/main/PRIVACY.nl.md` |
+
+The translations still need a native speaker's review before the first submission, like the
+store listing (`app-store-listing.md`).
 
 ### Why "Data Not Collected" is true
 
@@ -44,8 +57,9 @@ The app's privacy manifest (`Sources/RecipeRaccoon/Resources/PrivacyInfo.xcpriva
 no tracking, no collected data types. It also declares the one required-reason API the app's own
 code uses, `UserDefaults`, with reason `CA92.1` (read and written by the app itself only).
 
-Before each release, check the About page's "No Tracking" list, `PRIVACY.md`, the label and the
-manifest against the code (see "No tracking" in
+Before each release, check the About page's "No Tracking" list, `PRIVACY.md` and its four
+translations (`PRIVACY.es.md`, `.fr.md`, `.de.md`, `.nl.md`), the label and the manifest against
+the code (see "No tracking" in
 `docs/plans/2026-10-08-welcome-guide-and-about-design.md`). Anything that changes what leaves
 the device, such as a new SDK, crash reporting, or logging on the server, changes them all.
 
