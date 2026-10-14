@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RecipeRaccoon.DensityApi.Api/RecipeRaccoon.DensityApi.Api.csproj" />
+    <Project Path="src/RecipeRaccoon.DensityApi.Application/RecipeRaccoon.DensityApi.Application.csproj" />
+    <Project Path="src/RecipeRaccoon.DensityApi.Domain/RecipeRaccoon.DensityApi.Domain.csproj" />
+    <Project Path="src/RecipeRaccoon.DensityApi.Infrastructure/RecipeRaccoon.DensityApi.Infrastructure.csproj" />
+    <Project Path="src/RecipeRaccoon.DensityApi.Seed/RecipeRaccoon.DensityApi.Seed.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RecipeRaccoon.DensityApi.Api.Tests/RecipeRaccoon.DensityApi.Api.Tests.csproj" />
+    <Project Path="tests/RecipeRaccoon.DensityApi.Application.Tests/RecipeRaccoon.DensityApi.Application.Tests.csproj" />
+    <Project Path="tests/RecipeRaccoon.DensityApi.Domain.Tests/RecipeRaccoon.DensityApi.Domain.Tests.csproj" />
+    <Project Path="tests/RecipeRaccoon.DensityApi.Infrastructure.Tests/RecipeRaccoon.DensityApi.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

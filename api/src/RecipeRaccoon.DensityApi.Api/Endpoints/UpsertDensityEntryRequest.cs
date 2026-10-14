@@ -1,0 +1,3 @@
+namespace RecipeRaccoon.DensityApi.Api.Endpoints;
+
+public sealed record UpsertDensityEntryRequest(string IngredientName, double GramsPerMilliliter);

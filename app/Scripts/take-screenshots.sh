@@ -64,16 +64,16 @@ xcodegen generate --quiet
 
 for platform in $platforms; do
   case $platform in
-    iphone) scheme=PocketChef-iOS; destination="id=$(simulator iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-17)" ;;
-    ipad) scheme=PocketChef-iOS; destination="id=$(simulator iPad com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB)" ;;
-    mac) scheme=PocketChef-macOS; destination="platform=macOS" ;;
+    iphone) scheme=RecipeRaccoon-iOS; destination="id=$(simulator iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-17)" ;;
+    ipad) scheme=RecipeRaccoon-iOS; destination="id=$(simulator iPad com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB)" ;;
+    mac) scheme=RecipeRaccoon-macOS; destination="platform=macOS" ;;
     *) echo "Unknown platform $platform (iphone, ipad, mac)" >&2; exit 2 ;;
   esac
   for language in $languages; do
     echo "Taking the $platform screenshots in $language…"
     result="$work/$platform-$language.xcresult"
     TEST_RUNNER_POCKETCHEF_SCREENSHOTS=1 TEST_RUNNER_POCKETCHEF_SCREENSHOT_LANGUAGE=$language \
-      xcodebuild test -project PocketChef.xcodeproj -scheme "$scheme" -destination "$destination" \
+      xcodebuild test -project RecipeRaccoon.xcodeproj -scheme "$scheme" -destination "$destination" \
       -derivedDataPath "$work/DerivedData" -only-testing:"$scheme"UITests/AppStoreScreenshotsUITests \
       -resultBundlePath "$result" -quiet >"$work/$platform-$language.log" 2>&1 ||
       { tail -40 "$work/$platform-$language.log" >&2; mkdir -p "$output"; rm -rf "$output/failed.xcresult"; mv "$result" "$output/failed.xcresult"

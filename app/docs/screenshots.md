@@ -1,7 +1,7 @@
 # App Store screenshots
 
 PLAN.md 12.2. The screenshots are real captures of the app, taken by a UI test
-(`Tests/PocketChefUITests/AppStoreScreenshotsUITests.swift`) in a fixed starting state,
+(`Tests/RecipeRaccoonUITests/AppStoreScreenshotsUITests.swift`) in a fixed starting state,
 `UITestScenario.screenshots`. Take them again after any visible UI change.
 
 ## Taking them
@@ -63,7 +63,7 @@ https://developer.apple.com/help/app-store-connect/reference/app-information/scr
 The recipe photos are from Wikimedia Commons and free to use for any purpose, with no attribution
 required (CC0 or public domain). They're scaled to 1400 px, live in
 `Data/DevSupport/ScreenshotPhotos/` and ship in Debug builds only (`EXCLUDED_SOURCE_FILE_NAMES` in
-`Config/PocketChef.xcconfig`).
+`Config/RecipeRaccoon.xcconfig`).
 
 | Photo | Author | License | Source |
 |---|---|---|---|

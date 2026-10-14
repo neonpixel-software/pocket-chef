@@ -1,4 +1,4 @@
-# PocketChef.DensityApi
+# RecipeRaccoon.DensityApi
 
 .NET 10 Minimal API serving ingredient density data (grams per millilitre). Clean
 Architecture: `Domain` (entity + validation) → `Application` (services,
@@ -14,9 +14,9 @@ podman compose up -d                          # starts Postgres on localhost:543
 dotnet tool install --global dotnet-ef        # once
 export PATH="$PATH:$HOME/.dotnet/tools"
 dotnet ef database update \
-  --project src/PocketChef.DensityApi.Infrastructure \
-  --startup-project src/PocketChef.DensityApi.Api
-dotnet run --project src/PocketChef.DensityApi.Api
+  --project src/RecipeRaccoon.DensityApi.Infrastructure \
+  --startup-project src/RecipeRaccoon.DensityApi.Api
+dotnet run --project src/RecipeRaccoon.DensityApi.Api
 ```
 
 `GET /health` confirms the host is up.
@@ -25,7 +25,7 @@ To load the seed densities (safe to re-run; ingredients already in the table are
 left alone; add `--dry-run` to see what it would insert without writing):
 
 ```sh
-dotnet run --project src/PocketChef.DensityApi.Seed -- \
+dotnet run --project src/RecipeRaccoon.DensityApi.Seed -- \
   --connection "Host=localhost;Port=5433;Database=densityapi;Username=densityapi;Password=densityapi-local-dev"
 ```
 
@@ -35,7 +35,7 @@ Seed density values come from [USDA FoodData Central](https://fdc.nal.usda.gov/)
 (SR Legacy household-measure portion weights — the cup/tbsp unit is in the
 `food_portion.modifier` column — converted to g/ml), which is public domain under
 [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Each seed entry
-(`src/PocketChef.DensityApi.Application/Seeding/UsdaSeedData.cs`) cites its FDC
+(`src/RecipeRaccoon.DensityApi.Application/Seeding/UsdaSeedData.cs`) cites its FDC
 ID and the portion it came from. Don't add values copied from sources whose license doesn't
 permit redistribution in this MIT-licensed repo (see PLAN.md Phase 9.1).
 

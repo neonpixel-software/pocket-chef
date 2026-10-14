@@ -43,7 +43,7 @@ jobs:
         run: dotnet test --no-build --configuration Release
       - name: Publish
         # Framework-dependent: the VPS has the ASP.NET Core runtime, not the SDK.
-        run: dotnet publish src/PocketChef.DensityApi.Api --no-restore --configuration Release --output ../out
+        run: dotnet publish src/RecipeRaccoon.DensityApi.Api --no-restore --configuration Release --output ../out
       - name: Upload publish output
         uses: actions/upload-artifact@v7
         with:

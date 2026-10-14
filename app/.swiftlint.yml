@@ -1,4 +1,4 @@
-# Pocket Chef SwiftLint contract.
+# Recipe Raccoon SwiftLint contract.
 #
 # Enforced in CI via `swiftlint Sources Tests --strict` (see
 # .github/workflows/ci.yml, build-apple job, macOS leg). --strict promotes warnings to

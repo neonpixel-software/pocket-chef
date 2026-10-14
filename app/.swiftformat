@@ -1,4 +1,4 @@
-# Pocket Chef Swift formatting contract.
+# Recipe Raccoon Swift formatting contract.
 #
 # Enforced in CI via `swiftformat Sources Tests --lint` (see
 # .github/workflows/ci.yml, build-apple job, macOS leg). Run `swiftformat` from app/ to apply

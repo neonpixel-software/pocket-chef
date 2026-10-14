@@ -1,0 +1,21 @@
+// Shared by the iOS and macOS app targets (project.yml configFiles).
+
+// macOS: App Sandbox with outgoing network (URL capture, the density API, CloudKit).
+// The Mac App Store requires the sandbox. iOS is always sandboxed and needs no entitlements
+// until iCloud is turned on in Signing.xcconfig.
+CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = Config/RecipeRaccoon-macOS.entitlements
+
+// Optional and gitignored: the signing team and the iCloud entitlements. The repo is public,
+// so the team ID stays out of it. Without this file the app builds without iCloud
+// (the storage setting is disabled), which is how CI builds it.
+// Copy Signing.xcconfig.example to Signing.xcconfig to enable iCloud sync locally.
+#include? "Signing.xcconfig"
+
+// Optional and gitignored: the density API's host and read key, which the Info.plists pass to
+// the app (DensityAPIConfiguration). Without this file the app never fetches densities.
+// Copy DensityAPI.xcconfig.example to DensityAPI.xcconfig to use the API locally.
+#include? "DensityAPI.xcconfig"
+
+// The App Store screenshots' stock photos (Data/DevSupport/ScreenshotPhotos) are for Debug
+// runs of UITestScenario.screenshots only; Release builds leave them out of the app.
+EXCLUDED_SOURCE_FILE_NAMES[config=Release] = screenshot-*.jpg

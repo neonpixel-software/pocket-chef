@@ -50,12 +50,12 @@ sudo matches the command literally, which is why the workflow restarts
 On the Mac:
 
 ```sh
-ssh-keygen -t ed25519 -f ./density_api_deploy_key -N "" -C "pocket-chef-density-api-deploy"
+ssh-keygen -t ed25519 -f ./density_api_deploy_key -N "" -C "recipe-raccoon-density-api-deploy"
 ssh-copy-id -p <ssh-port> -i ./density_api_deploy_key.pub <deploy-user>@<vps-host>
 ssh-keyscan -p <ssh-port> <vps-host>
 ```
 
-In the pocket-chef repo's Settings → Secrets and variables → Actions, add:
+In the recipe-raccoon repo's Settings → Secrets and variables → Actions, add:
 
 - `VPS_DEPLOY_KEY`: the contents of `density_api_deploy_key` (the private key).
   Delete the local file afterwards; it only needs to live in the secret.
@@ -151,7 +151,7 @@ Wants=postgresql.service
 Type=simple
 User=<deploy-user>
 WorkingDirectory=<deploy-path>/current
-ExecStart=/usr/bin/dotnet <deploy-path>/current/PocketChef.DensityApi.Api.dll
+ExecStart=/usr/bin/dotnet <deploy-path>/current/RecipeRaccoon.DensityApi.Api.dll
 Restart=on-failure
 RestartSec=5
 KillSignal=SIGINT
@@ -171,6 +171,11 @@ sudo systemctl enable <service-name>.service
 
 Don't start it yet: `<deploy-path>/current` only exists after the first
 deploy. Logs: `journalctl -u <service-name>`.
+
+A server set up before 2026-10-14 starts `PocketChef.DensityApi.Api.dll`. The projects were
+renamed to `RecipeRaccoon.DensityApi.*` then, so before the first deploy after that, change
+`ExecStart` (and `Description`) to match the unit above and run `sudo systemctl daemon-reload`.
+A rollback (§7) to a release from before the rename needs the old `ExecStart` back.
 
 ## 6. nginx and HTTPS
 
@@ -257,8 +262,8 @@ the tunnel:
 export PROD_DB="Host=localhost;Port=15432;Database=densityapi;Username=densityapi;Password=<db password>"
 
 dotnet ef database update \
-  --project src/PocketChef.DensityApi.Infrastructure \
-  --startup-project src/PocketChef.DensityApi.Api \
+  --project src/RecipeRaccoon.DensityApi.Infrastructure \
+  --startup-project src/RecipeRaccoon.DensityApi.Api \
   --connection "$PROD_DB"
 ```
 
@@ -268,8 +273,8 @@ re-running it after hand curation changes nothing. `--dry-run` shows what it
 would insert without writing:
 
 ```sh
-dotnet run --project src/PocketChef.DensityApi.Seed -- --connection "$PROD_DB" --dry-run
-dotnet run --project src/PocketChef.DensityApi.Seed -- --connection "$PROD_DB"
+dotnet run --project src/RecipeRaccoon.DensityApi.Seed -- --connection "$PROD_DB" --dry-run
+dotnet run --project src/RecipeRaccoon.DensityApi.Seed -- --connection "$PROD_DB"
 ```
 
 The seed tool refuses to run while migrations are pending.

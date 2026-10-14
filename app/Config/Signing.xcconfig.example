@@ -3,15 +3,15 @@
 // `xcodegen generate`. A Signing.xcconfig still holding the placeholder fails at code signing.
 // Find the team ID under Membership details on developer.apple.com/account.
 // Xcode must be signed in to that team (Settings > Apple Accounts).
-// The app targets include this file (PocketChef.xcconfig), and so do the unit test targets
+// The app targets include this file (RecipeRaccoon.xcconfig), and so do the unit test targets
 // (UnitTests.xcconfig) for the team, without the entitlements.
 
 DEVELOPMENT_TEAM = ABCDE12345
 CODE_SIGN_STYLE = Automatic
 
 // iCloud (CloudKit) container iCloud.com.neonpixel.reciperaccoon plus push for sync.
-CODE_SIGN_ENTITLEMENTS[sdk=iphone*] = Config/PocketChef-iOS-iCloud.entitlements
-CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = Config/PocketChef-macOS-iCloud.entitlements
+CODE_SIGN_ENTITLEMENTS[sdk=iphone*] = Config/RecipeRaccoon-iOS-iCloud.entitlements
+CODE_SIGN_ENTITLEMENTS[sdk=macosx*] = Config/RecipeRaccoon-macOS-iCloud.entitlements
 
 // Tells the code the entitlement is there (BuildConfiguration.isICloudEnabled).
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) ICLOUD_ENABLED

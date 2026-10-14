@@ -3,7 +3,7 @@
 The icon is a raccoon in a chef's hat, in the app's palette (`PCColor`): an ink raccoon with a
 white hat on pink for light mode, a cream raccoon with a pink hat on ink for dark mode.
 
-It ships as an Icon Composer file, `app/Sources/PocketChef/Resources/AppIcon.icon`, so iOS,
+It ships as an Icon Composer file, `app/Sources/RecipeRaccoon/Resources/AppIcon.icon`, so iOS,
 iPadOS and macOS 26 draw it with Liquid Glass and generate the tinted and clear looks.
 
 - `icon.json` sets the background (pink, or ink in dark mode), picks each layer's image per

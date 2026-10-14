@@ -6,7 +6,7 @@
 set -euo pipefail
 
 here=${0:A:h}
-icon=${here:h:h}/Sources/PocketChef/Resources/AppIcon.icon
+icon=${here:h:h}/Sources/RecipeRaccoon/Resources/AppIcon.icon
 previews=${1:-$(mktemp -d)}
 ictool="$(xcode-select -p)/../Applications/Icon Composer.app/Contents/Executables/ictool"
 # :a resolves the ".." so the messages show plain paths.

@@ -44,9 +44,9 @@ Recipe Raccoon doesn't collect data from anyone, including children.
 ## Changes
 
 If this policy ever changes, the new version will be published here with a new date. Its
-history is kept in the app's [public repository](https://github.com/neonpixel-software/pocket-chef/commits/main/PRIVACY.md).
+history is kept in the app's [public repository](https://github.com/neonpixel-software/recipe-raccoon/commits/main/PRIVACY.md).
 
 ## Contact
 
 Questions about privacy, or anything else about the app, can be asked as an
-[issue on GitHub](https://github.com/neonpixel-software/pocket-chef/issues/new).
+[issue on GitHub](https://github.com/neonpixel-software/recipe-raccoon/issues/new).
