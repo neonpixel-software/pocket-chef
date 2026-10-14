@@ -22,7 +22,7 @@ just in CI.
 
 - **.NET 10** (matches the SDK already installed here). `dotnet new sln`
   on .NET 10 defaults to the new XML `.slnx` format rather than the classic
-  `.sln` — `api/RecipeRaccoon.DensityApi.slnx`.
+  `.sln` — `api/PocketChef.DensityApi.slnx`.
 - **Solution layout**: `src/` (Domain, Application, Infrastructure, Api) and
   `tests/` (one test project per src layer). Mirrors the Swift app's Clean
   Architecture layering.

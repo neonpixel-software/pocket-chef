@@ -72,7 +72,7 @@ for platform in $platforms; do
   for language in $languages; do
     echo "Taking the $platform screenshots in $language…"
     result="$work/$platform-$language.xcresult"
-    TEST_RUNNER_POCKETCHEF_SCREENSHOTS=1 TEST_RUNNER_POCKETCHEF_SCREENSHOT_LANGUAGE=$language \
+    TEST_RUNNER_RECIPERACCOON_SCREENSHOTS=1 TEST_RUNNER_RECIPERACCOON_SCREENSHOT_LANGUAGE=$language \
       xcodebuild test -project RecipeRaccoon.xcodeproj -scheme "$scheme" -destination "$destination" \
       -derivedDataPath "$work/DerivedData" -only-testing:"$scheme"UITests/AppStoreScreenshotsUITests \
       -resultBundlePath "$result" -quiet >"$work/$platform-$language.log" 2>&1 ||

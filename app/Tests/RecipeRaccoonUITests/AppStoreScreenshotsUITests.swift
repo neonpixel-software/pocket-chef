@@ -2,7 +2,7 @@ import XCTest
 
 /// Takes the App Store screenshots (PLAN.md 12.2) in the UITestScenario.screenshots state and
 /// attaches them to the test results. Skipped unless app/Scripts/take-screenshots.sh runs it,
-/// which sets POCKETCHEF_SCREENSHOTS and the language (POCKETCHEF_SCREENSHOT_LANGUAGE), then
+/// which sets RECIPERACCOON_SCREENSHOTS and the language (RECIPERACCOON_SCREENSHOT_LANGUAGE), then
 /// exports the attachments as PNGs.
 final class AppStoreScreenshotsUITests: XCTestCase {
     private struct Language {
@@ -26,8 +26,8 @@ final class AppStoreScreenshotsUITests: XCTestCase {
 
     override func setUpWithError() throws {
         let environment = ProcessInfo.processInfo.environment
-        try XCTSkipUnless(environment["POCKETCHEF_SCREENSHOTS"] == "1", "Screenshots are taken by app/Scripts/take-screenshots.sh")
-        let code = environment["POCKETCHEF_SCREENSHOT_LANGUAGE"] ?? "en"
+        try XCTSkipUnless(environment["RECIPERACCOON_SCREENSHOTS"] == "1", "Screenshots are taken by app/Scripts/take-screenshots.sh")
+        let code = environment["RECIPERACCOON_SCREENSHOT_LANGUAGE"] ?? "en"
         language = try XCTUnwrap(Self.languages.first { $0.code == code }, "No screenshot language \(code)")
         continueAfterFailure = false
     }
