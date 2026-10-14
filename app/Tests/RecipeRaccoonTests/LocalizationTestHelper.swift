@@ -20,4 +20,16 @@ enum LocalizationTestHelper {
         }
         return bundle.localizedString(forKey: key, value: nil, table: "Localizable")
     }
+
+    /// Whether the language's catalog has an entry for `key`, for words that are the same in
+    /// English and that language. A missing key returns the `value` passed in, which no
+    /// translation is.
+    static func hasEntry(_ key: String, languageCode: String) -> Bool {
+        guard let lprojPath = Bundle.main.path(forResource: languageCode, ofType: "lproj"),
+              let bundle = Bundle(path: lprojPath) else {
+            return false
+        }
+        let missing = "\u{0}missing"
+        return bundle.localizedString(forKey: key, value: missing, table: "Localizable") != missing
+    }
 }

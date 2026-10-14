@@ -208,6 +208,7 @@ struct RecipeRaccoonApp: App {
         WindowGroup {
             rootView
                 .environment(\.convertIngredientsToWeight, convertIngredientsToWeightUseCase)
+                .appTheme()
                 // The periodic check (Phase 10.2): on launch and whenever the app comes back,
                 // refresh densities if the last refresh is more than a day old.
                 .onChange(of: scenePhase, initial: true) { _, phase in
@@ -242,7 +243,9 @@ struct RecipeRaccoonApp: App {
 
         #if os(macOS)
         Settings {
+            // Also here: with the recipe window closed, a theme change would otherwise wait.
             SettingsView(viewModel: settingsViewModel)
+                .appTheme()
         }
 
         // Opened by the recipe window at launch, Settings and the Help menu; never by itself,

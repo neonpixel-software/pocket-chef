@@ -4228,6 +4228,258 @@
           }
         }
       }
+    },
+    "Appearance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erscheinungsbild"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apariencia"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apparence"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weergave"
+          }
+        }
+      }
+    },
+    "Theme": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Design"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tema"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thème"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thema"
+          }
+        }
+      }
+    },
+    "System": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistema"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Système"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systeem"
+          }
+        }
+      }
+    },
+    "Light": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hell"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Claro"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clair"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licht"
+          }
+        }
+      }
+    },
+    "Dark": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dunkel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oscuro"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sombre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Donker"
+          }
+        }
+      }
+    },
+    "Language": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprache"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Langue"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taal"
+          }
+        }
+      }
+    },
+    "Open System Settings": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systemeinstellungen öffnen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Ajustes del Sistema"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir Réglages Système"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Systeeminstellingen"
+          }
+        }
+      }
+    },
+    "Recipe Raccoon uses your Mac's language. To choose another one for this app only, add Recipe Raccoon under Applications in Language & Region.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe Raccoon verwendet die Sprache deines Mac. Um nur für diese App eine andere zu wählen, füge Recipe Raccoon unter „Programme“ in „Sprache & Region“ hinzu."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe Raccoon usa el idioma de tu Mac. Para elegir otro solo para esta app, añade Recipe Raccoon en Aplicaciones, en Idioma y región."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe Raccoon utilise la langue de votre Mac. Pour en choisir une autre pour cette app uniquement, ajoutez Recipe Raccoon sous Applications dans Langue et région."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe Raccoon gebruikt de taal van je Mac. Wil je alleen voor deze app een andere taal, voeg Recipe Raccoon dan toe onder Apps in Taal en regio."
+          }
+        }
+      }
+    },
+    "Recipe Raccoon uses your device's language. To use another one for this app only, choose it under Language in Settings. If it isn't listed, add it to your device's languages first.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe Raccoon verwendet die Sprache deines Geräts. Um nur in dieser App eine andere zu verwenden, wähle sie in den Einstellungen unter „Sprache“. Wenn sie fehlt, füge sie zuerst zu den Sprachen deines Geräts hinzu."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe Raccoon usa el idioma de tu dispositivo. Para usar otro solo en esta app, elígelo en Idioma, en Ajustes. Si no aparece, añádelo primero a los idiomas de tu dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe Raccoon utilise la langue de votre appareil. Pour en utiliser une autre dans cette app uniquement, choisissez-la sous Langue dans Réglages. Si elle n'apparaît pas, ajoutez-la d'abord aux langues de votre appareil."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recipe Raccoon gebruikt de taal van je apparaat. Wil je alleen in deze app een andere taal, kies die dan bij Taal in Instellingen. Staat die er niet bij, voeg die dan eerst toe aan de talen van je apparaat."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
