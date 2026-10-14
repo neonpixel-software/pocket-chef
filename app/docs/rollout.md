@@ -54,6 +54,8 @@ and read key in Xcode Cloud's Release workflow are the production ones.
 - The content rights answer given (still open in `app-store-connect.md`) and the age rating done.
 - Screenshots in every language (`screenshots.md`), and the listing text from
   `app-store-listing.md`, after the native-speaker check.
+- The privacy policy translations (`PRIVACY.es.md`, `.fr.md`, `.de.md`, `.nl.md`) checked by
+  native speakers too: App Store Connect already links each language to its translation.
 
 **Version.** `MARKETING_VERSION` set to the release version, then tag (`release.md`).
 
