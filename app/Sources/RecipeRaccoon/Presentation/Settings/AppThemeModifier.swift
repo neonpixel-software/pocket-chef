@@ -35,7 +35,14 @@ struct AppThemeModifier: ViewModifier {
     @AppStorage(AppTheme.storageKey) private var theme = AppTheme.system
 
     func body(content: Content) -> some View {
-        content.onChange(of: theme, initial: true) { _, theme in Self.apply(theme) }
+        content.onChange(of: theme, initial: true) { _, theme in
+            #if DEBUG
+            // UI test runs read the developer's own settings on the Mac; the stored theme would
+            // undo the screenshots' light mode (UITestScenario.prepareScreenshotWindow).
+            guard UITestScenario.current() == nil else { return }
+            #endif
+            Self.apply(theme)
+        }
     }
 
     @MainActor
