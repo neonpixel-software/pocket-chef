@@ -143,7 +143,7 @@ The committed `appsettings.json` has none of them and never should.
 
 ```ini
 [Unit]
-Description=Pocket Chef density API
+Description=Recipe Raccoon density API
 After=network.target postgresql.service
 Wants=postgresql.service
 

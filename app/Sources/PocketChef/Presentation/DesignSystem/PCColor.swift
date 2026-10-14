@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// NeonPixel brand tokens applied to Pocket Chef. Values match the approved
+/// NeonPixel brand tokens applied to Recipe Raccoon. Values match the approved
 /// Phase 1.4 visual identity (locked brand pink/teal plus supporting ink/cream neutrals).
 enum PCColor {
     static let pink = Color(red: 1.0, green: 61 / 255, blue: 148 / 255)
