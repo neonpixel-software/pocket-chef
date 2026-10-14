@@ -3333,34 +3333,6 @@
         }
       }
     },
-    "Storage: keep your recipes on this device, or sync them with iCloud.": {
-      "localizations": {
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Almacenamiento: guarda tus recetas en este dispositivo o sincronízalas con iCloud."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stockage : gardez vos recettes sur cet appareil, ou synchronisez-les avec iCloud."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Speicher: Behalte deine Rezepte auf diesem Gerät oder synchronisiere sie mit iCloud."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Opslag: bewaar je recepten op dit apparaat, of synchroniseer ze met iCloud."
-          }
-        }
-      }
-    },
     "Cups and Spoons: US or metric sizes, used for weights.": {
       "localizations": {
         "es": {
@@ -4477,6 +4449,118 @@
           "stringUnit": {
             "state": "translated",
             "value": "Recipe Raccoon gebruikt de taal van je apparaat. Wil je alleen in deze app een andere taal, kies die dan bij Taal in Instellingen. Staat die er niet bij, voeg die dan eerst toe aan de talen van je apparaat."
+          }
+        }
+      }
+    },
+    "Theme and Language: light or dark, and the language Recipe Raccoon uses.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Design und Sprache: hell oder dunkel und die Sprache, die Recipe Raccoon verwendet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tema e idioma: claro u oscuro, y el idioma que usa Recipe Raccoon."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thème et langue : clair ou sombre, et la langue utilisée par Recipe Raccoon."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thema en taal: licht of donker, en de taal die Recipe Raccoon gebruikt."
+          }
+        }
+      }
+    },
+    "Where to Keep Your Recipes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wo deine Rezepte gespeichert werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dónde guardar tus recetas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Où garder vos recettes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waar je je recepten bewaart"
+          }
+        }
+      }
+    },
+    "Your recipes stay on this device. You can turn on iCloud later in Settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Rezepte bleiben auf diesem Gerät. Du kannst iCloud später in den Einstellungen aktivieren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus recetas se quedan en este dispositivo. Puedes activar iCloud más tarde en Ajustes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos recettes restent sur cet appareil. Vous pourrez activer iCloud plus tard dans Réglages."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je recepten blijven op dit apparaat. Je kunt iCloud later aanzetten in Instellingen."
+          }
+        }
+      }
+    },
+    "Your recipes sync to your other devices signed in to the same account.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Rezepte werden mit deinen anderen Geräten synchronisiert, die mit demselben Account angemeldet sind."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus recetas se sincronizan con tus otros dispositivos que usan la misma cuenta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos recettes se synchronisent avec vos autres appareils connectés au même compte."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je recepten worden gesynchroniseerd met je andere apparaten die met hetzelfde account zijn ingelogd."
           }
         }
       }

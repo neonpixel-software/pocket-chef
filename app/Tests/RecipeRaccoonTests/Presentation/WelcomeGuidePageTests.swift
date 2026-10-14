@@ -68,11 +68,19 @@ final class WelcomeGuidePageTests: XCTestCase {
         #endif
     }
 
+    /// Only the last page offers the choice between this device and iCloud.
+    func testOnlyTheSettingsPageOffersTheStorageChoice() {
+        let pages = WelcomeGuidePage.pages(isCaptureAvailable: true)
+
+        XCTAssertEqual(pages.map(\.offersStorageChoice), [false, false, false, true])
+        XCTAssertEqual(pages.last?.id, .settings)
+    }
+
     func testTheSettingsPageNamesEachSettingAndWhereSettingsIs() {
         let page = WelcomeGuidePage.pages(isCaptureAvailable: true)[3]
 
         XCTAssertEqual(page.items, [
-            "Storage: keep your recipes on this device, or sync them with iCloud.",
+            "Theme and Language: light or dark, and the language Recipe Raccoon uses.",
             "Cups and Spoons: US or metric sizes, used for weights.",
             "Ingredient Densities: they update daily, and you can refresh them any time.",
         ])

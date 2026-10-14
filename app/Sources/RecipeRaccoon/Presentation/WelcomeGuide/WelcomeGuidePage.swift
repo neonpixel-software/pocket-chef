@@ -21,6 +21,9 @@ struct WelcomeGuidePage: Identifiable, Equatable {
     var items: [String] = []
     /// A closing remark in smaller type.
     var note: String?
+    /// Whether the page ends with the choice between keeping recipes on this device and iCloud.
+    /// It's a control of its own after the page's text, which VoiceOver reads as one element.
+    var offersStorageChoice = false
 
     /// What VoiceOver reads for the page, which is one element: all its text, then where it is
     /// ("Page 2 of 4"). The position goes in the label, not the value: the Mac doesn't read a
@@ -60,11 +63,12 @@ struct WelcomeGuidePage: Identifiable, Equatable {
                 title: String(localized: "Make It Yours"),
                 body: String(localized: "In Settings you can change:"),
                 items: [
-                    String(localized: "Storage: keep your recipes on this device, or sync them with iCloud."),
+                    String(localized: "Theme and Language: light or dark, and the language Recipe Raccoon uses."),
                     String(localized: "Cups and Spoons: US or metric sizes, used for weights."),
                     String(localized: "Ingredient Densities: they update daily, and you can refresh them any time."),
                 ],
-                note: settingsLocation
+                note: settingsLocation,
+                offersStorageChoice: true
             ),
         ]
     }

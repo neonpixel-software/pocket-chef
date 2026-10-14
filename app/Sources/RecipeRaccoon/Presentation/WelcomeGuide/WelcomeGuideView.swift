@@ -7,12 +7,15 @@ struct WelcomeGuideView: View {
     /// The Mac's guide window. A window rather than a sheet on the recipe window: Settings and
     /// the Help menu open it too, and Settings is a window of its own.
     static let windowID = "welcomeGuide"
-    /// The iPad sheet and the Mac window. 520 pt fits the longest page; a page that still
-    /// doesn't fit (large Dynamic Type, a long translation) scrolls.
-    static let size = CGSize(width: 560, height: 520)
+    /// The iPad sheet and the Mac window. 680 pt fits the longest page, the last one with its
+    /// storage choice, so the choice shows without scrolling; a page that still doesn't fit
+    /// (large Dynamic Type, a long translation) scrolls.
+    static let size = CGSize(width: 560, height: 680)
     static let pageAccessibilityIdentifier = "WelcomeGuidePage"
 
     @Bindable var viewModel: WelcomeGuideViewModel
+    /// For the last page's storage choice; nil leaves the choice out.
+    var settingsViewModel: SettingsViewModel?
     let onClose: () -> Void
 
     var body: some View {
@@ -56,12 +59,12 @@ struct WelcomeGuideView: View {
         ScrollView(.horizontal) {
             LazyHStack(spacing: 0) {
                 ForEach(Array(viewModel.pages.enumerated()), id: \.element.id) { index, page in
-                    WelcomeGuidePageView(page: page)
-                        .containerRelativeFrame(.horizontal)
-                        // One element per page, so VoiceOver reads it whole and says where it is.
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(page.accessibilityLabel(at: index, of: viewModel.pages.count))
-                        .accessibilityIdentifier(Self.pageAccessibilityIdentifier)
+                    WelcomeGuidePageView(
+                        page: page,
+                        accessibilityLabel: page.accessibilityLabel(at: index, of: viewModel.pages.count),
+                        settingsViewModel: settingsViewModel
+                    )
+                    .containerRelativeFrame(.horizontal)
                 }
             }
             .scrollTargetLayout()
@@ -93,10 +96,13 @@ struct WelcomeGuideView: View {
     }
 }
 
-/// One page: the app icon or a symbol in a pink circle, the title, the text and its points.
-/// Centered; it scrolls when it doesn't fit.
+/// One page: the app icon or a symbol in a pink circle, the title, the text and its points,
+/// then on the last page the storage choice. Centered; it scrolls when it doesn't fit.
 struct WelcomeGuidePageView: View {
     let page: WelcomeGuidePage
+    /// What VoiceOver reads for the page's text, which is one element (`WelcomeGuidePage`).
+    var accessibilityLabel: String = ""
+    var settingsViewModel: SettingsViewModel?
 
     @ViewBuilder private var artwork: some View {
         switch page.artwork {
@@ -116,40 +122,12 @@ struct WelcomeGuidePageView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 18) {
-                artwork
-                    .accessibilityHidden(true)
-
-                Text(page.title)
-                    .font(PCFont.display(30))
-                    .multilineTextAlignment(.center)
-
-                Text(page.body)
-                    .font(PCFont.body(17))
-                    .multilineTextAlignment(.center)
-
-                if !page.items.isEmpty {
-                    VStack(alignment: .leading, spacing: 10) {
-                        ForEach(page.items, id: \.self) { item in
-                            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                                Image(systemName: "circle.fill")
-                                    .font(.system(size: 7))
-                                    .foregroundStyle(PCColor.teal)
-                                Text(item)
-                                    .font(PCFont.body(16))
-                            }
-                        }
-                    }
-                }
-
-                if let note = page.note {
-                    Text(note)
-                        .font(PCFont.body(14))
-                        .opacity(0.7)
-                        .multilineTextAlignment(.center)
+            VStack(spacing: 28) {
+                text
+                if page.offersStorageChoice, let settingsViewModel {
+                    WelcomeStorageChoiceView(viewModel: settingsViewModel)
                 }
             }
-            .foregroundStyle(PCColor.textPrimary)
             .frame(maxWidth: 440)
             .padding(.horizontal, 24)
             .frame(maxWidth: .infinity)
@@ -157,20 +135,67 @@ struct WelcomeGuidePageView: View {
         .scrollBounceBehavior(.basedOnSize)
         .defaultScrollAnchor(.center, for: .alignment)
     }
+
+    /// One element, so VoiceOver reads the text whole and says where it is; the storage choice
+    /// after it stays a control of its own.
+    private var text: some View {
+        VStack(spacing: 18) {
+            artwork
+                .accessibilityHidden(true)
+
+            Text(page.title)
+                .font(PCFont.display(30))
+                .multilineTextAlignment(.center)
+
+            Text(page.body)
+                .font(PCFont.body(17))
+                .multilineTextAlignment(.center)
+
+            if !page.items.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(page.items, id: \.self) { item in
+                        HStack(alignment: .firstTextBaseline, spacing: 10) {
+                            Image(systemName: "circle.fill")
+                                .font(.system(size: 7))
+                                .foregroundStyle(PCColor.teal)
+                            Text(item)
+                                .font(PCFont.body(16))
+                        }
+                    }
+                }
+            }
+
+            if let note = page.note {
+                Text(note)
+                    .font(PCFont.body(14))
+                    .opacity(0.7)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .foregroundStyle(PCColor.textPrimary)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityIdentifier(WelcomeGuideView.pageAccessibilityIdentifier)
+    }
 }
 
 #if os(iOS)
 extension View {
     /// Presents the welcome guide: full screen in a compact width (an iPhone), a sheet otherwise
     /// (an iPad).
-    func welcomeGuide(isPresented: Binding<Bool>, viewModel: WelcomeGuideViewModel) -> some View {
-        modifier(WelcomeGuidePresentation(isPresented: isPresented, viewModel: viewModel))
+    func welcomeGuide(
+        isPresented: Binding<Bool>,
+        viewModel: WelcomeGuideViewModel,
+        settingsViewModel: SettingsViewModel? = nil
+    ) -> some View {
+        modifier(WelcomeGuidePresentation(isPresented: isPresented, viewModel: viewModel, settingsViewModel: settingsViewModel))
     }
 }
 
 private struct WelcomeGuidePresentation: ViewModifier {
     @Binding var isPresented: Bool
     let viewModel: WelcomeGuideViewModel
+    let settingsViewModel: SettingsViewModel?
     @Environment(\.horizontalSizeClass) private var sizeClass
 
     func body(content: Content) -> some View {
@@ -184,7 +209,7 @@ private struct WelcomeGuidePresentation: ViewModifier {
     }
 
     private var guide: some View {
-        WelcomeGuideView(viewModel: viewModel) { isPresented = false }
+        WelcomeGuideView(viewModel: viewModel, settingsViewModel: settingsViewModel) { isPresented = false }
     }
 
     /// If the size class changes while the guide is open (an iPad resized in multitasking), one
@@ -203,11 +228,14 @@ private struct WelcomeGuidePresentation: ViewModifier {
 /// The Mac's guide window: Skip and Get Started close it.
 struct WelcomeGuideWindow: View {
     let viewModel: WelcomeGuideViewModel
+    let settingsViewModel: SettingsViewModel
     @Environment(\.dismissWindow) private var dismissWindow
 
     var body: some View {
-        WelcomeGuideView(viewModel: viewModel) { dismissWindow(id: WelcomeGuideView.windowID) }
-            .frame(width: WelcomeGuideView.size.width, height: WelcomeGuideView.size.height)
+        WelcomeGuideView(viewModel: viewModel, settingsViewModel: settingsViewModel) {
+            dismissWindow(id: WelcomeGuideView.windowID)
+        }
+        .frame(width: WelcomeGuideView.size.width, height: WelcomeGuideView.size.height)
     }
 }
 
