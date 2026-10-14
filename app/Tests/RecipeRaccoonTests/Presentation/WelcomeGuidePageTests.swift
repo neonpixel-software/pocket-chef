@@ -54,6 +54,20 @@ final class WelcomeGuidePageTests: XCTestCase {
         )
     }
 
+    /// The first page shows the app icon, so the image WelcomeGuidePageView draws for it must
+    /// ship in the app; the other pages keep their symbols.
+    func testTheWelcomePageShowsTheAppIcon() {
+        let pages = WelcomeGuidePage.pages(isCaptureAvailable: true)
+
+        XCTAssertEqual(pages[0].artwork, .appIcon)
+        XCTAssertEqual(pages.dropFirst().map(\.artwork), [.symbol("plus"), .symbol("frying.pan"), .symbol("gearshape")])
+        #if os(macOS)
+        XCTAssertNotNil(NSImage(named: "WelcomeAppIcon"))
+        #else
+        XCTAssertNotNil(UIImage(named: "WelcomeAppIcon"))
+        #endif
+    }
+
     func testTheSettingsPageNamesEachSettingAndWhereSettingsIs() {
         let page = WelcomeGuidePage.pages(isCaptureAvailable: true)[3]
 

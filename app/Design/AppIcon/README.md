@@ -27,7 +27,9 @@ app/Design/AppIcon/build.sh [preview directory]
 ```
 
 It rewrites the layer PNGs and renders previews of every appearance with Icon Composer's `ictool`
-(iOS light, dark, tinted, clear; macOS light and dark). Check the previews before committing.
+(iOS light, dark, tinted, clear; macOS light and dark). It also re-renders the icon the welcome
+guide shows on its first page (`Assets.xcassets/WelcomeAppIcon.imageset`, light and dark, at 1×,
+2× and 3×), so commit those with the layers. Check the previews before committing.
 You can also open `AppIcon.icon` in Icon Composer (in Xcode's Developer Tools menu).
 
 Each layer PNG has two near-invisible pixels in opposite corners. Icon Composer crops a layer to
