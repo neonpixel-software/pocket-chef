@@ -62,7 +62,7 @@ struct RecipeFormPhotosSection: View {
                     openURL(url)
                 }
             }
-            Button("Cancel", role: .cancel) {}
+            Button("Cancel", role: .cancel) { /* The alert closes itself; nothing else to do. */ }
         } message: {
             Text("To take photos for your recipes, allow camera access in Settings.")
         }
