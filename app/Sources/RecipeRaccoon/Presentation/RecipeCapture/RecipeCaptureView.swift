@@ -31,9 +31,7 @@ struct RecipeCaptureView: View {
                         .disabled(viewModel.isCapturing)
 
                     if let errorMessage = viewModel.errorMessage {
-                        Text(errorMessage)
-                            .font(PCFont.body(13))
-                            .foregroundStyle(PCColor.pink)
+                        PCErrorMessage(errorMessage)
                     }
                 }
                 .padding(20)
