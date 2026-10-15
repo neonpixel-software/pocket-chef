@@ -27,6 +27,13 @@ signing certificates or App Store Connect keys are needed locally.
    ```
 3. Xcode Cloud's **Release** workflow builds both platforms. When it's green, both builds are in
    TestFlight for internal testers. From there, follow the rollout in `rollout.md`.
+4. Create a draft GitHub release for the tag, with notes for people, not a commit list: what's
+   new, what changed, anything a user should know.
+   ```sh
+   gh release create v1.0.0 --draft --title "Recipe Raccoon 1.0.0" --notes-file notes.md
+   ```
+   Publish it once the version is live on the App Store (`rollout.md` Stage 4), not at the tag:
+   before that, nobody can download what it announces.
 
 If no build starts, check that the Release workflow was saved before the tag was pushed: Xcode
 Cloud ignores tags pushed before the workflow existed. Start the build by hand with Xcode (⌘9 →

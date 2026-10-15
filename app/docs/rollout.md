@@ -135,7 +135,8 @@ fix goes through `release.md` and Stage 1 again.
    and a Mac (not over the TestFlight build), and run a short check: launch, add a recipe, Weight,
    iCloud sync between two devices.
 3. Check the store pages in each language: name, subtitle, screenshots, description.
-4. For the next few days, check crashes and ratings daily.
+4. Publish the draft GitHub release for the tag (`release.md`, Cutting a release, step 4).
+5. For the next few days, check crashes and ratings daily.
 
 Tick 12.4 in PLAN.md once v1 is live on all three platforms.
 
