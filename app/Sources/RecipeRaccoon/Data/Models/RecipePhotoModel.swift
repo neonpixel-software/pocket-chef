@@ -9,7 +9,9 @@ final class RecipePhotoModel {
     /// Not unique, on purpose: CloudKit-backed stores can't have unique constraints (#48), and
     /// two devices reordering one gallery offline can leave duplicates until the next save.
     var position: Int = 0
-    /// External storage keeps the bytes out of the store's rows; CloudKit syncs them as assets.
+    /// External storage keeps the bytes out of the store's rows. CloudKit syncs them as an asset
+    /// (`CD_imageData_ckAsset`) or inline (`CD_imageData`) depending on size, so the schema needs
+    /// both fields, for the thumbnail too (app/docs/rollout.md, Stage 0).
     @Attribute(.externalStorage) var imageData: Data?
     @Attribute(.externalStorage) var thumbnailData: Data?
     @Relationship(inverse: \RecipeModel.photos) var recipe: RecipeModel?
