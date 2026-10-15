@@ -21,6 +21,9 @@ struct RecipeRaccoonApp: App {
     /// Nil only when the density store couldn't open.
     private let convertIngredientsToWeightUseCase: ConvertIngredientsToWeightUseCase?
     @Environment(\.scenePhase) private var scenePhase
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var appDelegate
+    #endif
 
     init() {
         PCFontRegistrar.registerCustomFonts()
