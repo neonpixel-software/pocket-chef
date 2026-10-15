@@ -40,8 +40,12 @@ syncs. So first fill in every field once:
    ingredients, tags or photos fields. The recipe–tag links are many-to-many, and those sync as
    `CDMR` records, which is why a tagged recipe is part of step 1. Large data can also get a
    second field ending in `_ckAsset` (for example `CD_imageData_ckAsset`). Extra fields like that
-   are fine; what matters is that every field in the table is there.
+   are fine; what matters is that every field in the table is there. A `Users` record type is
+   there too: CloudKit creates it in every container, and the app doesn't use it.
 3. **Deploy Schema Changes…** to production, and check that the production record types match.
+
+Done 2026-10-15 for the first release. The recipe was added in a development build on the Mac,
+because Paste a Link needs Apple Intelligence and the iPhone 12 doesn't have it.
 
 `DensityEntryModel` isn't listed: it's a local cache and never syncs.
 
