@@ -55,7 +55,7 @@ and read key in Xcode Cloud's Release workflow are the production ones.
 **App Store Connect.** For both iOS and macOS:
 - App Privacy published ("Data Not Collected", `app-store-connect.md`); check it, `PRIVACY.md` and
   the privacy manifest against the code, as that doc asks before each release.
-- The content rights answer given (still open in `app-store-connect.md`) and the age rating done.
+- The content rights answer given (`app-store-connect.md`) and the age rating done.
 - Screenshots in every language (`screenshots.md`), and the listing text from
   `app-store-listing.md`, after the native-speaker check.
 - The privacy policy translations (`PRIVACY.es.md`, `.fr.md`, `.de.md`, `.nl.md`) checked by

@@ -69,7 +69,7 @@ the device, such as a new SDK, crash reporting, or logging on the server, change
 |---|---|
 | Name | Recipe Raccoon |
 | Primary category | Food & Drink (matches `LSApplicationCategoryType` in `project.yml`) |
-| Content rights | Open question for the owner: the app fetches recipe websites the user links to and keeps the recipe text they review. Apple asks whether the app "contains, shows, or accesses third-party content"; answer **Yes** with "I have the necessary rights" only if that's agreed, otherwise **No** on the grounds that the user, not the app, brings the content. |
+| Content rights | **No** (answered 2026-10-14): the app ships no third-party content. It fetches only recipe websites the user links to and keeps the recipe text they review, so the user, not the app, brings the content. |
 | Age rating | Answer **None** or **No** to every question, which gives 4+. "Unrestricted web access" is **No**: the app only fetches a page to turn it into a recipe and never shows it. |
 
 ## Version information (per platform)
