@@ -21,6 +21,9 @@ struct RecipeRaccoonApp: App {
     /// Nil only when the density store couldn't open.
     private let convertIngredientsToWeightUseCase: ConvertIngredientsToWeightUseCase?
     @Environment(\.scenePhase) private var scenePhase
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var appDelegate
+    #endif
 
     init() {
         PCFontRegistrar.registerCustomFonts()
@@ -133,7 +136,7 @@ struct RecipeRaccoonApp: App {
     // unit tests need @testable (Debug), and -UITestScenario is Debug only.
     private static let seedsSampleData = false
     private static let usesDensityAPI = true
-    private static let isICloudEnabled = BuildConfiguration.isICloudEnabled
+    static let isICloudEnabled = BuildConfiguration.isICloudEnabled
     private static let makeContainer: PersistenceController.ContainerFactory = RecipeStore.makeContainer(for:)
 
     private static func recipeRepository(wrapping repository: RecipeRepository) -> RecipeRepository {
