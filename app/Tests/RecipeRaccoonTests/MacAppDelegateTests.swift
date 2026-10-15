@@ -22,5 +22,11 @@ final class MacAppDelegateTests: XCTestCase {
 
         XCTAssertEqual(registrations, 0)
     }
+
+    /// Like the store, the push registration stays off in the unit tests' host app (#160).
+    func testTheTestHostDoesNotRegister() {
+        XCTAssertTrue(RecipeRaccoonApp.isHostingUnitTests)
+        XCTAssertFalse(MacAppDelegate().isICloudEnabled)
+    }
 }
 #endif

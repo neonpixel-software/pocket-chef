@@ -7,12 +7,15 @@ import AppKit
 /// example on a click (PLAN 4.1, 12.4 Stage 1). iOS needs no call: the remote-notification
 /// background mode in Info-iOS.plist covers it.
 final class MacAppDelegate: NSObject, NSApplicationDelegate {
-    private let isICloudEnabled: Bool
+    /// Internal so a test can check the unit tests' host app doesn't register.
+    let isICloudEnabled: Bool
     private let registerForRemoteNotifications: () -> Void
 
     override convenience init() {
+        // The app's flag rather than BuildConfiguration's: the unit tests' host app runs
+        // without iCloud (#160), so it doesn't open a push channel to the real container.
         self.init(
-            isICloudEnabled: BuildConfiguration.isICloudEnabled,
+            isICloudEnabled: RecipeRaccoonApp.isICloudEnabled,
             registerForRemoteNotifications: { NSApplication.shared.registerForRemoteNotifications() }
         )
     }
