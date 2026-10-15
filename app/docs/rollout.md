@@ -44,7 +44,7 @@ syncs. So first fill in every field once:
    photo's size. If one of the four is missing, add it by hand in the development schema
    (`CD_imageData` and `CD_thumbnailData` as Bytes, the `_ckAsset` ones as Asset) before
    deploying. A missing one stops a device's sync completely (see below). Other fields can be
-   there too; what matters is that every field in the table is. A `Users` record type is
+   there too; what matters is that every field in the table is there. A `Users` record type is
    there too: CloudKit creates it in every container, and the app doesn't use it.
 3. **Deploy Schema Changes…** to production, and check that the production record types match.
 
