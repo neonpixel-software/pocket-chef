@@ -34,9 +34,7 @@ struct RecipeFormPhotosSection: View {
             .scrollClipDisabled()
 
             if let photoErrorMessage = viewModel.photoErrorMessage {
-                Text(photoErrorMessage)
-                    .font(PCFont.body(13))
-                    .foregroundStyle(PCColor.pink)
+                PCErrorMessage(photoErrorMessage)
             }
         }
         .photosPicker(
