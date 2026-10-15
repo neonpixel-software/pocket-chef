@@ -40,8 +40,12 @@ syncs. So first fill in every field once:
    ingredients, tags or photos fields. The recipe–tag links are many-to-many, and those sync as
    `CDMR` records, which is why a tagged recipe is part of step 1. Large data can also get a
    second field ending in `_ckAsset` (for example `CD_imageData_ckAsset`). Extra fields like that
-   are fine; what matters is that every field in the table is there.
+   are fine; what matters is that every field in the table is there. A `Users` record type is
+   there too: CloudKit creates it in every container, and the app doesn't use it.
 3. **Deploy Schema Changes…** to production, and check that the production record types match.
+
+Done 2026-10-15 for the first release. The recipe was added in a development build on the Mac,
+because Paste a Link needs Apple Intelligence and the iPhone 12 doesn't have it.
 
 `DensityEntryModel` isn't listed: it's a local cache and never syncs.
 
@@ -51,7 +55,7 @@ and read key in Xcode Cloud's Release workflow are the production ones.
 **App Store Connect.** For both iOS and macOS:
 - App Privacy published ("Data Not Collected", `app-store-connect.md`); check it, `PRIVACY.md` and
   the privacy manifest against the code, as that doc asks before each release.
-- The content rights answer given (still open in `app-store-connect.md`) and the age rating done.
+- The content rights answer given (`app-store-connect.md`) and the age rating done.
 - Screenshots in every language (`screenshots.md`), and the listing text from
   `app-store-listing.md`, after the native-speaker check.
 - The privacy policy translations (`PRIVACY.es.md`, `.fr.md`, `.de.md`, `.nl.md`) checked by
