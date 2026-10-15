@@ -33,19 +33,29 @@ syncs. So first fill in every field once:
    | `CD_RecipeModel` | `CD_id`, `CD_title`, `CD_steps`, `CD_equipment`, `CD_isTypedSource`, `CD_sourceURL` |
    | `CD_IngredientLineModel` | `CD_id`, `CD_rawText`, `CD_amount`, `CD_unit`, `CD_ingredientName`, `CD_position`, `CD_recipe` |
    | `CD_TagModel` | `CD_id`, `CD_name`, `CD_isPreset` |
-   | `CD_RecipePhotoModel` | `CD_id`, `CD_position`, `CD_imageData`, `CD_thumbnailData`, `CD_recipe` |
+   | `CD_RecipePhotoModel` | `CD_id`, `CD_position`, `CD_imageData`, `CD_imageData_ckAsset`, `CD_thumbnailData`, `CD_thumbnailData_ckAsset`, `CD_recipe` |
    | `CDMR` | `CD_entityNames`, `CD_recordNames`, `CD_relationships` |
 
    A relationship is a field only on its to-one side (`CD_recipe`), so the recipe has no
    ingredients, tags or photos fields. The recipe–tag links are many-to-many, and those sync as
-   `CDMR` records, which is why a tagged recipe is part of step 1. Large data can also get a
-   second field ending in `_ckAsset` (for example `CD_imageData_ckAsset`). Extra fields like that
-   are fine; what matters is that every field in the table is there. A `Users` record type is
+   `CDMR` records, which is why a tagged recipe is part of step 1. The photo's image and
+   thumbnail each need two fields: Core Data's mirroring puts large data in a CloudKit asset
+   (`_ckAsset`) and small data inline (Bytes), so which one a recipe creates depends on the
+   photo's size. If one of the four is missing, add it by hand in the development schema
+   (`CD_imageData` and `CD_thumbnailData` as Bytes, the `_ckAsset` ones as Asset) before
+   deploying. A missing one stops a device's sync completely (see below). Other fields can be
+   there too; what matters is that every field in the table is. A `Users` record type is
    there too: CloudKit creates it in every container, and the app doesn't use it.
 3. **Deploy Schema Changes…** to production, and check that the production record types match.
 
 Done 2026-10-15 for the first release. The recipe was added in a development build on the Mac,
-because Paste a Link needs Apple Intelligence and the iPhone 12 doesn't have it.
+because Paste a Link needs Apple Intelligence and the iPhone 12 doesn't have it. Its photos
+were large, so only `CD_imageData_ckAsset` and `CD_thumbnailData` were created and deployed. In
+Stage 1 the iPhone added a smaller photo and CloudKit rejected the upload: "Cannot create or modify
+field 'CD_imageData' in record 'CD_RecipePhotoModel' in production schema". The whole batch failed
+and the iPhone's mirroring stopped until the app was relaunched, so nothing more from it synced.
+`CD_imageData` and `CD_thumbnailData_ckAsset` were added in development and deployed the same day,
+and after a relaunch the iPhone synced again.
 
 `DensityEntryModel` isn't listed: it's a local cache and never syncs.
 
