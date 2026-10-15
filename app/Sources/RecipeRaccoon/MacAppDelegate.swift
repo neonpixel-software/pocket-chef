@@ -24,12 +24,12 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
 
     /// Builds without the iCloud entitlement (CI, fresh clones) have no aps-environment either,
     /// so they skip the registration.
-    func applicationDidFinishLaunching(_ notification: Notification) {
+    func applicationDidFinishLaunching(_: Notification) {
         guard isICloudEnabled else { return }
         registerForRemoteNotifications()
     }
 
-    func application(_ application: NSApplication, didFailToRegisterForRemoteNotificationsWithError error: any Error) {
+    func application(_: NSApplication, didFailToRegisterForRemoteNotificationsWithError error: any Error) {
         print("Failed to register for remote notifications: \(error)")
     }
 }

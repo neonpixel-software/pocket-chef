@@ -1,6 +1,6 @@
 #if os(macOS)
-@testable import RecipeRaccoon
 import AppKit
+@testable import RecipeRaccoon
 import XCTest
 
 @MainActor
