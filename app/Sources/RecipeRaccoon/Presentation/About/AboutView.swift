@@ -69,7 +69,7 @@ struct AboutView: View {
         #endif
     }
 
-    /// Pink buttons with ink text, like the welcome guide's: pink text on cream is too faint.
+    /// Pink buttons with ink text, like the welcome guide's: pink text on the light background is too faint.
     private var links: some View {
         VStack(spacing: 10) {
             Group {

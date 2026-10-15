@@ -5,14 +5,14 @@ import UIKit
 import XCTest
 
 /// The launch screen's LaunchBackground asset (Info-iOS.plist) is a copy of PCColor.background's
-/// cream and ink, so a cold launch goes straight to the app's background with no white or black
+/// pale gray and ink, so a cold launch goes straight to the app's background with no white or black
 /// flash first (#102). An asset can't reference code, so this keeps the copy from drifting.
 ///
 /// iOS only: UILaunchScreen is an iOS and iPadOS key, and a macOS app has no launch screen, so
 /// nothing on the Mac reads the asset.
 final class LaunchBackgroundTests: XCTestCase {
-    func testLightAppearanceIsCream() throws {
-        try assertLaunchBackground(.light, equals: PCColor.cream)
+    func testLightAppearanceIsPaleGray() throws {
+        try assertLaunchBackground(.light, equals: PCColor.paleGray)
     }
 
     func testDarkAppearanceIsInk() throws {
