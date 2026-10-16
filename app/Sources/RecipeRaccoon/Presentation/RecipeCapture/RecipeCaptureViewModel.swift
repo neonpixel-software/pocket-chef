@@ -34,7 +34,7 @@ final class RecipeCaptureViewModel {
             // mismatch, etc.) for on-device verification; the user only sees the generic
             // message below.
             if case let RecipeCaptureError.captureFailed(underlying) = error {
-                print("Recipe capture failed: \(underlying)")
+                Log.presentation.error("Recipe capture failed: \(underlying.logSummary, privacy: .public) \(underlying.localizedDescription)")
             }
             errorMessage = String(localized: "Couldn't extract a recipe from that text. Check it over and try again.")
             return nil

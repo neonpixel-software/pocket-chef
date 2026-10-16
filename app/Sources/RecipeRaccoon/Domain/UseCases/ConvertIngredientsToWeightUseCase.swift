@@ -20,7 +20,7 @@ final class DefaultConvertIngredientsToWeightUseCase: ConvertIngredientsToWeight
         do {
             entries = try cacheRepository.allEntries()
         } catch {
-            print("Reading the density cache failed: \(error)")
+            Log.domain.error("Reading the density cache failed: \(error.logSummary, privacy: .public) \(error.localizedDescription)")
             entries = []
         }
         let index = DensityNameIndex(entries)

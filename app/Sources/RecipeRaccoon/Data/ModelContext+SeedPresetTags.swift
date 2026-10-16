@@ -22,8 +22,8 @@ extension ModelContext {
             try save()
         } catch {
             // Presets are load-bearing (an empty filter row is a visible regression), so a
-            // silent failure here is worth surfacing even without a logging framework yet.
-            print("Failed to seed preset tags: \(error)")
+            // silent failure here is worth surfacing.
+            Log.data.error("Failed to seed preset tags: \(error.logSummary, privacy: .public) \(error.localizedDescription)")
         }
     }
 }
