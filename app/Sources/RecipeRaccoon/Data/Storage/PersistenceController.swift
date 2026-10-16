@@ -129,7 +129,7 @@ final class PersistenceController: StorageModeSwitcher {
         do {
             try context.deduplicateTags()
         } catch {
-            print("Failed to merge duplicate tags: \(error)")
+            Log.data.error("Failed to merge duplicate tags: \(error.logSummary, privacy: .public) \(error.localizedDescription)")
         }
     }
 }

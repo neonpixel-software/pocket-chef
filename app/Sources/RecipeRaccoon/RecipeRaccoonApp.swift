@@ -49,7 +49,7 @@ struct RecipeRaccoonApp: App {
         do {
             densityContainer = try Self.makeDensityContainer()
         } catch {
-            print("Failed to open the density cache: \(error)")
+            Log.app.error("Failed to open the density cache: \(error.logSummary, privacy: .public) \(error.localizedDescription)")
             densityContainer = nil
         }
         convertIngredientsToWeightUseCase = densityContainer.map {
@@ -220,7 +220,7 @@ struct RecipeRaccoonApp: App {
                         do {
                             try await refreshDensityCacheUseCase.executeIfStale()
                         } catch {
-                            print("Refreshing ingredient densities failed: \(error)")
+                            Log.app.error("Refreshing ingredient densities failed: \(error.logSummary, privacy: .public) \(error.localizedDescription)")
                         }
                     }
                 }
