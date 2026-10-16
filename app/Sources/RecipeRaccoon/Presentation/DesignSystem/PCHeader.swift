@@ -87,6 +87,10 @@ private struct OutlinedText: View {
                     }
                 }
             }
+            // The header is one line high, so a long recipe title ends in "…" instead of running
+            // off screen. Set here, the limit reaches the fill and the outline copies alike, so
+            // they cut at the same place; VoiceOver still reads the whole title from the label.
+            .lineLimit(1)
             // One element for the fill and its copies. Hiding the copies' ZStack didn't remove
             // them: the accessibility tree had the title 17 times (found by the UI tests, #98).
             .accessibilityElement(children: .ignore)
