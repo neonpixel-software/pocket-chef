@@ -61,4 +61,21 @@ public class TranslatedSeedNamesTests
         Assert.Single(TranslatedSeedNames.Rows, row => row.IngredientName == "huile d'olive");
         Assert.Single(TranslatedSeedNames.Rows, row => row.IngredientName == "huile d’olive");
     }
+
+    [Fact]
+    public void Rows_EveryNameWithAnApostropheHasItsTwin()
+    {
+        var names = TranslatedSeedNames.Rows.Select(row => row.IngredientName).ToHashSet();
+
+        Assert.All(names.Where(name => name.Contains('\'')), name => Assert.Contains(name.Replace('\'', '’'), names));
+        Assert.All(names.Where(name => name.Contains('’')), name => Assert.Contains(name.Replace('’', '\''), names));
+    }
+
+    /// In Belgium, Canada and Switzerland "sucre en poudre" is powdered sugar, so it can't stand
+    /// for granulated (PR #213 review).
+    [Fact]
+    public void Rows_LeaveOutNamesThatMeanDifferentProductsByRegion()
+    {
+        Assert.DoesNotContain(TranslatedSeedNames.Rows, row => row.IngredientName == "sucre en poudre");
+    }
 }

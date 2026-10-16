@@ -52,7 +52,7 @@ public static class TranslatedSeedNames
             Spanish: ["copos de avena", "avena en hojuelas"]),
         new("white rice",
             Dutch: ["witte rijst"],
-            German: ["langkornreis"],
+            German: ["weißer reis", "langkornreis"],
             French: ["riz blanc", "riz long"],
             Spanish: ["arroz blanco", "arroz de grano largo"]),
         new("quinoa", Dutch: [], German: [], French: [], Spanish: ["quinua"]),
@@ -62,11 +62,12 @@ public static class TranslatedSeedNames
             French: ["chapelure"],
             Spanish: ["pan rallado"]),
 
-        // Sugars and syrups. French "sucre en poudre" is granulated sugar; powdered is "sucre glace".
+        // Sugars and syrups. French "sucre en poudre" is left out: granulated sugar in France,
+        // but powdered sugar in Belgium, Canada and Switzerland (120 vs 200 g a cup).
         new("granulated sugar",
             Dutch: ["suiker", "kristalsuiker", "witte suiker"],
             German: ["zucker", "weißer zucker", "kristallzucker"],
-            French: ["sucre", "sucre blanc", "sucre en poudre", "sucre semoule"],
+            French: ["sucre", "sucre blanc", "sucre semoule"],
             Spanish: ["azúcar", "azúcar blanco", "azúcar blanca", "azúcar granulado"]),
         new("brown sugar",
             Dutch: ["bruine suiker"],
@@ -232,12 +233,12 @@ public static class TranslatedSeedNames
             French: ["vinaigre de cidre"],
             Spanish: ["vinagre de manzana", "vinagre de sidra"]),
         new("balsamic vinegar",
-            Dutch: ["balsamicoazijn"],
+            Dutch: ["balsamicoazijn", "balsamico azijn"],
             German: ["balsamicoessig", "balsamico"],
             French: ["vinaigre balsamique"],
             Spanish: ["vinagre balsámico"]),
         new("red wine vinegar",
-            Dutch: ["rodewijnazijn"],
+            Dutch: ["rodewijnazijn", "rode wijnazijn"],
             German: ["rotweinessig"],
             French: ["vinaigre de vin rouge"],
             Spanish: ["vinagre de vino tinto"]),
@@ -280,9 +281,9 @@ public static class TranslatedSeedNames
             Spanish: ["semillas de sésamo", "ajonjolí"]),
     ];
 
-    /// One row per distinct translated name. French sites often print a typographic apostrophe
-    /// ("huile d’olive"), and the app compares names exactly, so names with an apostrophe get a
-    /// row for each spelling.
+    /// One row per distinct translated name. French sites print either apostrophe ("huile d'olive",
+    /// "huile d’olive"), and the app compares names exactly, so a name with either gets a row for
+    /// each spelling.
     public static IReadOnlyList<DensitySeedRow> Rows { get; } = BuildRows();
 
     private static List<DensitySeedRow> BuildRows()
@@ -290,10 +291,13 @@ public static class TranslatedSeedNames
         var english = UsdaSeedData.Rows.ToDictionary(row => row.IngredientName);
         return Translations
             .SelectMany(translation => translation.Names
-                .SelectMany(name => name.Contains('\'') ? [name, name.Replace('\'', '’')] : new[] { name })
+                .SelectMany(ApostropheSpellings)
                 .Distinct()
                 .Where(name => name != translation.EnglishName)
                 .Select(name => english[translation.EnglishName] with { IngredientName = name }))
             .ToList();
     }
+
+    private static string[] ApostropheSpellings(string name) =>
+        name.Contains('\'') || name.Contains('’') ? [name.Replace('’', '\''), name.Replace('\'', '’')] : [name];
 }
